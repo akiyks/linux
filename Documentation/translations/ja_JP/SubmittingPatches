@@ -120,6 +120,10 @@ http://savannah.nongnu.org/projects/quilt
 人、レビューする人、どちらのためにもなります。レビューする人の中には、おそらく
 過去のバージョンのパッチを受け取ってもいない人がいます。
 
+変更内容は、命令法で記述してください。例: "[This patch] makes xyzzy do frotz"
+や "[I] changed xyzzy to do frotz" ではなく "make xyzzy do frotz" のように、
+コードベースに対してその振る舞いを変更するよう命じるかのように書きます。
+
 登録済みのバグエントリを修正するパッチであれば、そのバグエントリを示すバグ ID
 や URL を明記してください。
 
