@@ -49,7 +49,7 @@ a2765e81d8a5 ("stable_api_nonsense.txt: Disambiguate the use of "this" by using 
 
 * SubmittingPatches
 f5039935ac68 ("Documentation: update GregKH links")
-db12fb833a88 ("Documentation: fix spelling error in SubmittingPatches")
+db12fb833a88 ("Documentation: fix spelling error in SubmittingPatches") --- nop for ja_JP
 e52d2e1f25f0 ("Documentation/SubmittingPatches: suggested the use of scripts/get_maintainer.pl")
 755727b7fb1e ("Randy has moved")
 8543ae1296f6 ("checkpatch: add Suggested-by as a standard signature")
