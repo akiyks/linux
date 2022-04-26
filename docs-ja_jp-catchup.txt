@@ -59,7 +59,7 @@ e52d2e1f25f0 ("Documentation/SubmittingPatches: suggested the use of scripts/get
 8e3072a23ff8 ("SubmittingPatches: document the use of git")
 37c703f40dd8 ("Documentation/SubmittingPatches: update some dead URLs") --- covers ja_JP
 8401aa1f5997 ("Documentation/SubmittingPatches: describe the Fixes: tag")
-305af08c5398 ("doc: replace "practise" with "practice" in Documentation")
+305af08c5398 ("doc: replace "practise" with "practice" in Documentation") --- nop in ja_JP
 7b9828d44194 ("Documentation: SubmittingPatches: overhaul changelog description")
 7e0dae61e24a ("Documentation: new page link in SubmittingPatches")
 d75ef707ea5e ("Documentation/SubmittingPatches: Reported-by tags and permission")
