@@ -143,6 +143,9 @@ load_imgmath = (load_imgmath or (major == 1 and minor < 8)
 if load_imgmath:
     extensions.append("sphinx.ext.imgmath")
     math_renderer = 'imgmath'
+    # workaround Sphinx issue #10944
+    if (major, minor) >= (5, 3):
+        imgmath_embed = True
 else:
     math_renderer = 'mathjax'
 
