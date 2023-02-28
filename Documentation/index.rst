@@ -19,12 +19,13 @@ Working with the development community
 The essential guides for interacting with the kernel's development
 community and getting your work upstream.
 
+* process/development-process.rst
+* process/submitting-patches.rst
+* :doc:`Code of conduct <process/code-of-conduct>`
+
 .. toctree::
    :maxdepth: 1
 
-   process/development-process
-   process/submitting-patches
-   Code of conduct <process/code-of-conduct>
    maintainer/index
    All development-process docs <process/index>
 
@@ -48,13 +49,19 @@ Development tools and processes
 
 Various other manuals with useful information for all kernel developers.
 
+* process/license-rules.rst
+
 .. toctree::
    :maxdepth: 1
 
-   process/license-rules
    doc-guide/index
    dev-tools/index
-   dev-tools/testing-overview
+
+* dev-tools/testing-overview.rst
+
+.. toctree::
+   :maxdepth: 1
+
    kernel-hacking/index
    trace/index
    fault-injection/index
@@ -74,7 +81,12 @@ developers seeking information on the kernel's user-space APIs.
 
    admin-guide/index
    The kernel build system <kbuild/index>
-   admin-guide/reporting-issues.rst
+
+* admin-guide/reporting-issues.rst
+
+.. toctree::
+   :maxdepth: 1
+
    User-space tools <tools/index>
    userspace-api/index
 
