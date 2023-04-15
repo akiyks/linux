@@ -50,6 +50,7 @@ might be built atop online fsck.
 
 .. contents:: Table of Contents
    :local:
+   :depth: 4
 
 1. What is a Filesystem Check?
 ==============================
