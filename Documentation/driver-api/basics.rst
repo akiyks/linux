@@ -84,9 +84,6 @@ Reference counting
 Atomics
 -------
 
-.. kernel-doc:: arch/x86/include/asm/atomic.h
-   :internal:
-
 .. kernel-doc:: include/linux/atomic/atomic-arch-fallback.h
    :internal:
 
