@@ -6,6 +6,7 @@ Security Documentation
    :maxdepth: 1
 
    credentials
+   x86-confidential-computing
    IMA-templates
    keys/index
    lsm
