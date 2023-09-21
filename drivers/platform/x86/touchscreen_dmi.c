@@ -32,7 +32,7 @@ static const struct property_entry bush_bush_windows_tablet_props[] = {
 	PROPERTY_ENTRY_BOOL("touchscreen-swapped-x-y"),
 	PROPERTY_ENTRY_U32("silead,max-fingers", 10),
 	PROPERTY_ENTRY_BOOL("silead,home-button"),
-	PROPERTY_ENTRY_STRING("firmware-name", "gsl1680-bush_bush_windows_tablet.fw"),
+	PROPERTY_ENTRY_STRING("firmware-name", "gsl1680-bush-bush-windows-tablet.fw"),
 	{ }
 };
 
