@@ -1552,11 +1552,13 @@ static int find_pos_and_ways(struct cxl_port *port, struct range *range,
  * @cxled: the endpoint decoder
  *
  * The endpoint position is calculated by traversing from the endpoint to
- * the root decoder and iteratively applying this calculation:
+ * the root decoder and iteratively applying this calculation::
+ *
  *	position = position * parent_ways + parent_pos;
  *
  * For example, the expected interleave order of the 4-way region shown
  * below is: mem0, mem2, mem1, mem3
+ * ::
  *
  *		  root_port
  *                 /      \
@@ -1570,12 +1572,13 @@ static int find_pos_and_ways(struct cxl_port *port, struct range *range,
  * uses the host-bridge position in the root_port and the ways of the
  * root_port to refine the position.
  *
- * A trace of the calculation per endpoint looks like this:
- * mem0:	pos = 0 * 2 + 0		mem2:	pos = 0 * 2 + 0
+ * A trace of the calculation per endpoint looks like this::
+ *
+ *  mem0:	pos = 0 * 2 + 0		mem2:	pos = 0 * 2 + 0
  *		pos = 0 * 2 + 0			pos = 0 * 2 + 1
  *		pos: 0				pos: 1
  *
- * mem1:	pos = 0 * 2 + 1		mem3:	pos = 0 * 2 + 1
+ *  mem1:	pos = 0 * 2 + 1		mem3:	pos = 0 * 2 + 1
  *		pos = 1 * 2 + 0			pos = 1 * 2 + 1
  *		pos: 2				pos = 3
  *
