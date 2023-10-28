@@ -66,8 +66,12 @@ The squashfs-tools development tree is now located on kernel.org
 
 2.1 Mount options
 -----------------
-===================    =========================================================
-errors=%s              Specify whether squashfs errors trigger a kernel panic
+
+.. table::
+ :widths: 2 8
+
+ ===================   =========================================================
+ errors=%s             Specify whether squashfs errors trigger a kernel panic
                        or not
 
 		       ==========  =============================================
@@ -80,7 +84,7 @@ errors=%s              Specify whether squashfs errors trigger a kernel panic
                                    useful for analyzing and debugging the
                                    corruption.
                        ==========  =============================================
-threads=%s             Select the decompression mode or the number of threads
+ threads=%s            Select the decompression mode or the number of threads
 
                        If SQUASHFS_CHOICE_DECOMP_BY_MOUNT is set:
 
@@ -120,7 +124,7 @@ threads=%s             Select the decompression mode or the number of threads
                                    The upper limit is num_online_cpus() * 2.
                        ==========  =============================================
 
-===================    =========================================================
+ ===================   =========================================================
 
 3. Squashfs Filesystem Design
 -----------------------------
