@@ -1884,7 +1884,7 @@ static int find_pos_and_ways(struct cxl_port *port, struct range *range,
  *
  * The endpoint position is calculated by traversing the topology from
  * the endpoint to the root decoder and iteratively applying this
- * calculation:
+ * calculation::
  *
  *    position = position * parent_ways + parent_pos;
  *
