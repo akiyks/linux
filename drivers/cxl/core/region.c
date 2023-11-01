@@ -2188,7 +2188,7 @@ static int cxl_port_interleave_pos(struct cxl_port *port,
  * it routes the endpoint through, scaled by the weight of that level: how many
  * region positions pass between successive advances of its target index. The
  * position is calculated by traversing the topology from the endpoint to the
- * root decoder and accumulating those contributions:
+ * root decoder and accumulating those contributions::
  *
  *    position += parent_pos * (parent_granularity / region_granularity);
  *
