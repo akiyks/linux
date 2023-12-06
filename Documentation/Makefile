@@ -15,6 +15,10 @@ ifeq ($(CONFIG_WARN_ABI_ERRORS),y)
 $(shell $(srctree)/scripts/get_abi.pl validate --dir $(srctree)/Documentation/ABI)
 endif
 
+# Work around crashes of command-line run Inkscape
+# Prevent Inkscape from interacting with desktop env/manager
+DBUS_SESSION_BUS_ADDRESS = na
+
 # You can set these variables from the command line.
 SPHINXBUILD   = sphinx-build
 SPHINXOPTS    =
