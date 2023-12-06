@@ -17,6 +17,10 @@ $(shell $(srctree)/scripts/get_abi.py --dir $(srctree)/Documentation/ABI validat
 endif
 endif
 
+# Work around crashes of command-line run Inkscape
+# Prevent Inkscape from interacting with desktop env/manager
+DBUS_SESSION_BUS_ADDRESS = na
+
 # You can set these variables from the command line.
 SPHINXBUILD   = sphinx-build
 SPHINXOPTS    =
