@@ -125,3 +125,46 @@ div[class^="highlight"] pre {
         color: inherit;
     }
 }
+
+/* Language selection menu */
+
+div.admonition {
+    /*
+     * Make sure we don't overlap notes and warnings at the top of the
+     * document.
+     */
+    clear: both;
+}
+
+div.language-selection {
+    margin-bottom: 1em;
+    padding: .5em;
+
+    position: relative;
+    float: right;
+}
+
+div.language-selection a {
+    display: block;
+    padding: 0.5em;
+    text-decoration: none;
+}
+
+div.language-selection ul {
+    display: none;
+    position: absolute;
+
+    /* Align with the parent div */
+    top: 100%;
+    right: 0;
+    margin: 0;
+
+    list-style: none;
+
+    /* Never break menu item lines */
+    white-space: nowrap;
+}
+
+div.language-selection:hover ul {
+    display: block;
+}
