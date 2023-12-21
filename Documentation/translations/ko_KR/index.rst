@@ -12,17 +12,7 @@
    :maxdepth: 1
 
    process/howto
-
-
-리눅스 커널 메모리 배리어
--------------------------
-
-.. raw:: latex
-
-    \footnotesize
-
-.. include:: ./memory-barriers.txt
-    :literal:
+   core-api/wrappers/memory-barriers.rst
 
 .. raw:: latex
 
