@@ -11,7 +11,7 @@ Barreras de Memoria del kernel Linux
 
     \footnotesize
 
-.. include:: ../memory-barriers.txt
+.. include:: ../../memory-barriers.txt
    :literal:
 
 .. raw:: latex

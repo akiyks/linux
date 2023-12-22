@@ -77,4 +77,4 @@ Traducciones al español
    :maxdepth: 1
 
    process/index
-   wrappers/memory-barriers
+   core-api/wrappers/memory-barriers
