@@ -97,8 +97,8 @@ struct drm_gpuva {
 		 */
 		u64 addr;
 
-		/*
-		 * @range: the range
+		/**
+		 * @va.range: the range
 		 */
 		u64 range;
 	} va;
