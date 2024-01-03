@@ -22,6 +22,11 @@ div[class^="highlight"] pre {
 	color: black;
 }
 
+/* color of kernel version below Tux logo */
+.wy-side-nav-search > div.version {
+    color: rgba(212, 224, 230, 0.9);
+}
+
 @media screen {
 
     /* Menu selection and keystrokes */
