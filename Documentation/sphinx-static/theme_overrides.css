@@ -54,6 +54,13 @@ div[class^="highlight"] pre {
     padding-bottom: 1px;
 }
 
+/* Size the logo appropriately */
+
+.wy-side-nav-search .wy-dropdown > a img.logo, .wy-side-nav-search > a img.logo {
+    width: 120px;
+    margin-bottom: 5px:
+}
+
 @media screen {
 
     /* content column
