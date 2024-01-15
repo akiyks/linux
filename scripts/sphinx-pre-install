@@ -281,6 +281,7 @@ sub get_sphinx_version($)
 sub check_sphinx()
 {
 	my $default_version;
+	my $suggest_version;
 
 	open IN, $conf or die "Can't open $conf";
 	while (<IN>) {
@@ -297,6 +298,12 @@ sub check_sphinx()
 	while (<IN>) {
 		if (m/^\s*Sphinx\s*==\s*([\d\.]+)$/) {
 			$default_version=$1;
+			$suggest_version=$1;
+			last;
+		}
+		if (m/^\s*Sphinx\s*>=\s*([\d\.]+)$/) {
+			$default_version="latest";
+			$suggest_version=$1;
 			last;
 		}
 	}
@@ -319,7 +326,7 @@ sub check_sphinx()
 
 	if ($cur_version lt $min_version) {
 		printf "ERROR: Sphinx version is %s. It should be >= %s (recommended >= %s)\n",
-		       $cur_version, $min_version, $default_version;
+		       $cur_version, $min_version, $suggest_version;
 		$need_sphinx = 1;
 		return;
 	}
