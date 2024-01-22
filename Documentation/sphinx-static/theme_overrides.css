@@ -59,10 +59,10 @@ div[class^="highlight"] pre {
     /* content column
      *
      * RTD theme's default is 800px as max width for the content, but we have
-     * tables with tons of columns, which need the full width of the view-port.
+     * larger font size.  950px seems reasonable.
      */
 
-    .wy-nav-content{max-width: none; }
+    .wy-nav-content{max-width: 950px; }
 
     /* table:
      *
