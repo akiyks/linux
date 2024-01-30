@@ -131,8 +131,12 @@ The DRM blend mode and its elements are then mapped by AMDGPU display manager
 (DM) to program the blending configuration of the Multiple Pipe/Plane Combined
 (MPC), as follows:
 
+.. c:namespace-push:: LOCAL
+
 .. kernel-doc:: drivers/gpu/drm/amd/display/dc/inc/hw/mpc.h
    :functions: mpcc_blnd_cfg
+
+.. c:namespace-pop::
 
 Therefore, the blending configuration for a single MPCC instance on the MPC
 tree is defined by :c:type:`mpcc_blnd_cfg`, where
@@ -143,8 +147,12 @@ multiplied (true/false), being only true for DRM pre-multiplied blend mode.
 alpha and plane alpha values. It sets one of the three modes for
 :c:type:`MPCC_ALPHA_BLND_MODE`, as described below.
 
+.. c:namespace-push:: LOCAL
+
 .. kernel-doc:: drivers/gpu/drm/amd/display/dc/inc/hw/mpc.h
    :functions: mpcc_alpha_blend_mode
+
+.. c:namespace-pop::
 
 DM then maps the elements of `enum mpcc_alpha_blend_mode` to those in the DRM
 blend formula, as follows:
