@@ -1,4 +1,4 @@
-What:		/sys/devices/pci0000:00/<dev>/fw_version
+What:		/sys/devices/pci0000:00/<catpt>/fw_version
 Date:		September 2020
 Contact:	Cezary Rojewski <cezary.rojewski@intel.com>
 Description:
@@ -7,7 +7,7 @@ Description:
 
 		Format: %d.%d.%d.%d, type:major:minor:build.
 
-What:		/sys/devices/pci0000:00/<dev>/fw_info
+What:		/sys/devices/pci0000:00/<catpt>/fw_info
 Date:		September 2020
 Contact:	Cezary Rojewski <cezary.rojewski@intel.com>
 Description:
