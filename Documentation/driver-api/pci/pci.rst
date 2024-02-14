@@ -4,8 +4,13 @@ PCI Support Library
 .. kernel-doc:: drivers/pci/pci.c
    :export:
 
+
+.. c:namespace-push:: LOCAL
+
 .. kernel-doc:: drivers/pci/iomap.c
    :export:
+
+.. c:namespace-pop::
 
 .. kernel-doc:: drivers/pci/devres.c
    :export:
