@@ -25,6 +25,7 @@ Documentation/dev-tools/testing-overview.rst
    ubsan
    kmemleak
    kcsan
+   lkmm/index
    kfence
    gdb-kernel-debugging
    kgdb
