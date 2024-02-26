@@ -69,6 +69,7 @@ Documentation for filesystem implementations.
    afs
    autofs
    autofs-mount-control
+   bcachefs/errorcodes
    befs
    bfs
    btrfs
