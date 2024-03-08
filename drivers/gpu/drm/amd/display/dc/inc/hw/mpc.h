@@ -278,7 +278,7 @@ struct mpcc_state {
 	struct mpc_grph_gamut_adjustment gamut_remap;
 };
 
-/**
+/*
  * struct mpc_funcs - funcs
  */
 struct mpc_funcs {
