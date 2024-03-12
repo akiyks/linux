@@ -99,8 +99,10 @@ static void merge_final(void *priv, list_cmp_func_t cmp, struct list_head *head,
  * the @a < @b and @a == @b cases.
  *
  * This is compatible with two styles of @cmp function:
+ *
  * - The traditional style which returns <0 / =0 / >0, or
  * - Returning a boolean 0/1.
+ *
  * The latter offers a chance to save a few cycles in the comparison
  * (which is used by e.g. plug_ctx_cmp() in block/blk-mq.c).
  *
@@ -147,14 +149,15 @@ static void merge_final(void *priv, list_cmp_func_t cmp, struct list_head *head,
  *   is count >= 2^(k+1)).
  *
  * There are six states we distinguish.  "x" represents some arbitrary
- * bits, and "y" represents some arbitrary non-zero bits:
- * 0:  00x: 0 pending of size 2^k;           x pending of sizes < 2^k
- * 1:  01x: 0 pending of size 2^k; 2^(k-1) + x pending of sizes < 2^k
- * 2: x10x: 0 pending of size 2^k; 2^k     + x pending of sizes < 2^k
- * 3: x11x: 1 pending of size 2^k; 2^(k-1) + x pending of sizes < 2^k
- * 4: y00x: 1 pending of size 2^k; 2^k     + x pending of sizes < 2^k
- * 5: y01x: 2 pending of size 2^k; 2^(k-1) + x pending of sizes < 2^k
- * (merge and loop back to state 2)
+ * bits, and "y" represents some arbitrary non-zero bits::
+ *
+ *  0:  00x: 0 pending of size 2^k;           x pending of sizes < 2^k
+ *  1:  01x: 0 pending of size 2^k; 2^(k-1) + x pending of sizes < 2^k
+ *  2: x10x: 0 pending of size 2^k; 2^k     + x pending of sizes < 2^k
+ *  3: x11x: 1 pending of size 2^k; 2^(k-1) + x pending of sizes < 2^k
+ *  4: y00x: 1 pending of size 2^k; 2^k     + x pending of sizes < 2^k
+ *  5: y01x: 2 pending of size 2^k; 2^(k-1) + x pending of sizes < 2^k
+ *  (merge and loop back to state 2)
  *
  * We gain lists of size 2^k in the 2->3 and 4->5 transitions (because
  * bit k-1 is set while the more significant bits are non-zero) and
