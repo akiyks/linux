@@ -513,26 +513,29 @@ static inline void bitmap_replace(unsigned long *dst,
  *
  * Scatters bitmap with sequential bits according to the given @mask.
  *
- * Example:
- * If @src bitmap = 0x005a, with @mask = 0x1313, @dst will be 0x0302.
+ * Example::
  *
- * Or in binary form
- * @src			@mask			@dst
- * 0000000001011010	0001001100010011	0000001100000010
+ *  If @src bitmap = 0x005a, with @mask = 0x1313, @dst will be 0x0302.
+ *
+ * Or in binary form::
+ *
+ *  @src		@mask			@dst
+ *  0000000001011010	0001001100010011	0000001100000010
  *
  * (Bits 0, 1, 2, 3, 4, 5 are copied to the bits 0, 1, 4, 8, 9, 12)
  *
- * A more 'visual' description of the operation:
- * src:  0000000001011010
- *                 ||||||
- *          +------+|||||
- *          |  +----+||||
- *          |  |+----+|||
- *          |  ||   +-+||
- *          |  ||   |  ||
- * mask: ...v..vv...v..vv
- *       ...0..11...0..10
- * dst:  0000001100000010
+ * A more 'visual' description of the operation::
+ *
+ *  src:  0000000001011010
+ *                  ||||||
+ *           +------+|||||
+ *           |  +----+||||
+ *           |  |+----+|||
+ *           |  ||   +-+||
+ *           |  ||   |  ||
+ *  mask: ...v..vv...v..vv
+ *        ...0..11...0..10
+ *  dst:  0000001100000010
  *
  * A relationship exists between bitmap_scatter() and bitmap_gather().
  * bitmap_gather() can be seen as the 'reverse' bitmap_scatter() operation.
@@ -559,25 +562,28 @@ static inline void bitmap_scatter(unsigned long *dst, const unsigned long *src,
  *
  * Gathers bitmap with sparse bits according to the given @mask.
  *
- * Example:
- * If @src bitmap = 0x0302, with @mask = 0x1313, @dst will be 0x001a.
+ * Example::
  *
- * Or in binary form
- * @src			@mask			@dst
- * 0000001100000010	0001001100010011	0000000000011010
+ *  If @src bitmap = 0x0302, with @mask = 0x1313, @dst will be 0x001a.
+ *
+ * Or in binary form::
+ *
+ *  @src		@mask			@dst
+ *  0000001100000010	0001001100010011	0000000000011010
  *
  * (Bits 0, 1, 4, 8, 9, 12 are copied to the bits 0, 1, 2, 3, 4, 5)
  *
- * A more 'visual' description of the operation:
- * mask: ...v..vv...v..vv
- * src:  0000001100000010
- *          ^  ^^   ^   0
- *          |  ||   |  10
- *          |  ||   > 010
- *          |  |+--> 1010
- *          |  +--> 11010
- *          +----> 011010
- * dst:  0000000000011010
+ * A more 'visual' description of the operation::
+ *
+ *  mask: ...v..vv...v..vv
+ *  src:  0000001100000010
+ *           ^  ^^   ^   0
+ *           |  ||   |  10
+ *           |  ||   > 010
+ *           |  |+--> 1010
+ *           |  +--> 11010
+ *           +----> 011010
+ *  dst:  0000000000011010
  *
  * A relationship exists between bitmap_gather() and bitmap_scatter(). See
  * bitmap_scatter() for the bitmap scatter detailed operations.
