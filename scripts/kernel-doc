@@ -1039,8 +1039,8 @@ sub output_struct_rst(%) {
     }
     print "\n";
 
-    $lineprefix = $oldprefix;
     output_section_rst(@_);
+    $lineprefix = $oldprefix;
 }
 
 ## none mode output functions
