@@ -289,6 +289,7 @@ if html_theme == 'sphinx_rtd_theme' or html_theme == 'sphinx_rtd_dark_mode':
     # Read the Docs theme
     try:
         import sphinx_rtd_theme
+        extensions.append('sphinx_rtd_theme')  # sphinx >= 6.0.0 need this.
         html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
         # Add any paths that contain custom static files (such as style sheets) here,
@@ -303,6 +304,7 @@ if html_theme == 'sphinx_rtd_theme' or html_theme == 'sphinx_rtd_dark_mode':
             try:
                 import sphinx_rtd_dark_mode
                 extensions.append('sphinx_rtd_dark_mode')
+                html_css_files.append('theme_rtd_dark_mode_colors.css')
             except ImportError:
                 html_theme == 'sphinx_rtd_theme'
 
