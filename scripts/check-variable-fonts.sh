@@ -81,6 +81,11 @@
 #        - Don't forget to update fontconfig cache by running fc-cache.
 #
 
+# Default per-user fontconfig path (overridden by env variable)
+
+: ${FONTCONFIG_FOR_XETEX:=$HOME/xetex}
+export XDG_CONFIG_HOME=${FONTCONFIG_FOR_XETEX}
+
 vffonts=`fc-list -b | grep -iE 'file: .*noto.*cjk.*-vf' | \
 	 sed -e 's/\tfile:/  file:/' -e 's/(s)$//' | sort | uniq`
 
