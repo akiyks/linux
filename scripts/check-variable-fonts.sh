@@ -29,14 +29,9 @@
 # [5]: https://build.opensuse.org/request/show/1157217
 #
 # Workarounds for building translations.pdf:
-#  * Skip CJK pages in PDF
-#    - Uninstall texlive-xecjk, or
-#
-#  * Need CJK pages in PDF
-#    - Hide variable-font format "Noto CJK" fonts:
-#      * Create a per-user fonts.conf file to reject those fonts and set
-#        env variable XDG_CONFIG_HOME properly.
-#        - Example for Fedora
+#  * Denylist veriable "Noto CJK" fonts
+#    - Create $HOME/xetex/fontconfig/fonts.conf
+#      * Example for Fedora
 # -----------------------------------------------------------------
 # <?xml version="1.0"?>
 # <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
@@ -67,33 +62,39 @@
 # </fontconfig>
 # -----------------------------------------------------------------
 #
-#    - Install non-variable-font format of "Noto CJK" fonts
+#  * Skip CJK pages in PDF
+#    - Uninstall texlive-xecjk
+#
+#  * Need CJK pages in PDF
+#    - Install non-variable "Noto CJK" fonts
 #      * Fedora
 #        - google-noto-sans-cjk-fonts
 #        - google-noto-serif-cjk-fonts
 #      * openSUSE tumbleweed
-#        - non-variable format of "Noto CJK" fonts are not availabe as distro
-#          packages as of April, 2024.  Fetch a set of font files from
-#          upstream Noto CJK Fonts release at:
+#        - non-variable "Noto CJK" fonts are not availabe as distro packages
+#          as of April, 2024.  Fetch a set of font files from upstream Noto
+#          CJK Font release at:
 #            https://github.com/notofonts/noto-cjk/tree/main/Sans#super-otc
 #          and at:
 #            https://github.com/notofonts/noto-cjk/tree/main/Serif#super-otc
 #          , then unzip and manually deploy them.
 #        - Don't forget to update fontconfig cache by running fc-cache.
+#
 
 vffonts=`fc-list -b | grep -iE 'file: .*noto.*cjk.*-vf' | \
 	 sed -e 's/\tfile:/  file:/' -e 's/(s)$//' | sort | uniq`
 
 if [ "x$vffonts" != "x" ] ; then
 	echo "====================================================================="
-	echo "Detected variable-font format of Noto CJK fonts:"
+	echo "Variable-font format of Noto CJK fonts listed below caused error."
 	echo "$vffonts"
 	echo "They are not compatible with XeTeX."
-	echo "If you need CJK contents in PDF, remove them and install non-variable"
-	echo "fonts.  Otherwise, get rid of texlive-xecjk."
 	echo
-	echo "For other options and info on variable fonts, see header comments of"
-	echo "scripts/check-variable-fonts.sh"
+	echo "If you need CJK contents in PDF, opt-in to denylisting them."
+	echo "Otherwise, get rid of texlive-xecjk."
+	echo
+	echo "For more info on denylisting, other options, and info on variable"
+	echo "font, see header comments of scripts/check-variable-fonts.sh."
 	echo "====================================================================="
 fi
 

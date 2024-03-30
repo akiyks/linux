@@ -28,6 +28,10 @@ BUILDDIR      = $(obj)/output
 PDFLATEX      = xelatex
 LATEXOPTS     = -interaction=batchmode -no-shell-escape
 
+# For denylisting "variable font" files
+# Can be overriden by setting as an env variable
+FONTCONFIG_FOR_XETEX ?= $(HOME)/xetex
+
 ifeq ($(findstring 1, $(KBUILD_VERBOSE)),)
 SPHINXOPTS    += "-q"
 endif
@@ -151,10 +155,11 @@ pdfdocs:
 
 else # HAVE_PDFLATEX
 
+pdfdocs: DENY_VF = XDG_CONFIG_HOME=$(FONTCONFIG_FOR_XETEX)
 pdfdocs: latexdocs
 	@$(srctree)/scripts/sphinx-pre-install --version-check
 	$(foreach var,$(SPHINXDIRS), \
-	   $(MAKE) PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" -C $(BUILDDIR)/$(var)/latex || sh $(srctree)/scripts/check-variable-fonts.sh || exit; \
+	   $(MAKE) PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/$(var)/latex || $(DENY_VF) sh $(srctree)/scripts/check-variable-fonts.sh || exit; \
 	   mkdir -p $(BUILDDIR)/$(var)/pdf; \
 	   mv $(subst .tex,.pdf,$(wildcard $(BUILDDIR)/$(var)/latex/*.tex)) $(BUILDDIR)/$(var)/pdf/; \
 	)
