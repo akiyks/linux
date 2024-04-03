@@ -36,7 +36,7 @@
 #===========================================================================
 #
 # * Denylist veriable "Noto CJK" fonts.
-#   - Create $HOME/xetex/fontconfig/fonts.conf from template below, with
+#   - Create $HOME/deny-vf/fontconfig/fonts.conf from template below, with
 #     tweaks when necessary.  Remove leading "# ".
 #     * Template:
 # -----------------------------------------------------------------
@@ -89,9 +89,9 @@
 #     is effective only for XeLaTeX in "make pdfdocs".
 
 # Default per-user fontconfig path (overridden by env variable)
-: ${FONTCONFIG_FOR_XETEX:=$HOME/xetex}
+: ${FONTS_CONF_DENY_VF:=$HOME/deny-vf}
 
-export XDG_CONFIG_HOME=${FONTCONFIG_FOR_XETEX}
+export XDG_CONFIG_HOME=${FONTS_CONF_DENY_VF}
 
 vffonts=`fc-list -b | grep -iE 'file: .*noto.*cjk.*-vf' | \
 	 sed -e 's/\tfile:/  file:/' -e 's/(s)$//' | sort | uniq`
