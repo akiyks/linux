@@ -35,9 +35,9 @@
 # Workarounds for building translations.pdf
 #===========================================================================
 #
-# * Denylist veriable "Noto CJK" fonts.
+# * Denylist "veriable font" Noto CJK fonts.
 #   - Create $HOME/deny-vf/fontconfig/fonts.conf from template below, with
-#     tweaks when necessary.  Remove leading "# ".
+#     tweaks if necessary.  Remove leading "# ".
 #     * Template:
 # -----------------------------------------------------------------
 # <?xml version="1.0"?>
@@ -61,7 +61,7 @@
 # </fontconfig>
 # -----------------------------------------------------------------
 #
-#     The denylisting is effective only for "make pdfdocs".
+#     The denylisting is activated for "make pdfdocs".
 #
 # * For skipping CJK pages in PDF
 #   - Uninstall texlive-xecjk.
@@ -73,7 +73,7 @@
 #       - google-noto-sans-cjk-fonts
 #       - google-noto-serif-cjk-fonts
 #     * openSUSE tumbleweed
-#       - non-variable "Noto CJK" fonts are not availabe as distro packages
+#       - Non-variable "Noto CJK" fonts are not availabe as distro packages
 #         as of April, 2024.  Fetch a set of font files from upstream Noto
 #         CJK Font released at:
 #           https://github.com/notofonts/noto-cjk/tree/main/Sans#super-otc
@@ -98,14 +98,14 @@ vffonts=`fc-list -b | grep -iE 'file: .*noto.*cjk.*-vf' | \
 
 if [ "x$vffonts" != "x" ] ; then
 	echo '============================================================================='
-	echo 'XeTeX is confused by "Noto CJK" fonts of variable-font format listed below:'
+	echo 'XeTeX is confused by variable-font format font files listed below:'
 	echo "$vffonts"
 	echo
-	echo 'For CJK pages in PDF, those fonts need to be hidden from XeTeX by denylisted.'
-	echo 'Otherwise, uninstalling texlive-xecjk should suffice.'
+	echo 'For CJK pages in PDF, they need to be hidden from XeTeX by denylisting.'
+	echo 'Or, CJK pages can be skipped by uninstalling texlive-xecjk.'
 	echo
-	echo 'For more info on denylisting, other options, and info on variable font,'
-	echo 'see header comments of scripts/check-variable-fonts.sh.'
+	echo 'For more info on denylisting, other options, and variable font, see header'
+	echo 'comments of scripts/check-variable-fonts.sh.'
 	echo '============================================================================='
 fi
 
