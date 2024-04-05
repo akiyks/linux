@@ -38,6 +38,9 @@
 # * Denylist "veriable font" Noto CJK fonts.
 #   - Create $HOME/deny-vf/fontconfig/fonts.conf from template below, with
 #     tweaks if necessary.  Remove leading "# ".
+#   - Path of fontconfig/fonts.conf can be overriden by setting env variable
+#     FONTS_CONF_DENY_VF.
+#
 #     * Template:
 # -----------------------------------------------------------------
 # <?xml version="1.0"?>
@@ -98,7 +101,7 @@ vffonts=`fc-list -b | grep -iE 'file: .*noto.*cjk.*-vf' | \
 
 if [ "x$vffonts" != "x" ] ; then
 	echo '============================================================================='
-	echo 'XeTeX is confused by variable-font format font files listed below:'
+	echo 'XeTeX is confused by variable-font files listed below:'
 	echo "$vffonts"
 	echo
 	echo 'For CJK pages in PDF, they need to be hidden from XeTeX by denylisting.'
