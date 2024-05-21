@@ -17,3 +17,5 @@ This part of documentation literally renders documents under
 
    tool-readme
    docs-index
+   litmus-index
+   docs-litmus-index
