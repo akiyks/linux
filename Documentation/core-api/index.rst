@@ -73,6 +73,7 @@ Documentation/locking/index.rst for more related documentation.
    padata
    ../RCU/index
    wrappers/memory-barriers.rst
+   wrappers/memory-barriers-pretty
 
 Low-level hardware management
 =============================
