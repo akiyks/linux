@@ -1,3 +1,8 @@
+.. raw:: latex
+
+	\AtBeginEnvironment{sphinxalltt}{\footnotesize}
+	\fvset{fontsize=\footnotesize}
+
 ================================
 Development tools for the kernel
 ================================
