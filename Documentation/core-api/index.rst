@@ -1,3 +1,7 @@
+.. raw:: latex
+
+	\fvset{fontsize=\footnotesize}
+
 ======================
 Core API Documentation
 ======================

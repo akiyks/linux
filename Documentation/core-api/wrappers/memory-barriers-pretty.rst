@@ -13,7 +13,11 @@ Linux kernel memory barriers (Pretty printed version, WIP)
        Will Deacon <will.deacon@arm.com>
        Peter Zijlstra <peterz@infradead.org>
 
-DISCLAIMER
+.. contents:: CONTENTS
+   :depth: 3
+   :local:
+
+Disclaimer
 ==========
 
 This document is not a specification; it is intentionally (for the sake of
@@ -44,71 +48,7 @@ architecture because the way that arch works renders an explicit barrier
 unnecessary in that case.
 
 
-CONTENTS
-========
-
- * Abstract memory access model.
-
-     - Device operations.
-     - Guarantees.
-
- * What are memory barriers?
-
-     - Varieties of memory barrier.
-     - What may not be assumed about memory barriers?
-     - Address-dependency barriers (historical).
-     - Control dependencies.
-     - SMP barrier pairing.
-     - Examples of memory barrier sequences.
-     - Read memory barriers vs load speculation.
-     - Multicopy atomicity.
-
- * Explicit kernel barriers.
-
-     - Compiler barrier.
-     - CPU memory barriers.
-
- * Implicit kernel memory barriers.
-
-     - Lock acquisition functions.
-     - Interrupt disabling functions.
-     - Sleep and wake-up functions.
-     - Miscellaneous functions.
-
- * Inter-CPU acquiring barrier effects.
-
-     - Acquires vs memory accesses.
-
- * Where are memory barriers needed?
-
-     - Interprocessor interaction.
-     - Atomic operations.
-     - Accessing devices.
-     - Interrupts.
-
- * Kernel I/O barrier effects.
-
- * Assumed minimum execution ordering model.
-
- * The effects of the cpu cache.
-
-     - Cache coherency.
-     - Cache coherency vs DMA.
-     - Cache coherency vs MMIO.
-
- * The things CPUs get up to.
-
-     - And then there's the Alpha.
-     - Virtual Machine Guests.
-
- * Example uses.
-
-     - Circular buffers.
-
- * References.
-
-
-ABSTRACT MEMORY ACCESS MODEL
+Abstract memory access model
 ============================
 
 Consider the following abstract model of the system::
@@ -202,7 +142,7 @@ Note that CPU 2 will never try and load C into D because the CPU will load P
 into Q before issuing the load of \*Q.
 
 
-DEVICE OPERATIONS
+Device operations
 -----------------
 
 Some devices present their control interfaces as collections of memory
@@ -224,7 +164,7 @@ the second of which will almost certainly result in a malfunction, since it set
 the address *after* attempting to read the register.
 
 
-GUARANTEES
+Guarantees
 ----------
 
 There are some minimal guarantees that may be expected of a CPU:
@@ -333,7 +273,7 @@ And there are anti-guarantees:
      guarantees were introduced into the C11 standard, so beware when
      using older pre-C11 compilers (for example, gcc 4.6).  The portion
      of the standard containing this guarantee is Section 3.14, which
-     defines "memory location" as follows::
+     defines "memory location" as follows:
 
 	memory location
 		either an object of scalar type, or a maximal sequence
@@ -355,7 +295,7 @@ And there are anti-guarantees:
 		sizes of those intervening bit-fields happen to be.
 
 
-WHAT ARE MEMORY BARRIERS?
+What are memory barriers?
 =========================
 
 As can be seen above, independent memory operations are effectively performed
@@ -374,7 +314,7 @@ override or suppress these tricks, allowing the code to sanely control the
 interaction of multiple CPUs and/or devices.
 
 
-VARIETIES OF MEMORY BARRIER
+Varieties of memory barrier
 ---------------------------
 
 Memory barriers come in four basic varieties:
@@ -509,7 +449,7 @@ And a couple of implicit varieties:
 
      The use of ACQUIRE and RELEASE operations generally precludes the need
      for other sorts of memory barrier.  In addition, a RELEASE+ACQUIRE pair is
-     -not- guaranteed to act as a full memory barrier.  However, after an
+     *not* guaranteed to act as a full memory barrier.  However, after an
      ACQUIRE on a given variable, all memory accesses preceding any prior
      RELEASE on that same variable are guaranteed to be visible.  In other
      words, within a given variable's critical section, all accesses of all
@@ -537,7 +477,7 @@ more substantial guarantees, but they may *not* be relied upon outside of arch
 specific code.
 
 
-WHAT MAY NOT BE ASSUMED ABOUT MEMORY BARRIERS?
+What may not be assumed about memory barriers?
 ----------------------------------------------
 
 There are certain things that the Linux kernel memory barriers do not guarantee:
@@ -562,15 +502,14 @@ There are certain things that the Linux kernel memory barriers do not guarantee:
      mechanisms should propagate the indirect effects of a memory barrier
      between CPUs, but might not do so in order.
 
-     .. [#f1]
-	For information on bus mastering DMA and coherency please read
+.. [#f1]
+   For information on bus mastering DMA and coherency, please read
+   Documentation/driver-api/pci/pci.rst,
+   Documentation/core-api/dma-api-howto.rst, and
+   Documentation/core-api/dma-api.rst.
 
-	    * Documentation/driver-api/pci/pci.rst
-	    * Documentation/core-api/dma-api-howto.rst
-	    * Documentation/core-api/dma-api.rst
 
-
-ADDRESS-DEPENDENCY BARRIERS (HISTORICAL)
+Address-dependency barriers (HISTORICAL)
 ----------------------------------------
 
 .. note::
@@ -696,7 +635,7 @@ target appearing to be incompletely initialised.
 See also the subsection on "Cache Coherency" for a more thorough example.
 
 
-CONTROL DEPENDENCIES
+Control dependencies
 --------------------
 
 Control dependencies can be a bit tricky because current compilers do
@@ -913,7 +852,7 @@ for more information.
 In summary:
 
     * Control dependencies can order prior loads against later stores.
-      However, they do -not- guarantee any other sort of ordering:
+      However, they do *not* guarantee any other sort of ordering:
       Not prior loads against later loads, nor prior stores against
       later anything.  If you need these other forms of ordering,
       use smp_rmb(), smp_wmb(), or, in the case of prior stores and
@@ -922,7 +861,7 @@ In summary:
     * If both legs of the "if" statement begin with identical stores to
       the same variable, then those stores must be ordered, either by
       preceding both of them with smp_mb() or by using smp_store_release()
-      to carry out the stores.  Please note that it is -not- sufficient
+      to carry out the stores.  Please note that it is *not* sufficient
       to use barrier() at beginning of each leg of the "if" statement
       because, as shown by the example above, optimizing compilers can
       destroy the control dependency while respecting the letter of the
@@ -943,7 +882,7 @@ In summary:
     * Control dependencies apply only to the then-clause and else-clause
       of the if-statement containing the control dependency, including
       any functions that these two clauses call.  Control dependencies
-      do -not- apply to code following the if-statement containing the
+      do *not* apply to code following the if-statement containing the
       control dependency.
 
     * Control dependencies pair normally with other types of barriers.
@@ -955,7 +894,7 @@ In summary:
       your job to ensure that they do not break your code.
 
 
-SMP BARRIER PAIRING
+SMP barrier pairing
 -------------------
 
 When dealing with CPU-CPU interactions, certain types of memory barrier should
@@ -1019,7 +958,7 @@ the "weaker" type.
 	WRITE_ONCE(d, 4);    }----   --->{  y = READ_ONCE(b);
 
 
-EXAMPLES OF MEMORY BARRIER SEQUENCES
+Examples of memory barrier sequences
 ------------------------------------
 
 Firstly, write barriers act as partial orderings on store operations.
@@ -1290,7 +1229,7 @@ load of B came up with ``B == 2``.  No such guarantee exists for the first
 load of A; that may come up with either ``A == 0`` or ``A == 1``.
 
 
-READ MEMORY BARRIERS VS LOAD SPECULATION
+Read memory barriers vs load speculation
 ----------------------------------------
 
 Many CPUs speculate with loads: that is they see that they will need to load an
@@ -1387,7 +1326,7 @@ the speculation will be cancelled and the value reloaded::
 	retrieved                               :       :       +-------+
 
 
-MULTICOPY ATOMICITY
+Multicopy atomicity
 -------------------
 
 Multicopy atomicity is a deeply intuitive notion about ordering that is
@@ -1397,7 +1336,7 @@ CPUs agree on the order in which all stores become visible.  However,
 support of full multicopy atomicity would rule out valuable hardware
 optimizations, so a weaker form called "other multicopy atomicity"
 instead guarantees only that a given store becomes visible at the same
-time to all -other- CPUs.  The remainder of this document discusses this
+time to all *other* CPUs.  The remainder of this document discusses this
 weaker form, but for brevity will call it simply "multicopy atomicity".
 
 The following example demonstrates multicopy atomicity::
@@ -1454,8 +1393,8 @@ writes.  General barriers are therefore required to ensure that all CPUs
 agree on the combined order of multiple accesses.
 
 General barriers can compensate not only for non-multicopy atomicity,
-but can also generate additional ordering that can ensure that -all-
-CPUs will perceive the same order of -all- operations.  In contrast, a
+but can also generate additional ordering that can ensure that *all*
+CPUs will perceive the same order of *all* operations.  In contrast, a
 chain of release-acquire pairs do not provide this additional ordering,
 which means that only those CPUs on the chain are guaranteed to agree
 on the combined order of the accesses.  For example, switching to C code
@@ -1537,7 +1476,7 @@ To reiterate, if your code requires full ordering of all operations,
 use general barriers throughout.
 
 
-EXPLICIT KERNEL BARRIERS
+Explicit kernel barriers
 ========================
 
 The Linux kernel has a variety of different barriers that act at different
@@ -1548,7 +1487,7 @@ levels:
   * CPU memory barriers.
 
 
-COMPILER BARRIER
+Compiler barrier
 ----------------
 
 The Linux kernel has an explicit compiler barrier function that prevents the
@@ -1851,7 +1790,7 @@ Please note that these compiler barriers have no direct effect on the CPU,
 which may then reorder things however it wishes.
 
 
-CPU MEMORY BARRIERS
+CPU memory barriers
 -------------------
 
 The Linux kernel has seven basic CPU memory barriers::
@@ -1989,7 +1928,7 @@ There are some more advanced barrier functions:
      write-combining memory accesses before this macro with those after it when
      such wait has performance implications.
 
-IMPLICIT KERNEL MEMORY BARRIERS
+Implicit kernel memory barriers
 ===============================
 
 Some of the other functions in the linux kernel imply memory barriers, amongst
@@ -2000,7 +1939,7 @@ provide more substantial guarantees, but these may not be relied upon outside
 of arch specific code.
 
 
-LOCK ACQUISITION FUNCTIONS
+Lock acquisition functions
 --------------------------
 
 The Linux kernel has a number of locking constructs:
@@ -2070,7 +2009,7 @@ When the ACQUIRE and RELEASE are a lock acquisition and release,
 respectively, this same reordering can occur if the lock's ACQUIRE and
 RELEASE are to the same lock variable, but only from the perspective of
 another CPU not holding that lock.  In short, a ACQUIRE followed by an
-RELEASE may -not- be assumed to be a full memory barrier.
+RELEASE may *not* be assumed to be a full memory barrier.
 
 Similarly, the reverse case of a RELEASE followed by an ACQUIRE does
 not imply a full memory barrier.  Therefore, the CPU's execution of the
@@ -2147,7 +2086,7 @@ But none of the following are::
 
 
 
-INTERRUPT DISABLING FUNCTIONS
+Interrupt disabling functions
 -----------------------------
 
 Functions that disable interrupts (ACQUIRE equivalent) and enable interrupts
@@ -2156,7 +2095,7 @@ barriers are required in such a situation, they must be provided from some
 other means.
 
 
-SLEEP AND WAKE-UP FUNCTIONS
+Sleep and wake-up functions
 ---------------------------
 
 Sleeping and waking on an event flagged in global data can be viewed as an
@@ -2309,7 +2248,7 @@ and the waker should do::
 	wake_up(&event_wait_queue);
 
 
-MISCELLANEOUS FUNCTIONS
+Miscellaneous functions
 -----------------------
 
 Other functions that imply barriers:
@@ -2317,7 +2256,7 @@ Other functions that imply barriers:
    * schedule() and similar imply full memory barriers.
 
 
-INTER-CPU ACQUIRING BARRIER EFFECTS
+Inter-CPU acquiring barrier effects
 ===================================
 
 On SMP systems locking primitives give a more substantial form of barrier: one
@@ -2325,7 +2264,7 @@ that does affect memory access ordering on other CPUs, within the context of
 conflict on any particular lock.
 
 
-ACQUIRES VS MEMORY ACCESSES
+Acquires vs memory accesses
 ---------------------------
 
 Consider the following: the system has a pair of spinlocks (M) and (Q), and
@@ -2354,7 +2293,7 @@ But it won't see any of::
 	*E, *F or *G following RELEASE Q
 
 
-WHERE ARE MEMORY BARRIERS NEEDED?
+Where are memory barriers needed?
 =================================
 
 Under normal operation, memory operation reordering is generally not going to
@@ -2371,7 +2310,7 @@ circumstances in which reordering definitely *could* be a problem:
    * Interrupts.
 
 
-INTERPROCESSOR INTERACTION
+Interprocessor interaction
 --------------------------
 
 When there's a system with more than one processor, more than one CPU in the
@@ -2472,7 +2411,7 @@ right order without actually intervening in the CPU.  Since there's only one
 CPU, that CPU's dependency ordering logic will take care of everything else.
 
 
-ATOMIC OPERATIONS
+Atomic operations
 -----------------
 
 While they are technically interprocessor interaction considerations, atomic
@@ -2480,10 +2419,11 @@ operations are noted specially as some of them imply full memory barriers and
 some don't, but they're very heavily relied on as a group throughout the
 kernel.
 
-See Documentation/atomic_t.txt for more information.
+See Documentation/atomic_t.txt (or Documentation/wrappers/atomic_t.rst)
+for more information.
 
 
-ACCESSING DEVICES
+Accessing devices
 -----------------
 
 Many devices can be memory mapped, and so appear to the CPU as if they're just
@@ -2506,7 +2446,7 @@ memory barriers are required to enforce ordering.
 See Documentation/driver-api/device-io.rst for more information.
 
 
-INTERRUPTS
+Interrupts
 ----------
 
 A driver may be interrupted by its own interrupt service routine, and thus the
@@ -2554,7 +2494,7 @@ running on separate CPUs that communicate with each other.  If such a case is
 likely, then interrupt-disabling locks should be used to guarantee ordering.
 
 
-KERNEL I/O BARRIER EFFECTS
+Kernel I/O barrier effects
 ==========================
 
 Interfacing with peripherals via I/O accesses is deeply architecture and device
@@ -2661,7 +2601,7 @@ little-endian and will therefore perform byte-swapping operations on big-endian
 architectures.
 
 
-ASSUMED MINIMUM EXECUTION ORDERING MODEL
+Assumed minimum execution ordering model
 ========================================
 
 It has to be assumed that the conceptual CPU is weakly-ordered but that it will
@@ -2673,7 +2613,7 @@ of arch-specific code.
 This means that it must be considered that the CPU will execute its instruction
 stream in any order it feels like - or even in parallel - provided that if an
 instruction in the stream depends on an earlier instruction, then that
-earlier instruction must be sufficiently complete\ [#f2] before the later
+earlier instruction must be sufficiently complete\ [#f2]_ before the later
 instruction may proceed; in other words: provided that the appearance of
 causality is maintained.
 
@@ -2692,10 +2632,10 @@ stream in any way it sees fit, again provided the appearance of causality is
 maintained.
 
 
-THE EFFECTS OF THE CPU CACHE
+The effects of the CPU cache
 ============================
 
-CACHE COHERENCY
+Cache coherency
 ---------------
 
 The way cached memory operations are perceived across the system is affected to
@@ -2757,7 +2697,7 @@ in the system.
    the use of any special device communication instructions the CPU may have.
 
 
-CACHE COHERENCY VS DMA
+Cache coherency vs DMA
 ----------------------
 
 Not all systems maintain cache coherency with respect to devices doing DMA.  In
@@ -2779,7 +2719,7 @@ See Documentation/core-api/cachetlb.rst for more information on cache
 management.
 
 
-CACHE COHERENCY VS MMIO
+Cache coherency vs MMIO
 -----------------------
 
 Memory mapped I/O usually takes place through memory locations that are part of
@@ -2794,7 +2734,7 @@ flushed between the cached memory write and the MMIO access if the two are in
 any way dependent.
 
 
-THE THINGS CPUS GET UP TO
+The things CPUs get up to
 =========================
 
 A programmer might take it for granted that the CPU will perform memory
@@ -2875,7 +2815,7 @@ accesses::
 in that order, but, without intervention, the sequence may have almost any
 combination of elements combined or discarded, provided the program's view
 of the world remains consistent.  Note that READ_ONCE() and WRITE_ONCE()
-are -not- optional in the above example, as there are architectures
+are *not* optional in the above example, as there are architectures
 where a given CPU might reorder successive loads to the same location.
 On such architectures, READ_ONCE() and WRITE_ONCE() do whatever is
 necessary to prevent this, for example, on Itanium the volatile casts
@@ -2909,7 +2849,7 @@ reduced to::
 and the LOAD operation never appear outside of the CPU.
 
 
-AND THEN THERE'S THE ALPHA
+And then there's the Alpha
 --------------------------
 
 The DEC Alpha CPU is one of the most relaxed CPUs there is.  Not only that,
@@ -2924,7 +2864,7 @@ the Linux kernel's addition of smp_mb() to READ_ONCE() on Alpha greatly
 reduced its impact on the memory model.
 
 
-VIRTUAL MACHINE GUESTS
+Virtual machine guests
 ----------------------
 
 Guests running within virtual machines might be affected by SMP effects even if
@@ -2943,10 +2883,10 @@ in particular, they do not control MMIO effects: to control
 MMIO effects, use mandatory barriers.
 
 
-EXAMPLE USES
+Example uses
 ============
 
-CIRCULAR BUFFERS
+Circular buffers
 ----------------
 
 Memory barriers can be used to implement circular buffering without the need
@@ -2957,7 +2897,7 @@ of a lock to serialise the producer with the consumer.  See:
 for details.
 
 
-REFERENCES
+References
 ==========
 
 * Alpha AXP Architecture Reference Manual, Second Edition (Sites & Witek,
