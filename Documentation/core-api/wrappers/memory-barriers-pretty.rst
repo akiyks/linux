@@ -3,15 +3,14 @@ Linux kernel memory barriers (Pretty printed version, WIP)
 ==========================================================
 
 .. note::
-   Work-in-progress attempt for pretty printing memory-barriers.txt.
-   This should be regarded as downstream of Documentation/memory-barriers.txt
+   Under work-in-progress attempt for pretty printing memory-barriers.txt.
+   This should be regarded as downstream.
 
-::
-
-   By: David Howells <dhowells@redhat.com>
-       Paul E. McKenney <paulmck@linux.ibm.com>
-       Will Deacon <will.deacon@arm.com>
-       Peter Zijlstra <peterz@infradead.org>
+Authors:
+   - David Howells <dhowells@redhat.com>
+   - Paul E. McKenney <paulmck@linux.ibm.com>
+   - Will Deacon <will.deacon@arm.com>
+   - Peter Zijlstra <peterz@infradead.org>
 
 .. contents:: CONTENTS
    :depth: 3
