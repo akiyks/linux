@@ -7,6 +7,10 @@
 
 .. _sp_process_index:
 
+===================================
+Spanish Translation of Process Docs
+===================================
+
 .. toctree::
    :maxdepth: 1
 
