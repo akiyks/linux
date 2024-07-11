@@ -2,6 +2,10 @@
 
 .. _sp_scheduler_index:
 
+=====================================
+Spanish Translation of Scheduler Docs
+=====================================
+
 .. toctree::
     :maxdepth: 1
 
