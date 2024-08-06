@@ -15,5 +15,6 @@ Documentation
    access-marking
    cheatsheet
    explanation
+   herd-representation
    glossary
    references
