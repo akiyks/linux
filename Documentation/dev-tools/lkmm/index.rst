@@ -25,6 +25,7 @@ This part of documentation literally renders documents under
 
    readme
    docs/index
+   litmus-tests/index
 
 .. raw:: latex
 

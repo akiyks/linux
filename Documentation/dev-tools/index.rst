@@ -27,6 +27,7 @@ Documentation/dev-tools/testing-overview.rst
    kmemleak
    kcsan
    lkmm/index
+   litmus-tests/index
    kfence
    gdb-kernel-debugging
    kgdb
