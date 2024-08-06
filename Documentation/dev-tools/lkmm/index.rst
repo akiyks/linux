@@ -1,5 +1,11 @@
 .. SPDX-License-Identifier: GPL-2.0
 
+.. raw:: latex
+
+	\begingroup
+	\AtBeginEnvironment{sphinxalltt}{\footnotesize}
+	\fvset{fontsize=\footnotesize}
+
 ============================================
 Linux Kernel Memory Consistency Model (LKMM)
 ============================================
@@ -19,3 +25,7 @@ This part of documentation literally renders documents under
 
    readme
    docs/index
+
+.. raw:: latex
+
+	\endgroup
