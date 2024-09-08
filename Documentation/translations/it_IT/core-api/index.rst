@@ -20,7 +20,7 @@ sul tema.
 .. toctree::
    :maxdepth: 1
 
-   ../RCU/index
+   RCU/index
 
 .. only:: subproject and html
 
