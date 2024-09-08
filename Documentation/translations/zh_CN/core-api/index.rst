@@ -74,7 +74,7 @@ Linux如何让一切同时发生。 详情请参阅
 
 Todolist:
 
-   ../RCU/index
+   RCU/index
 
 低级硬件管理
 ============
