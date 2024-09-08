@@ -801,8 +801,8 @@ diff shows how closely related RCU and reader-writer locking can be.
 ::
 
 	@@ -5,5 +5,5 @@ struct el {
-	 	int data;
-	 	/* Other data fields */
+		int data;
+		/* Other data fields */
 	 };
 	-rwlock_t listmutex;
 	+spinlock_t listmutex;
