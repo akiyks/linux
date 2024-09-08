@@ -78,7 +78,7 @@ Documentation/locking/index.rst for more related documentation.
    irq/index
    local_ops
    padata
-   ../RCU/index
+   RCU/index
    wrappers/memory-barriers.rst
 
 Low-level hardware management
