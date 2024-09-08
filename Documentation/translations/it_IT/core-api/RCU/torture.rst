@@ -1,6 +1,6 @@
 .. SPDX-License-Identifier: GPL-2.0
 
-.. include:: ../disclaimer-ita.rst
+.. include:: ../../disclaimer-ita.rst
 
 =============================================
 Le operazioni RCU per le verifiche *torture*
