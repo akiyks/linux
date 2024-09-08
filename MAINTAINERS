@@ -22218,11 +22218,11 @@ L:	rcu@vger.kernel.org
 S:	Supported
 W:	http://www.rdrop.com/users/paulmck/RCU/
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/rcu/linux.git rcu/dev
-F:	Documentation/RCU/
+F:	Documentation/core-api/RCU/
 F:	include/linux/rcu*
 F:	kernel/rcu/
 F:	rust/kernel/sync/rcu.rs
-X:	Documentation/RCU/torture.rst
+X:	Documentation/core-api/RCU/torture.rst
 X:	include/linux/srcu*.h
 X:	kernel/rcu/srcu*.c
 
@@ -26742,7 +26742,7 @@ M:	Josh Triplett <josh@joshtriplett.org>
 L:	linux-kernel@vger.kernel.org
 S:	Supported
 T:	git git://git.kernel.org/pub/scm/linux/kernel/git/rcu/linux.git rcu/dev
-F:	Documentation/RCU/torture.rst
+F:	Documentation/core-api/RCU/torture.rst
 F:	kernel/locking/locktorture.c
 F:	kernel/rcu/rcuscale.c
 F:	kernel/rcu/rcutorture.c
