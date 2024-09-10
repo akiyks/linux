@@ -46,14 +46,17 @@ attack, and re-enable it.
 Mitigation mechanism
 --------------------
 This issue is mitigated in microcode. The microcode defines the following new
-bits:
+bits::
 
  ================================   ===   ============================
  IA32_ARCH_CAPABILITIES[GDS_CTRL]   R/O   Enumerates GDS vulnerability
                                           and mitigation support.
+
  IA32_ARCH_CAPABILITIES[GDS_NO]     R/O   Processor is not vulnerable.
+
  IA32_MCU_OPT_CTRL[GDS_MITG_DIS]    R/W   Disables the mitigation
                                           0 by default.
+
  IA32_MCU_OPT_CTRL[GDS_MITG_LOCK]   R/W   Locks GDS_MITG_DIS=0. Writes
                                           to GDS_MITG_DIS are ignored
                                           Can't be cleared once set.
@@ -83,25 +86,33 @@ GDS this can be accessed by the following sysfs file:
 
 /sys/devices/system/cpu/vulnerabilities/gather_data_sampling
 
-The possible values contained in this file are:
+The possible values contained in this file are::
 
- ============================== =============================================
+ ============================== ================================================
  Not affected                   Processor not vulnerable.
+
  Vulnerable                     Processor vulnerable and mitigation disabled.
+
  Vulnerable: No microcode       Processor vulnerable and microcode is missing
                                 mitigation.
- Mitigation: AVX disabled,
- no microcode                   Processor is vulnerable and microcode is missing
-                                mitigation. AVX disabled as mitigation.
+
+ Mitigation: AVX disabled,      Processor is vulnerable and microcode is missing
+ no microcode                   mitigation. AVX disabled as mitigation.
+
  Mitigation: Microcode          Processor is vulnerable and mitigation is in
                                 effect.
+
  Mitigation: Microcode (locked) Processor is vulnerable and mitigation is in
                                 effect and cannot be disabled.
- Unknown: Dependent on
- hypervisor status              Running on a virtual guest processor that is
-                                affected but with no way to know if host
+
+ Unknown: Dependent on          Running on a virtual guest processor that is
+ hypervisor status              affected but with no way to know if host
                                 processor is mitigated or vulnerable.
- ============================== =============================================
+ ============================== ================================================
+
+.. Note on the use of literal block:
+   in reST, simple table can't represent rows whose first column don't fit
+   within the column width.
 
 GDS Default mitigation
 ----------------------
