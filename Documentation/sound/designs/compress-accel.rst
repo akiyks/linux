@@ -72,7 +72,7 @@ The passthrough audio stream state machine is described below::
          all passthrough task ops      +----------+
   +------------------------------------|          |
   |                                    |   SETUP  |
-  |                                    |
+  |                                    |          |
   |                                    +----------+
   |                                          |
   +------------------------------------------+
