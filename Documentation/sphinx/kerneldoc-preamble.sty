@@ -123,7 +123,11 @@
 	\newCJKfontfamily[KRserif]\krserif{Noto Sans CJK KR}[AutoFakeSlant]
     }
     \newCJKfontfamily[KRsans]\krsans{Noto Sans CJK KR}[AutoFakeSlant]
-    \newCJKfontfamily[KRmono]\krmono{Noto Sans Mono CJK KR}[AutoFakeSlant]
+    \IfFontExistsTF{Sarasa Mono K}{
+	\newCJKfontfamily[KRmono]\krmono{Sarasa Mono K}
+    }{
+	\newCJKfontfamily[KRmono]\krmono{Noto Sans Mono CJK KR}[AutoFakeSlant]
+    }
     %% for Japanese
     \IfFontExistsTF{Noto Serif CJK JP}{
 	\newCJKfontfamily[JPmain]\jpmain{Noto Serif CJK JP}[AutoFakeSlant]
@@ -176,7 +180,11 @@
 	\renewcommand{\CJKttdefault}{KRmono}%
 	% \xeCJKsetup{CJKspace = true} % true by default
 	% For CJK ascii-art alignment (still misaligned for Hangul)
-	\setmonofont{Noto Sans Mono CJK KR}[AutoFakeSlant]%
+	\IfFontExistsTF{Sarasa Mono K}{%
+	    \setmonofont{Sarasa Mono K}%
+	}{%
+	    \setmonofont{Noto Sans Mono CJK KR}[AutoFakeSlant]%
+	}%
     }
     \newcommand{\kerneldocEndKR}{\endgroup}
     %% for Japanese
