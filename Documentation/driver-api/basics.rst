@@ -66,6 +66,15 @@ Wait queues and Wake events
 .. kernel-doc:: kernel/sched/wait.c
    :export:
 
+Wait on/Wake up via bit/var
+---------------------------
+
+.. kernel-doc:: include/linux/wait_bit.h
+   :internal:
+
+.. kernel-doc:: kernel/sched/wait_bit.c
+   :export:
+
 Internal Functions
 ------------------
 
