@@ -146,7 +146,7 @@ EXPORT_SYMBOL(__wake_up_bit);
  * In order for this to function properly there must be a full memory
  * barrier after the bit is cleared and before this function is called.
  * If the bit was cleared atomically, such as a by clear_bit() then
- * smb_mb__after_atomic() can be used, othwewise smb_mb() is needed.
+ * smp_mb__after_atomic() can be used, othwewise smp_mb() is needed.
  * If the bit was cleared with a fully-ordered operation, no further
  * barrier is required.
  *
@@ -218,10 +218,10 @@ EXPORT_SYMBOL(init_wait_var_entry);
  * barrier after the variable is updated (or more accurately, after the
  * condition waited on has been made to be true) and before this function
  * is called.  If the variable was updated atomically, such as a by
- * atomic_dec() then smb_mb__after_atomic() can be used.  If the
+ * atomic_dec() then smp_mb__after_atomic() can be used.  If the
  * variable was updated by a fully ordered operation such as
  * atomic_dec_and_test() then no extra barrier is required.  Otherwise
- * smb_mb() is needed.
+ * smp_mb() is needed.
  *
  * Normally the variable should be updated (the condition should be made
  * to be true) by an operation with RELEASE semantics such as
