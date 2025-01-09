@@ -287,7 +287,7 @@ the NFS client. But if all applications properly align their IO, LOCALIO
 can be configured to use end-to-end O_DIRECT semantics from the NFS
 client to the underlying local filesystem, that it is sharing with
 the NFS server, by setting the 'localio_O_DIRECT_semantics' nfs module
-parameter to Y, e.g.:
+parameter to Y, e.g.::
 
     echo Y > /sys/module/nfs/parameters/localio_O_DIRECT_semantics
 
