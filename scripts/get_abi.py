@@ -276,6 +276,16 @@ class AbiParser:
         if content:
             self.warn(fdata, "Unexpected content", line)
 
+    def parse_readme(self, nametag, fname):
+        """Parse ABI README file"""
+
+        with open(fname, "r", encoding="utf8", errors="backslashreplace") as fp:
+            nametag["description"] = "```\n"
+            for line in fp:
+                nametag["description"] += "  " + line
+
+            nametag["description"] += "```\n"
+
     def parse_file(self, fname, path, basename):
         """Parse a single file"""
 
@@ -322,6 +332,10 @@ class AbiParser:
         if self.debug & DEBUG_WHAT_OPEN:
             self.log.debug("Opening file %s", fname)
 
+        if basename == "README":
+            self.parse_readme(fdata.nametag, fname)
+            return
+
         with open(fname, "r", encoding="utf8", errors="backslashreplace") as fp:
             for line in fp:
                 fdata.ln += 1
@@ -356,9 +370,6 @@ class AbiParser:
                     continue
 
                 basename = os.path.basename(name)
-
-                if basename == "README":
-                    continue
 
                 if basename.startswith("."):
                     continue
@@ -462,8 +473,12 @@ class AbiParser:
                     continue
 
             if filter_path:
-                if v.get("path") != filter_path:
-                    continue
+                if filter_path == "README":
+                    if not names[0].endswith("README"):
+                        continue
+                else:
+                    if v.get("path") != filter_path:
+                        continue
 
             msg = ""
 
