@@ -441,7 +441,7 @@ class AbiParser:
 
         return new_desc + "\n\n"
 
-    def doc(self, enable_lineno=False, output_in_txt=False, show_file=False):
+    def doc(self, output_in_txt=False, show_file=True):
         """Print ABI at stdout"""
 
         part = None
@@ -457,10 +457,6 @@ class AbiParser:
                 continue
 
             msg = ""
-
-            if enable_lineno:
-                ln = v.get("line_no", 1)
-                msg += f".. LINENO {file_ref[0][0]}#{ln}\n\n"
 
             if wtype != "File":
                 cur_part = names[0]
@@ -522,7 +518,9 @@ class AbiParser:
             if users and users.strip(" \t\n"):
                 msg += f"Users:\n\t{users.strip("\n").replace('\n', '\n\t')}\n\n"
 
-            yield msg
+            ln = v.get("line_no", 1)
+
+            yield (msg, file_ref[0][0], ln)
 
     def check_issues(self):
         """Warn about duplicated ABI entries"""
@@ -630,8 +628,11 @@ class AbiRest:
         parser.parse_abi()
         parser.check_issues()
 
-        for msg in parser.doc(args.enable_lineno, args.raw, not args.no_file):
-            print(msg)
+        for t in parser.doc(args.raw, not args.no_file):
+            if args.enable_lineno:
+                print (f".. LINENO {t[1]}#{t[2]}\n\n")
+
+            print(t[0])
 
 
 class AbiValidate:
