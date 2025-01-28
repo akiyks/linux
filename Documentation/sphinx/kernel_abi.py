@@ -32,32 +32,30 @@ u"""
 
 """
 
-import codecs
 import os
-import subprocess
-import sys
 import re
+import sys
 
-from docutils import nodes, statemachine
+from docutils import nodes
 from docutils.statemachine import ViewList
 from docutils.parsers.rst import directives, Directive
-from docutils.utils.error_reporting import ErrorString
 from sphinx.util.docutils import switch_source_input
 from sphinx.util import logging
 
-__version__  = '1.0'
+__version__ = "1.0"
+
 
 def setup(app):
 
     app.add_directive("kernel-abi", KernelCmd)
-    return dict(
-        version = __version__
-        , parallel_read_safe = True
-        , parallel_write_safe = True
-    )
+    return {
+        "version": __version__,
+        "parallel_read_safe": True,
+        "parallel_write_safe": True
+    }
+
 
 class KernelCmd(Directive):
-
     u"""KernelABI (``kernel-abi``) directive"""
 
     required_arguments = 1
@@ -92,15 +90,15 @@ class KernelCmd(Directive):
         nodeList = self.nestedParse(lines, self.arguments[0])
         return nodeList
 
-    def nestedParse(self, lines, fname):
+    def nested_parse(self, lines, fname):
         env = self.state.document.settings.env
         content = ViewList()
         node = nodes.section()
 
         if "debug" in self.options:
             code_block = "\n\n.. code-block:: rst\n    :linenos:\n"
-            for l in lines.split("\n"):
-                code_block += "\n    " + l
+            for line in lines.split("\n"):
+                code_block += "\n    " + line
             lines = code_block + "\n\n"
 
         line_regex = re.compile(r"^\.\. LINENO (\S+)\#([0-9]+)$")
