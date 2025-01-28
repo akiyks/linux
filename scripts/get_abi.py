@@ -173,6 +173,7 @@ class AbiParser:
                         self.data[fdata.key] = {
                             "what": [content],
                             "file": [fdata.file_ref],
+                            "path": fdata.ftype,
                             "line_no": fdata.ln,
                         }
 
@@ -194,8 +195,6 @@ class AbiParser:
 
                 if new_what:
                     fdata.label = ""
-
-                    self.data[fdata.key]["type"] = fdata.ftype
 
                     if "description" in self.data[fdata.key]:
                         self.data[fdata.key]["description"] += "\n\n"
@@ -312,6 +311,7 @@ class AbiParser:
         fdata.nametag = {}
         fdata.nametag["what"] = [f"File {path}/{basename}"]
         fdata.nametag["type"] = "File"
+        fdata.nametag["path"] = fdata.ftype
         fdata.nametag["file"] = [fdata.file_ref]
         fdata.nametag["line_no"] = 1
         fdata.nametag["description"] = ""
@@ -441,7 +441,8 @@ class AbiParser:
 
         return new_desc + "\n\n"
 
-    def doc(self, output_in_txt=False, show_file=True):
+    def doc(self, output_in_txt=False, show_symbols=True, show_file=True,
+            filter_path=None):
         """Print ABI at stdout"""
 
         part = None
@@ -449,12 +450,20 @@ class AbiParser:
                              key=lambda x: (x[1].get("type", ""),
                                             x[1].get("what"))):
 
-            wtype = v.get("type", "Var")
+            wtype = v.get("type", "Symbol")
             file_ref = v.get("file")
             names = v.get("what", [""])
 
-            if not show_file and wtype == "File":
-                continue
+            if wtype == "File":
+                if not show_file:
+                    continue
+            else:
+                if not show_symbols:
+                    continue
+
+            if filter_path:
+                if v.get("path") != filter_path:
+                    continue
 
             msg = ""
 
@@ -616,7 +625,11 @@ class AbiRest:
                                  "It not used, output will contain dynamically"
                                  " generated cross references when possible.")
         parser.add_argument("--no-file", action="store_true",
-                            help="Don't the files section")
+                            help="Don't show files section")
+        parser.add_argument("--no-symbols", action="store_true",
+                            help="Don't show symbols section")
+        parser.add_argument("--filter",
+                            help="Filter a section of ABI (e..g stable, testing, obsolete, removed)")
         parser.add_argument("--show-hints", help="Show-hints")
 
         parser.set_defaults(func=self.run)
@@ -628,7 +641,12 @@ class AbiRest:
         parser.parse_abi()
         parser.check_issues()
 
-        for t in parser.doc(args.raw, not args.no_file):
+        for t in parser.doc(args.raw, show_file=not args.no_file,
+                            show_symbols=not args.no_symbols,
+                            filter_path=args.filter):
+
+            # As line number is returned at the tuple, artifically place
+            # them as a comment tag if one wants to debug troubles there
             if args.enable_lineno:
                 print (f".. LINENO {t[1]}#{t[2]}\n\n")
 
