@@ -11,7 +11,9 @@
 Linux カーネルパッチ投稿チェックリスト
 ======================================
 
-.. note:: 【訳註】
+.. admonition:: 【訳註】
+   :class: note
+
    この文書は、
    Documentation/process/submit-checklist.rst
    の翻訳です。
@@ -25,7 +27,9 @@ Linux カーネルパッチ投稿チェックリスト
 これは、 Documentation/process/submitting-patches.rst およびその他の
 Linux カーネルパッチ投稿に関する文書を踏まえ、それを補足するものです。
 
-.. note:: 【訳註】
+.. admonition:: 【訳註】
+   :class: note
+
    可能な項目については、パッチもしくはパッチ内の更新を暗黙の主語として、
    その望ましい状態を表す文体とします。その他、原義を損なわない範囲で
    係り結びを調整するなど、簡潔で把握しやすい箇条書きを目指します。
