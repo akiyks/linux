@@ -5,8 +5,10 @@
 Linux カーネル開発のやり方
 ==========================
 
-.. note::
-   【訳註】この文書は、
+.. admonition:: 【訳註】
+   :class: note
+
+   この文書は、
    Documentation/process/howto.rst
    の翻訳です。
    免責条項については、
