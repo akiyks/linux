@@ -134,6 +134,9 @@ Kernel utility functions
 .. kernel-doc:: kernel/panic.c
    :export:
 
+.. kernel-doc:: include/linux/util_macros.h
+   :internal:
+
 Device Resource Management
 --------------------------
 
