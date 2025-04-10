@@ -907,8 +907,8 @@ sub output_enum_rst(%) {
         print "\n";
     }
     print "\n";
-    $lineprefix = $oldprefix;
     output_section_rst(@_);
+    $lineprefix = $oldprefix;
 }
 
 sub output_typedef_rst(%) {
@@ -925,8 +925,8 @@ sub output_typedef_rst(%) {
     output_highlight_rst($args{'purpose'});
     print "\n";
 
-    $lineprefix = $oldprefix;
     output_section_rst(@_);
+    $lineprefix = $oldprefix;
 }
 
 sub output_struct_rst(%) {
@@ -972,8 +972,8 @@ sub output_struct_rst(%) {
     }
     print "\n";
 
-    $lineprefix = $oldprefix;
     output_section_rst(@_);
+    $lineprefix = $oldprefix;
 }
 
 ## none mode output functions
