@@ -6,13 +6,5 @@
 Linux kernel memory barriers
 ============================
 
-.. raw:: latex
-
-    \footnotesize
-
 .. include:: ../../memory-barriers.txt
    :literal:
-
-.. raw:: latex
-
-    \normalsize
