@@ -62,6 +62,11 @@
 % , which is too short.
 \setlength{\tymin}{20em}
 
+% Set default font size for literal and code blocks (in order to reduce
+% ugly-looking line breaks
+\AtBeginEnvironment{sphinxalltt}{\footnotesize}
+\fvset{fontsize=\footnotesize}
+
 % Adjust \headheight for fancyhdr
 \addtolength{\headheight}{1.6pt}
 \addtolength{\topmargin}{-1.6pt}
