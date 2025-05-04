@@ -24,7 +24,7 @@
 
 #include <linux/string_helpers.h>
 
-#include "auxch.h"
+#include "aux.h"
 #include "pad.h"
 
 static int
