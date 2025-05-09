@@ -56,6 +56,9 @@
 \makeatother
 %% Prevent default \sphinxtableofcontentshook from overwriting above tweaks.
 \renewcommand{\sphinxtableofcontentshook}{} % Empty the hook
+%% In reST, it is impossible to mark up sentence ending puncts properly.
+%% Disable double spacing there.
+\frenchspacing
 
 % Prevent column squeezing of tabulary.  \tymin is set by Sphinx as:
 %   \setlength{\tymin}{3\fontcharwd\font`0 }
