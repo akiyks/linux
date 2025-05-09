@@ -57,6 +57,11 @@
 %% Prevent default \sphinxtableofcontentshook from overwriting above tweaks.
 \renewcommand{\sphinxtableofcontentshook}{} % Empty the hook
 
+\IfFileExists{microtype.sty}{
+  \usepackage{microtype}
+}{}
+\frenchspacing
+
 % Prevent column squeezing of tabulary.  \tymin is set by Sphinx as:
 %   \setlength{\tymin}{3\fontcharwd\font`0 }
 % , which is too short.
