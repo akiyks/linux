@@ -51,6 +51,7 @@ type, and iterator state should be represented as a matching
 a pointer to this `struct bpf_iter_<type>` as the very first argument.
 
 Additionally:
+
   - Constructor, i.e., `bpf_iter_<type>_new()`, can have arbitrary extra
     number of arguments. Return type is not enforced either.
   - Next method, i.e., `bpf_iter_<type>_next()`, has to return a pointer
