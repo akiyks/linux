@@ -137,6 +137,10 @@ for examples on how to exercise this path.
 fwctl cxl Kernel API
 ====================
 
+.. c:namespace-push:: UAPI
+
 .. kernel-doc:: drivers/cxl/core/features.c
    :export:
 .. kernel-doc:: include/cxl/features.h
+
+.. c:namespace-pop::
