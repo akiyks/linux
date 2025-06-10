@@ -69,7 +69,7 @@ SUN RPC subsystem
    :export:
 
 .. kernel-doc:: net/sunrpc/socklib.c
-   :export:
+   :internal:
 
 .. kernel-doc:: net/sunrpc/stats.c
    :export:
