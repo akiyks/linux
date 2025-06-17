@@ -3282,6 +3282,7 @@ static inline bool is_dot_dotdot(const char *name, size_t len)
 
 /**
  * name_contains_dotdot - check if a file name contains ".." path components
+ * @name: Need proper description.
  *
  * Search for ".." surrounded by either '/' or start/end of string.
  */
