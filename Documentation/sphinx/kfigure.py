@@ -207,17 +207,19 @@ def setupTools(app):
         dot_Tpdf = False
 
     else:
-        if convert_cmd:
+        if rsvg_convert_cmd:
+            logger.verbose("use rsvg-convert(1) from: " + rsvg_convert_cmd)
+        elif convert_cmd:
             logger.verbose("use convert(1) from: " + convert_cmd)
         else:
             logger.verbose(
-                "Neither inkscape(1) nor convert(1) found.\n"
-                "For SVG to PDF conversion, install either Inkscape (https://inkscape.org/) (preferred) or\n"
+                "Neither inkscape(1), rsvg-convert(1), nor convert(1) found.\n"
+                "For SVG to PDF conversion, install either Inkscape (https://inkscape.org/) (preferred),\n"
+                "rsvg-convert (https://wiki.gnome.org/Projects/LibRsvg), or\n"
                 "ImageMagick (https://www.imagemagick.org)"
             )
 
         if rsvg_convert_cmd:
-            logger.verbose("use rsvg-convert(1) from: " + rsvg_convert_cmd)
             logger.verbose("use 'dot -Tsvg' and rsvg-convert(1) for DOT -> PDF conversion")
             dot_Tpdf = False
         else:
@@ -293,11 +295,11 @@ def convert_image(img_node, translator, src_fname=None):
     elif in_ext == '.svg':
 
         if translator.builder.format == 'latex':
-            if not inkscape_cmd and convert_cmd is None:
+            if not inkscape_cmd and not rsvg_convert_cmd and convert_cmd is None:
                 logger.warning(
                     "no SVG to PDF conversion available / include SVG raw.\n"
                     "Including large raw SVGs can cause xelatex error.\n"
-                    "Install Inkscape (preferred) or ImageMagick."
+                    "Install Inkscape (preferred) or rsvg-convert or ImageMagick."
                 )
                 img_node.replace_self(file2literal(src_fname))
             else:
@@ -363,10 +365,12 @@ def dot2format(app, dot_fname, out_fname):
     return bool(exit_code == 0)
 
 def svg2pdf(app, svg_fname, pdf_fname):
-    """Converts SVG to PDF with ``inkscape(1)`` or ``convert(1)`` command.
+    """Converts SVG to PDF with ``inkscape(1)`` or ``rsvg-convert`` or ``convert(1)`` command.
 
-    Uses ``inkscape(1)`` from Inkscape (https://inkscape.org/) or ``convert(1)``
-    from ImageMagick (https://www.imagemagick.org) for conversion.
+    Uses ``inkscape(1)`` from Inkscape (https://inkscape.org/) or
+    ``rsvg-convert(1)``from Gnome librsvg (https://wiki.gnome.org/Projects/LibRsvg)
+    or ``convert(1)`` from ImageMagick (https://www.imagemagick.org)
+    for conversion.
     Returns ``True`` on success and ``False`` if an error occurred.
 
     * ``svg_fname`` pathname of the input SVG file with extension (``.svg``)
@@ -382,6 +386,9 @@ def svg2pdf(app, svg_fname, pdf_fname):
             cmd = [inkscape_cmd, '-o', pdf_fname, svg_fname]
         else:
             cmd = [inkscape_cmd, '-z', '--export-pdf=%s' % pdf_fname, svg_fname]
+    else:
+        cmd_name = 'rsvg-convert(1)'
+        cmd = [rsvg_convert_cmd, '--format=pdf', '-o', pdf_fname, svg_fname]
 
     try:
         warning_msg = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
