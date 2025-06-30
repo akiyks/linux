@@ -429,21 +429,24 @@ latex_elements = {
     #
     "maxlistdepth": "10",
     # For CJK One-half spacing, need to be in front of hyperref
-    "extrapackages": r"\usepackage{setspace}",
+    "extrapackages": r"""
+        \usepackage{setspace}
+	\PassOptionsToPackage{pdfversion=1.7}{hyperref}
+    """,
     # Additional stuff for the LaTeX preamble.
-    "preamble": """
+    "preamble": r"""
         % Use some font with UTF-8 support with XeLaTeX
-        \\usepackage{fontspec}
-        \\setsansfont{DejaVu Sans}
-        \\setromanfont{DejaVu Serif}
-        \\setmonofont{DejaVu Sans Mono}
+        \usepackage{fontspec}
+        \setsansfont{DejaVu Sans}
+        \setromanfont{DejaVu Serif}
+        \setmonofont{DejaVu Sans Mono}
     """,
 }
 
 # Load kerneldoc specific LaTeX settings
-latex_elements["preamble"] += """
+latex_elements["preamble"] += r"""
         % Load kerneldoc specific LaTeX settings
-        \\input{kerneldoc-preamble.sty}
+        \input{kerneldoc-preamble.sty}
 """
 
 # Grouping the document tree into LaTeX files. List of tuples
