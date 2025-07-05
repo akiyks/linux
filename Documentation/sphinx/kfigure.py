@@ -37,8 +37,9 @@
 
     * SVG to PDF: To generate PDF, you need at least one of this tools:
 
-      - ``convert(1)``: ImageMagick (https://www.imagemagick.org)
+      - ``rsvg-convert`` : Librsvg (https://gitlab.gnome.org/GNOME/librsvg)
       - ``inkscape(1)``: Inkscape (https://inkscape.org/)
+      - ``convert(1)``: ImageMagick (https://www.imagemagick.org)
 
     List of customizations:
 
@@ -113,14 +114,13 @@ dot_cmd = None
 # dot(1) -Tpdf should be used
 dot_Tpdf = False
 
+# Inkscape's inkscape(1) support
+inkscape_cmd = None
+# librsvg's rsvg-convert(1) support
+rsvg_convert_cmd = None
 # ImageMagick' convert(1) support
 convert_cmd = None
 
-# librsvg's rsvg-convert(1) support
-rsvg_convert_cmd = None
-
-# Inkscape's inkscape(1) support
-inkscape_cmd = None
 # Inkscape prior to 1.0 uses different command options
 inkscape_ver_one = False
 
@@ -172,13 +172,14 @@ def setupTools(app):
     This function is called once, when the builder is initiated.
     """
     global dot_cmd, dot_Tpdf, convert_cmd, rsvg_convert_cmd   # pylint: disable=W0603
-    global inkscape_cmd, inkscape_ver_one  # pylint: disable=W0603
+    global inkscape_cmd, inkscape_ver_one, svg2pdf_cmd_name  # pylint: disable=W0603
+
     logger.verbose("kfigure: check installed tools ...")
 
     dot_cmd = which('dot')
-    convert_cmd = which('convert')
-    rsvg_convert_cmd = which('rsvg-convert')
     inkscape_cmd = which('inkscape')
+    rsvg_convert_cmd = which('rsvg-convert')
+    convert_cmd = which('convert')
 
     if dot_cmd:
         logger.verbose("use dot(1) from: " + dot_cmd)
@@ -196,39 +197,33 @@ def setupTools(app):
         logger.warning(
             "dot(1) not found, for better output quality install graphviz from https://www.graphviz.org"
         )
+
     if inkscape_cmd:
         logger.verbose("use inkscape(1) from: " + inkscape_cmd)
+        svg2pdf_cmd_name = 'inkscape(1)'
         inkscape_ver = subprocess.check_output([inkscape_cmd, '--version'],
                                                stderr=subprocess.DEVNULL)
         ver_one_ptn = b'Inkscape 1'
         inkscape_ver_one = re.search(ver_one_ptn, inkscape_ver)
-        convert_cmd = None
-        rsvg_convert_cmd = None
-        dot_Tpdf = False
+
+    elif rsvg_convert_cmd:
+        logger.verbose("use rsvg-convert(1) from: " + rsvg_convert_cmd)
+        svg2pdf_cmd_name = 'rsvg-convert(1)'
+
+    elif convert_cmd:
+        logger.verbose("use convert(1) from: " + convert_cmd)
+        svg2pdf_cmd_name = 'convert(1)'
 
     else:
-        if convert_cmd:
-            logger.verbose("use convert(1) from: " + convert_cmd)
-        else:
-            logger.verbose(
-                "Neither inkscape(1) nor convert(1) found.\n"
-                "For SVG to PDF conversion, install either Inkscape (https://inkscape.org/) (preferred) or\n"
-                "ImageMagick (https://www.imagemagick.org)"
+        logger.verbose(
+            "Neither rsvg-convert(1), inkscape(1), nor convert(1) found.\n"
+            "For SVG to PDF conversion, install one of\n"
+            "Librsvg (https://gitlab.gnome.org/GNOME/librsvg),\n"
+            "Inkscape (https://inkscape.org/), or\n"
+            "ImageMagick (https://www.imagemagick.org)"
             )
 
-        if rsvg_convert_cmd:
-            logger.verbose("use rsvg-convert(1) from: " + rsvg_convert_cmd)
-            logger.verbose("use 'dot -Tsvg' and rsvg-convert(1) for DOT -> PDF conversion")
-            dot_Tpdf = False
-        else:
-            logger.verbose(
-                "rsvg-convert(1) not found.\n"
-                "  SVG rendering of convert(1) is done by ImageMagick-native renderer."
-            )
-            if dot_Tpdf:
-                logger.verbose("use 'dot -Tpdf' for DOT -> PDF conversion")
-            else:
-                logger.verbose("use 'dot -Tsvg' and convert(1) for DOT -> PDF conversion")
+        logger.verbose("use 'dot -Tsvg' and", svg2pdf_cmd, "for DOT -> PDF conversion")
 
 
 # integrate conversion tools
@@ -293,11 +288,11 @@ def convert_image(img_node, translator, src_fname=None):
     elif in_ext == '.svg':
 
         if translator.builder.format == 'latex':
-            if not inkscape_cmd and convert_cmd is None:
+            if not svg2pdf_cmd_name:
                 logger.warning(
                     "no SVG to PDF conversion available / include SVG raw.\n"
                     "Including large raw SVGs can cause xelatex error.\n"
-                    "Install Inkscape (preferred) or ImageMagick."
+                    "Install Librsvg, Inkscape (preferred), or ImageMagick."
                 )
                 img_node.replace_self(file2literal(src_fname))
             else:
@@ -319,10 +314,10 @@ def convert_image(img_node, translator, src_fname=None):
 
             if in_ext == '.dot':
                 logger.verbose('convert DOT to: {out}/' + _name)
-                if translator.builder.format == 'latex' and not dot_Tpdf:
+                if translator.builder.format == 'latex':
                     svg_fname = path.join(translator.builder.outdir, fname + '.svg')
                     ok1 = dot2format(app, src_fname, svg_fname)
-                    ok2 = svg2pdf_by_rsvg(app, svg_fname, dst_fname)
+                    ok2 = svg2pdf(app, svg_fname, dst_fname)
                     ok = ok1 and ok2
 
                 else:
@@ -363,25 +358,24 @@ def dot2format(app, dot_fname, out_fname):
     return bool(exit_code == 0)
 
 def svg2pdf(app, svg_fname, pdf_fname):
-    """Converts SVG to PDF with ``inkscape(1)`` or ``convert(1)`` command.
+    """Converts SVG to PDF with ``rsvg-convert``, ``inkscape(1)``, or ``convert(1)`` command.
 
-    Uses ``inkscape(1)`` from Inkscape (https://inkscape.org/) or ``convert(1)``
-    from ImageMagick (https://www.imagemagick.org) for conversion.
+    Uses ``rsvg-convert(1)``, ``inkscape(1)``, or ``convert(1)`` for conversion.
     Returns ``True`` on success and ``False`` if an error occurred.
 
     * ``svg_fname`` pathname of the input SVG file with extension (``.svg``)
     * ``pdf_name``  pathname of the output PDF file with extension (``.pdf``)
 
     """
-    cmd = [convert_cmd, svg_fname, pdf_fname]
-    cmd_name = 'convert(1)'
-
-    if inkscape_cmd:
-        cmd_name = 'inkscape(1)'
+    if svg2pdf_cmd_name == 'rsvg-convert(1)':
+        cmd = [rsvg_convert_cmd, '--format=pdf', '-o', pdf_fname, svg_fname]
+    elif svg2pdf_cmd_name == 'inkscape(1)':
         if inkscape_ver_one:
             cmd = [inkscape_cmd, '-o', pdf_fname, svg_fname]
         else:
             cmd = [inkscape_cmd, '-z', '--export-pdf=%s' % pdf_fname, svg_fname]
+    elif svg2pdf_cmd_name == 'convert(1)':
+        cmd = [convert_cmd, svg_fname, pdf_fname]
 
     try:
         warning_msg = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
@@ -395,39 +389,13 @@ def svg2pdf(app, svg_fname, pdf_fname):
         logger.warning("Error #%d when calling: %s" %
                             (exit_code, " ".join(cmd)))
         if warning_msg:
-            logger.warning( "Warning msg from %s: %s" %
-                                (cmd_name, str(warning_msg, 'utf-8')))
+            logger.warning("Warning msg from %s: %s" %
+                           (svg2pdf_cmd_name, str(warning_msg, 'utf-8')))
     elif warning_msg:
         logger.verbose("Warning msg from %s (likely harmless):\n%s" %
-                            (cmd_name, str(warning_msg, 'utf-8')))
+                            (svg2pdf_cmd_name, str(warning_msg, 'utf-8')))
 
     return bool(exit_code == 0)
-
-def svg2pdf_by_rsvg(app, svg_fname, pdf_fname):
-    """Convert SVG to PDF with ``rsvg-convert(1)`` command.
-
-    * ``svg_fname`` pathname of input SVG file, including extension ``.svg``
-    * ``pdf_fname`` pathname of output PDF file, including extension ``.pdf``
-
-    Input SVG file should be the one generated by ``dot2format()``.
-    SVG -> PDF conversion is done by ``rsvg-convert(1)``.
-
-    If ``rsvg-convert(1)`` is unavailable, fall back to ``svg2pdf()``.
-
-    """
-
-    if rsvg_convert_cmd is None:
-        ok = svg2pdf(app, svg_fname, pdf_fname)
-    else:
-        cmd = [rsvg_convert_cmd, '--format=pdf', '-o', pdf_fname, svg_fname]
-        # use stdout and stderr from parent
-        exit_code = subprocess.call(cmd)
-        if exit_code != 0:
-            logger.warning("Error #%d when calling: %s" %
-                                (exit_code, " ".join(cmd)))
-        ok = bool(exit_code == 0)
-
-    return ok
 
 
 # image handling
