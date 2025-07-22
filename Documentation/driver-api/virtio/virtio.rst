@@ -129,6 +129,15 @@ virtio_find_single_vq() or virtio_find_vqs(), which will end up calling
 a transport-specific ``find_vqs`` method.
 
 
+Testing
+=======
+
+For testing kernel-doc for ``struct virtio_device``.
+
+.. kernel-doc:: include/linux/virtio.h
+    :identifiers: struct virtio_device
+
+
 References
 ==========
 
