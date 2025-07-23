@@ -19,11 +19,9 @@ endif
 
 # You can set these variables from the command line.
 SPHINXBUILD   = sphinx-build
-SPHINXOPTS    =
 SPHINXDIRS    = .
 DOCS_THEME    =
 DOCS_CSS      =
-_SPHINXDIRS   = $(sort $(patsubst $(srctree)/Documentation/%/index.rst,%,$(wildcard $(srctree)/Documentation/*/index.rst)))
 SPHINX_CONF   = conf.py
 PAPER         =
 BUILDDIR      = $(obj)/output
@@ -32,6 +30,12 @@ LATEXOPTS     = -interaction=batchmode -no-shell-escape
 BUILD_WRAPPER = $(srctree)/scripts/sphinx-build-wrapper
 
 PYTHONPYCACHEPREFIX ?= $(abspath $(BUILDDIR)/__pycache__)
+
+PYTHONPYCACHEPREFIX ?= $(abspath $(BUILDDIR)/__pycache__)
+
+# Wrapper for sphinx-build
+
+BUILD_WRAPPER = $(srctree)/scripts/sphinx-build-wrapper
 
 # For denylisting "variable font" files
 # Can be overridden by setting as an env variable
@@ -103,7 +107,9 @@ refcheckdocs:
 
 cleandocs:
 	$(Q)rm -rf $(BUILDDIR)
-	$(Q)$(MAKE) BUILDDIR=$(abspath $(BUILDDIR)) $(build)=Documentation/userspace-api/media clean
+
+# Used only on help
+_SPHINXDIRS   = $(sort $(patsubst $(srctree)/Documentation/%/index.rst,%,$(wildcard $(srctree)/Documentation/*/index.rst)))
 
 dochelp:
 	@echo  ' Linux kernel internal documentation in different formats from ReST:'
