@@ -391,55 +391,9 @@ class SphinxBuilder:
             except subprocess.CalledProcessError as e:
                 sys.exit(f"Error generating info docs: {e}")
 
-    def get_make_media(self):
-        """
-        The media uAPI requires an additional Makefile target.
-        """
-
-        mediadir = f"{self.obj}/userspace-api/media"
-
-        make = os.environ.get("MAKE", "make")
-        build = os.environ.get("build", "-f $(srctree)/scripts/Makefile.build obj")
-
-        # Check if the script was started outside docs Makefile
-        if not os.environ.get("obj"):
-            mediadir = os.path.abspath(mediadir)
-
-        # the build makefile var contains macros that require expand
-        make_media = f"{make} {build}={mediadir}"
-        make_media = make_media.replace("$(", "${").replace(")", "}")
-        make_media = os.path.expandvars(make_media)
-
-        # As it also contains multiple arguments, use shlex to split it
-        return shlex.split(make_media)
-
-    def prepare_media(self, builder):
-        """
-        Run userspace-api/media Makefile.
-
-        The logic behind it are from the initial ports to Sphinx.
-        They're old and need to be replaced by a proper Sphinx extension.
-        While we don't do that, we need to explicitly call media Makefile
-        to build some files.
-        """
-
-        cmd = self.get_make_media() + [builder]
-
-        if self.verbose:
-            print(" ".join(cmd))
-
-        with JobserverExec() as jobserver:
-            rc = jobserver.run(cmd, env=self.env)
-
-        if rc:
-            cmd_str = " ".join(cmd)
-            sys.exit(f"Failed to run {cmd_str}")
-
     def cleandocs(self, builder):
 
         shutil.rmtree(self.builddir, ignore_errors=True)
-
-        self.prepare_media(builder)
 
     def build(self, target, sphinxdirs=None, conf="conf.py",
               theme=None, css=None, paper=None):
@@ -460,8 +414,6 @@ class SphinxBuilder:
         sphinxbuild = shutil.which(self.sphinxbuild, path=self.env["PATH"])
         if not sphinxbuild:
             sys.exit(f"Error: {self.sphinxbuild} not found in PATH.\n")
-
-        self.prepare_media(builder)
 
         if builder == "latex":
             if not self.pdflatex_cmd and not self.latexmk_cmd:
