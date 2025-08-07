@@ -38,7 +38,7 @@ transfers:
       auipc x7, <imm>
       jalr (x7)
 
-	Such form of indirect control transfer are still immutable and don't rely
+    Such form of indirect control transfer are still immutable and don't rely
     on memory and thus rs1=x7 is exempted from tracking and considered software
     guarded jumps.
 
@@ -111,5 +111,5 @@ following conditions:
 In all 3 cases, ``*tval = 2`` is captured and software check exception is
 raised (``cause=18``)
 
-Linux kernel will treat this as :c:macro:`SIGSEV`` with code =
+Linux kernel will treat this as :c:macro:`SIGSEV` with code =
 :c:macro:`SEGV_CPERR` and follow normal course of signal delivery.

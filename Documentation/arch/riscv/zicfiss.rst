@@ -93,28 +93,25 @@ shadow stack for the program.
 stack enabling for tasks. prctls are arch agnostic and returns -EINVAL on other
 arches.
 
-* prctl(PR_SET_SHADOW_STACK_STATUS, unsigned long arg)
+``prctl(PR_SET_SHADOW_STACK_STATUS, unsigned long arg)``
+    If arg1 :c:macro:`PR_SHADOW_STACK_ENABLE` and if CPU supports ``zicfiss`` then
+    kernel will enable shadow stack for the task. Dynamic loader can issue this
+    :c:macro:`prctl` once it has determined that all the objects loaded in address
+    space have support for shadow stack. Additionally if there is a
+    :c:macro:`dlopen` to an object which wasn't compiled with ``zicfiss``, dynamic
+    loader can issue this prctl with arg1 set to 0 (i.e.
+    :c:macro:`PR_SHADOW_STACK_ENABLE` being clear)
 
-If arg1 :c:macro:`PR_SHADOW_STACK_ENABLE` and if CPU supports ``zicfiss`` then
-kernel will enable shadow stack for the task. Dynamic loader can issue this
-:c:macro:`prctl` once it has determined that all the objects loaded in address
-space have support for shadow stack. Additionally if there is a
-:c:macro:`dlopen` to an object which wasn't compiled with ``zicfiss``, dynamic
-loader can issue this prctl with arg1 set to 0 (i.e.
-:c:macro:`PR_SHADOW_STACK_ENABLE` being clear)
+``prctl(PR_GET_SHADOW_STACK_STATUS, unsigned long *arg)``
+    Returns current status of indirect branch tracking. If enabled it'll return
+    :c:macro:`PR_SHADOW_STACK_ENABLE`.
 
-* prctl(PR_GET_SHADOW_STACK_STATUS, unsigned long *arg)
-
-Returns current status of indirect branch tracking. If enabled it'll return
-:c:macro:`PR_SHADOW_STACK_ENABLE`.
-
-* prctl(PR_LOCK_SHADOW_STACK_STATUS, unsigned long arg)
-
-Locks current status of shadow stack enabling on the task. User space may want
-to run with strict security posture and wouldn't want loading of objects
-without ``zicfiss`` support in it and thus would want to disallow disabling of
-shadow stack on current task. In that case user space can use this prctl to
-lock current settings.
+``prctl(PR_LOCK_SHADOW_STACK_STATUS, unsigned long arg)``
+    Locks current status of shadow stack enabling on the task. User space may want
+    to run with strict security posture and wouldn't want loading of objects
+    without ``zicfiss`` support in it and thus would want to disallow disabling of
+    shadow stack on current task. In that case user space can use this prctl to
+    lock current settings.
 
 5. violations related to returns with shadow stack enabled
 -----------------------------------------------------------
@@ -126,7 +123,7 @@ condition:
   stack. If mismatch happens then cpu does ``*tval = 3`` and raise software
   check exception.
 
-Linux kernel will treat this as :c:macro:`SIGSEV`` with code =
+Linux kernel will treat this as :c:macro:`SIGSEV` with code =
 :c:macro:`SEGV_CPERR` and follow normal course of signal delivery.
 
 6. Shadow stack tokens
