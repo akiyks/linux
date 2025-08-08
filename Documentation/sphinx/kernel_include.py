@@ -60,6 +60,7 @@ import re
 import sys
 
 from docutils import io, nodes, statemachine
+from docutils.statemachine import ViewList
 from docutils.utils.error_reporting import SafeString, ErrorString
 from docutils.parsers.rst import directives
 from docutils.parsers.rst.directives.body import CodeBlock, NumberLines
@@ -281,7 +282,18 @@ class KernelInclude(Include):
         if output_type == "code":
             return self.code(path, include_lines)
 
-        self.state_machine.insert_input(include_lines, path)
+        # ReST output. Append line numbers
+
+        result = ViewList()
+        if startline and startline > 0:
+            offset = startline - 1
+        else:
+            offset = 0
+
+        for ln, line in enumerate(include_lines, start=offset):
+            result.append(line, path, ln)
+
+        self.state_machine.insert_input(result, path)
 
         return []
 
