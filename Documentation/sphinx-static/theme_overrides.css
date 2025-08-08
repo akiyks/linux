@@ -54,6 +54,13 @@ div[class^="highlight"] pre {
     padding-bottom: 1px;
 }
 
+/* Size the logo appropriately */
+
+.wy-side-nav-search .wy-dropdown > a img.logo, .wy-side-nav-search > a img.logo {
+    width: 120px;
+    margin-bottom: 5px:
+}
+
 @media screen {
 
     /* content column
@@ -117,4 +124,47 @@ div[class^="highlight"] pre {
     .rst-content tt.literal,.rst-content tt.literal,.rst-content code.literal {
         color: inherit;
     }
+}
+
+/* Language selection menu */
+
+div.admonition {
+    /*
+     * Make sure we don't overlap notes and warnings at the top of the
+     * document.
+     */
+    clear: both;
+}
+
+div.language-selection {
+    margin-bottom: 1em;
+    padding: .5em;
+
+    position: relative;
+    float: right;
+}
+
+div.language-selection a {
+    display: block;
+    padding: 0.5em;
+    text-decoration: none;
+}
+
+div.language-selection ul {
+    display: none;
+    position: absolute;
+
+    /* Align with the parent div */
+    top: 100%;
+    right: 0;
+    margin: 0;
+
+    list-style: none;
+
+    /* Never break menu item lines */
+    white-space: nowrap;
+}
+
+div.language-selection:hover ul {
+    display: block;
 }
