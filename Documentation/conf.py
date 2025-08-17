@@ -453,6 +453,8 @@ htmlhelp_basename = "TheLinuxKerneldoc"
 
 # -- Options for LaTeX output ---------------------------------------------
 
+latex_engine = 'xelatex'
+
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     "papersize": "a4paper",
@@ -467,10 +469,10 @@ latex_elements = {
     'printindex': r'\footnotesize\raggedright\printindex',
     # Latex figure (float) alignment
     # 'figure_align': 'htbp',
-    # Don't mangle with UTF-8 chars
-    "fontenc": "",
-    "inputenc": "",
-    "utf8extra": "",
+    # Don't mangle with UTF-8 chars (default for latex_engine = 'xelatex'
+    #"fontenc": "",
+    #"inputenc": "",
+    #"utf8extra": "",
     'fontpkg': dedent(r'''
         \usepackage{fontspec}
         \setmainfont{DejaVu Serif}
