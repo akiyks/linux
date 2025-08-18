@@ -107,9 +107,10 @@ Cleaning Overhead
 Mount Options
 =============
 
+::
 
-======================== ============================================================
-background_gc=%s	 Turn on/off cleaning operations, namely garbage
+ ======================= ============================================================
+ background_gc=%s	 Turn on/off cleaning operations, namely garbage
 			 collection, triggered in background when I/O subsystem is
 			 idle. If background_gc=on, it will turn on the garbage
 			 collection and if background_gc=off, garbage collection
@@ -117,74 +118,71 @@ background_gc=%s	 Turn on/off cleaning operations, namely garbage
 			 on synchronous garbage collection running in background.
 			 Default value for this option is on. So garbage
 			 collection is on by default.
-gc_merge		 When background_gc is on, this option can be enabled to
+ gc_merge		 When background_gc is on, this option can be enabled to
 			 let background GC thread to handle foreground GC requests,
 			 it can eliminate the sluggish issue caused by slow foreground
 			 GC operation when GC is triggered from a process with limited
 			 I/O and CPU resources.
-nogc_merge		 Disable GC merge feature.
-disable_roll_forward	 Disable the roll-forward recovery routine
-norecovery		 Disable the roll-forward recovery routine, mounted read-
+ nogc_merge		 Disable GC merge feature.
+ disable_roll_forward	 Disable the roll-forward recovery routine
+ norecovery		 Disable the roll-forward recovery routine, mounted read-
 			 only (i.e., -o ro,disable_roll_forward)
-discard/nodiscard	 Enable/disable real-time discard in f2fs, if discard is
+ discard/nodiscard	 Enable/disable real-time discard in f2fs, if discard is
 			 enabled, f2fs will issue discard/TRIM commands when a
 			 segment is cleaned.
-heap/no_heap		 Deprecated.
-nouser_xattr		 Disable Extended User Attributes. Note: xattr is enabled
+ heap/no_heap		 Deprecated.
+ nouser_xattr		 Disable Extended User Attributes. Note: xattr is enabled
 			 by default if CONFIG_F2FS_FS_XATTR is selected.
-noacl			 Disable POSIX Access Control List. Note: acl is enabled
+ noacl			 Disable POSIX Access Control List. Note: acl is enabled
 			 by default if CONFIG_F2FS_FS_POSIX_ACL is selected.
-active_logs=%u		 Support configuring the number of active logs. In the
+ active_logs=%u		 Support configuring the number of active logs. In the
 			 current design, f2fs supports only 2, 4, and 6 logs.
 			 Default number is 6.
-disable_ext_identify	 Disable the extension list configured by mkfs, so f2fs
+ disable_ext_identify	 Disable the extension list configured by mkfs, so f2fs
 			 is not aware of cold files such as media files.
-inline_xattr		 Enable the inline xattrs feature.
-noinline_xattr		 Disable the inline xattrs feature.
-inline_xattr_size=%u	 Support configuring inline xattr size, it depends on
+ inline_xattr		 Enable the inline xattrs feature.
+ noinline_xattr		 Disable the inline xattrs feature.
+ inline_xattr_size=%u	 Support configuring inline xattr size, it depends on
 			 flexible inline xattr feature.
-inline_data		 Enable the inline data feature: Newly created small (<~3.4k)
+ inline_data		 Enable the inline data feature: Newly created small (<~3.4k)
 			 files can be written into inode block.
-inline_dentry		 Enable the inline dir feature: data in newly created
+ inline_dentry		 Enable the inline dir feature: data in newly created
 			 directory entries can be written into inode block. The
 			 space of inode block which is used to store inline
 			 dentries is limited to ~3.4k.
-noinline_dentry		 Disable the inline dentry feature.
-flush_merge		 Merge concurrent cache_flush commands as much as possible
+ noinline_dentry	 Disable the inline dentry feature.
+ flush_merge		 Merge concurrent cache_flush commands as much as possible
 			 to eliminate redundant command issues. If the underlying
 			 device handles the cache_flush command relatively slowly,
 			 recommend to enable this option.
-nobarrier		 This option can be used if underlying storage guarantees
+ nobarrier		 This option can be used if underlying storage guarantees
 			 its cached data should be written to the novolatile area.
 			 If this option is set, no cache_flush commands are issued
 			 but f2fs still guarantees the write ordering of all the
 			 data writes.
-barrier			 If this option is set, cache_flush commands are allowed to be
+ barrier		 If this option is set, cache_flush commands are allowed to be
 			 issued.
-fastboot		 This option is used when a system wants to reduce mount
+ fastboot		 This option is used when a system wants to reduce mount
 			 time as much as possible, even though normal performance
 			 can be sacrificed.
-extent_cache		 Enable an extent cache based on rb-tree, it can cache
+ extent_cache		 Enable an extent cache based on rb-tree, it can cache
 			 as many as extent which map between contiguous logical
 			 address and physical address per inode, resulting in
 			 increasing the cache hit ratio. Set by default.
-noextent_cache		 Disable an extent cache based on rb-tree explicitly, see
+ noextent_cache		 Disable an extent cache based on rb-tree explicitly, see
 			 the above extent_cache mount option.
-noinline_data		 Disable the inline data feature, inline data feature is
+ noinline_data		 Disable the inline data feature, inline data feature is
 			 enabled by default.
-data_flush		 Enable data flushing before checkpoint in order to
+ data_flush		 Enable data flushing before checkpoint in order to
 			 persist data of regular and symlink.
-reserve_root=%d		 Support configuring reserved space which is used for
+ reserve_root=%d	 Support configuring reserved space which is used for
 			 allocation from a privileged user with specified uid or
-			 gid, unit: 4KB, the default limit is 12.5% of user blocks.
-reserve_node=%d		 Support configuring reserved nodes which are used for
-			 allocation from a privileged user with specified uid or
-			 gid, the default limit is 12.5% of all nodes.
-resuid=%d		 The user ID which may use the reserved blocks and nodes.
-resgid=%d		 The group ID which may use the reserved blocks and nodes.
-fault_injection=%d	 Enable fault injection in all supported types with
+			 gid, unit: 4KB, the default limit is 0.2% of user blocks.
+ resuid=%d		 The user ID which may use the reserved blocks.
+ resgid=%d		 The group ID which may use the reserved blocks.
+ fault_injection=%d	 Enable fault injection in all supported types with
 			 specified injection rate.
-fault_type=%d		 Support configuring fault injection type, should be
+ fault_type=%d		 Support configuring fault injection type, should be
 			 enabled with fault_injection option, fault type value
 			 is shown below, it supports single or combined type.
 
@@ -216,7 +214,7 @@ fault_type=%d		 Support configuring fault injection type, should be
 			 FAULT_TIMEOUT                    0x00400000 (1000ms)
 			 FAULT_VMALLOC                    0x00800000
 			 ===========================      ==========
-mode=%s			 Control block allocation mode which supports "adaptive"
+ mode=%s		 Control block allocation mode which supports "adaptive"
 			 and "lfs". In "lfs" mode, there should be no random
 			 writes towards main area.
 			 "fragment:segment" and "fragment:block" are newly added here.
@@ -237,21 +235,21 @@ mode=%s			 Control block allocation mode which supports "adaptive"
 			 option for more randomness.
 			 Please, use these options for your experiments and we strongly
 			 recommend to re-format the filesystem after using these options.
-usrquota		 Enable plain user disk quota accounting.
-grpquota		 Enable plain group disk quota accounting.
-prjquota		 Enable plain project quota accounting.
-usrjquota=<file>	 Appoint specified file and type during mount, so that quota
-grpjquota=<file>	 information can be properly updated during recovery flow,
-prjjquota=<file>	 <quota file>: must be in root directory;
-jqfmt=<quota type>	 <quota type>: [vfsold,vfsv0,vfsv1].
-usrjquota=		 Turn off user journalled quota.
-grpjquota=		 Turn off group journalled quota.
-prjjquota=		 Turn off project journalled quota.
-quota			 Enable plain user disk quota accounting.
-noquota			 Disable all plain disk quota option.
-alloc_mode=%s		 Adjust block allocation policy, which supports "reuse"
+ usrquota		 Enable plain user disk quota accounting.
+ grpquota		 Enable plain group disk quota accounting.
+ prjquota		 Enable plain project quota accounting.
+ usrjquota=<file>	 Appoint specified file and type during mount, so that quota
+ grpjquota=<file>	 information can be properly updated during recovery flow,
+ prjjquota=<file>	 <quota file>: must be in root directory;
+ jqfmt=<quota type>	 <quota type>: [vfsold,vfsv0,vfsv1].
+ usrjquota=		 Turn off user journalled quota.
+ grpjquota=		 Turn off group journalled quota.
+ prjjquota=		 Turn off project journalled quota.
+ quota			 Enable plain user disk quota accounting.
+ noquota			 Disable all plain disk quota option.
+ alloc_mode=%s		 Adjust block allocation policy, which supports "reuse"
 			 and "default".
-fsync_mode=%s		 Control the policy of fsync. Currently supports "posix",
+ fsync_mode=%s		 Control the policy of fsync. Currently supports "posix",
 			 "strict", and "nobarrier". In "posix" mode, which is
 			 default, fsync will follow POSIX semantics and does a
 			 light operation to improve the filesystem performance.
@@ -260,13 +258,13 @@ fsync_mode=%s		 Control the policy of fsync. Currently supports "posix",
 			 pass, but the performance will regress. "nobarrier" is
 			 based on "posix", but doesn't issue flush command for
 			 non-atomic files likewise "nobarrier" mount option.
-test_dummy_encryption
-test_dummy_encryption=%s
+ test_dummy_encryption
+ test_dummy_encryption=%s
 			 Enable dummy encryption, which provides a fake fscrypt
 			 context. The fake fscrypt context is used by xfstests.
 			 The argument may be either "v1" or "v2", in order to
 			 select the corresponding fscrypt policy version.
-checkpoint=%s[:%u[%]]	 Set to "disable" to turn off checkpointing. Set to "enable"
+ checkpoint=%s[:%u[%]]	 Set to "disable" to turn off checkpointing. Set to "enable"
 			 to re-enable checkpointing. Is enabled by default. While
 			 disabled, any unmounting or unexpected shutdowns will cause
 			 the filesystem contents to appear as they did when the
@@ -282,7 +280,7 @@ checkpoint=%s[:%u[%]]	 Set to "disable" to turn off checkpointing. Set to "enabl
 			 hide up to all remaining free space. The actual space that
 			 would be unusable can be viewed at /sys/fs/f2fs/<disk>/unusable
 			 This space is reclaimed once checkpoint=enable.
-checkpoint_merge	 When checkpoint is enabled, this can be used to create a kernel
+ checkpoint_merge	 When checkpoint is enabled, this can be used to create a kernel
 			 daemon and make it to merge concurrent checkpoint requests as
 			 much as possible to eliminate redundant checkpoint issues. Plus,
 			 we can eliminate the sluggish issue caused by slow checkpoint
@@ -292,21 +290,21 @@ checkpoint_merge	 When checkpoint is enabled, this can be used to create a kerne
 			 to "3", to give one higher priority than other kernel threads.
 			 This is the same way to give a I/O priority to the jbd2
 			 journaling thread of ext4 filesystem.
-nocheckpoint_merge	 Disable checkpoint merge feature.
-compress_algorithm=%s	 Control compress algorithm, currently f2fs supports "lzo",
+ nocheckpoint_merge	 Disable checkpoint merge feature.
+ compress_algorithm=%s	 Control compress algorithm, currently f2fs supports "lzo",
 			 "lz4", "zstd" and "lzo-rle" algorithm.
-compress_algorithm=%s:%d Control compress algorithm and its compress level, now, only
-			 "lz4" and "zstd" support compress level config.
+ compress_algorithm=%s:%d Control compress algorithm and its compress level, now, only
+			 "lz4" and "zstd" support compress level config::
 
-                         =========      ===========
-			 algorithm	level range
-                         =========      ===========
-			 lz4		3 - 16
-			 zstd		1 - 22
-                         =========      ===========
-compress_log_size=%u	 Support configuring compress cluster size. The size will
+			  =========	===========
+			  algorithm	level range
+			  =========	===========
+			  lz4		3 - 16
+			  zstd		1 - 22
+			  =========	===========
+ compress_log_size=%u	 Support configuring compress cluster size. The size will
 			 be 4KB * (1 << %u). The default and minimum sizes are 16KB.
-compress_extension=%s	 Support adding specified extension, so that f2fs can enable
+ compress_extension=%s	 Support adding specified extension, so that f2fs can enable
 			 compression on those corresponding files, e.g. if all files
 			 with '.ext' has high compression rate, we can set the '.ext'
 			 on compression extension list and enable compression on
@@ -314,7 +312,7 @@ compress_extension=%s	 Support adding specified extension, so that f2fs can enab
 			 For other files, we can still enable compression via ioctl.
 			 Note that, there is one reserved special extension '*', it
 			 can be set to enable compression for all files.
-nocompress_extension=%s	 Support adding specified extension, so that f2fs can disable
+ nocompress_extension=%s Support adding specified extension, so that f2fs can disable
 			 compression on those corresponding files, just contrary to compression extension.
 			 If you know exactly which files cannot be compressed, you can use this.
 			 The same extension name can't appear in both compress and nocompress
@@ -326,26 +324,26 @@ nocompress_extension=%s	 Support adding specified extension, so that f2fs can di
 			 dir_flag < comp_extention,nocompress_extension < comp_file_flag,no_comp_file_flag.
 			 See more in compression sections.
 
-compress_chksum		 Support verifying chksum of raw data in compressed cluster.
-compress_mode=%s	 Control file compression mode. This supports "fs" and "user"
+ compress_chksum	 Support verifying chksum of raw data in compressed cluster.
+ compress_mode=%s	 Control file compression mode. This supports "fs" and "user"
 			 modes. In "fs" mode (default), f2fs does automatic compression
 			 on the compression enabled files. In "user" mode, f2fs disables
 			 the automaic compression and gives the user discretion of
 			 choosing the target file and the timing. The user can do manual
 			 compression/decompression on the compression enabled files using
 			 ioctls.
-compress_cache		 Support to use address space of a filesystem managed inode to
+ compress_cache		 Support to use address space of a filesystem managed inode to
 			 cache compressed block, in order to improve cache hit ratio of
 			 random read.
-inlinecrypt		 When possible, encrypt/decrypt the contents of encrypted
+ inlinecrypt		 When possible, encrypt/decrypt the contents of encrypted
 			 files using the blk-crypto framework rather than
 			 filesystem-layer encryption. This allows the use of
 			 inline encryption hardware. The on-disk format is
 			 unaffected. For more details, see
 			 Documentation/block/inline-encryption.rst.
-atgc			 Enable age-threshold garbage collection, it provides high
+ atgc			 Enable age-threshold garbage collection, it provides high
 			 effectiveness and efficiency on background GC.
-discard_unit=%s		 Control discard unit, the argument can be "block", "segment"
+ discard_unit=%s	 Control discard unit, the argument can be "block", "segment"
 			 and "section", issued discard command's offset/size will be
 			 aligned to the unit, by default, "discard_unit=block" is set,
 			 so that small discard functionality is enabled.
@@ -353,54 +351,55 @@ discard_unit=%s		 Control discard unit, the argument can be "block", "segment"
 			 default, it is helpful for large sized SMR or ZNS devices to
 			 reduce memory cost by getting rid of fs metadata supports small
 			 discard.
-memory=%s		 Control memory mode. This supports "normal" and "low" modes.
+ memory=%s		 Control memory mode. This supports "normal" and "low" modes.
 			 "low" mode is introduced to support low memory devices.
 			 Because of the nature of low memory devices, in this mode, f2fs
 			 will try to save memory sometimes by sacrificing performance.
 			 "normal" mode is the default mode and same as before.
-age_extent_cache	 Enable an age extent cache based on rb-tree. It records
+ age_extent_cache	 Enable an age extent cache based on rb-tree. It records
 			 data block update frequency of the extent per inode, in
 			 order to provide better temperature hints for data block
 			 allocation.
-errors=%s		 Specify f2fs behavior on critical errors. This supports modes:
+ errors=%s		 Specify f2fs behavior on critical errors. This supports modes:
 			 "panic", "continue" and "remount-ro", respectively, trigger
 			 panic immediately, continue without doing anything, and remount
 			 the partition in read-only mode. By default it uses "continue"
-			 mode.
+			 mode::
 
-			 ====================== =============== =============== ========
-			 mode			continue	remount-ro	panic
-			 ====================== =============== =============== ========
-			 access ops		normal		normal		N/A
-			 syscall errors		-EIO		-EROFS		N/A
-			 mount option		rw		ro		N/A
-			 pending dir write	keep		keep		N/A
-			 pending non-dir write	drop		keep		N/A
-			 pending node write	drop		keep		N/A
-			 pending meta write	keep		keep		N/A
-			 ====================== =============== =============== ========
-nat_bits		 Enable nat_bits feature to enhance full/empty nat blocks access,
+			  ===================== =============== =============== ========
+			  mode			continue	remount-ro	panic
+			  ===================== =============== =============== ========
+			  access ops		normal		normal		N/A
+			  syscall errors	-EIO		-EROFS		N/A
+			  mount option		rw		ro		N/A
+			  pending dir write	keep		keep		N/A
+			  pending non-dir write	drop		keep		N/A
+			  pending node write	drop		keep		N/A
+			  pending meta write	keep		keep		N/A
+			  ===================== =============== =============== ========
+
+ nat_bits		 Enable nat_bits feature to enhance full/empty nat blocks access,
 			 by default it's disabled.
-lookup_mode=%s		 Control the directory lookup behavior for casefolded
+ lookup_mode=%s		 Control the directory lookup behavior for casefolded
 			 directories. This option has no effect on directories
-			 that do not have the casefold feature enabled.
+			 that do not have the casefold feature enabled::
 
-			 ================== ========================================
-			 Value		    Description
-			 ================== ========================================
-			 perf		    (Default) Enforces a hash-only lookup.
+			  ================= ========================================
+			  Value		    Description
+			  ================= ========================================
+			  perf		    (Default) Enforces a hash-only lookup.
 					    The linear search fallback is always
 					    disabled, ignoring the on-disk flag.
-			 compat		    Enables the linear search fallback for
+			  compat	    Enables the linear search fallback for
 					    compatibility with directory entries
 					    created by older kernel that used a
 					    different case-folding algorithm.
 					    This mode ignores the on-disk flag.
-			 auto		    F2FS determines the mode based on the
-					    on-disk `SB_ENC_NO_COMPAT_FALLBACK_FL`
+			  auto		    F2FS determines the mode based on the
+					    on-disk SB_ENC_NO_COMPAT_FALLBACK_FL
 					    flag.
-			 ================== ========================================
-======================== ============================================================
+			  ================= ========================================
+ ======================== ============================================================
 
 Debugfs Entries
 ===============
