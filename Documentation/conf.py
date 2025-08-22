@@ -496,6 +496,8 @@ latex_elements = {
         \setsansfont{DejaVu Sans}
         \setmonofont{DejaVu Sans Mono}
         \newfontfamily\headingfont{DejaVu Serif}
+        % Load kerneldoc specific CJK font settings
+        \input{kerneldoc-cjkfontpkg.sty}
     """),
     "preamble": dedent(r"""
         % Load kerneldoc specific LaTeX settings
@@ -529,6 +531,7 @@ latex_documents = []
 # Additional LaTeX stuff to be copied to build directory
 latex_additional_files = [
     "sphinx/kerneldoc-preamble.sty",
+    "sphinx/kerneldoc-cjkfontpkg.sty",
 ]
 
 
