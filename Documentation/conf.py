@@ -456,6 +456,7 @@ htmlhelp_basename = "TheLinuxKerneldoc"
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
+    "latex_engine": "xelatex",
     # The paper size ('letterpaper' or 'a4paper').
     "papersize": "a4paper",
     "passoptionstopackages": dedent(r"""
@@ -467,10 +468,11 @@ latex_elements = {
     "printindex": r"\footnotesize\raggedright\printindex",
     # Latex figure (float) alignment
     # 'figure_align': 'htbp',
-    # Don't mangle with UTF-8 chars
+    # Don't mangle with Type1 fonts
+    "cmappkg": "",
     "fontenc": "",
     "inputenc": "",
-    "utf8extra": "",
+    "textgreek": "",
     # Set document margins
     "sphinxsetup": dedent(r"""
         hmargin=0.5in, vmargin=1in,
