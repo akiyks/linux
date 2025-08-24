@@ -66,6 +66,13 @@
 \addtolength{\headheight}{1.6pt}
 \addtolength{\topmargin}{-1.6pt}
 
+% Load optional package
+% Silence harmless/expected warnings, redirected to .sil
+\IfFileExists{silence.sty}{
+    \usepackage[save]{silence}
+    \WarningFilter[tymin]{tabulary}{tymin too large}
+    \ActivateWarningFilters[tymin]
+}{}
 
 \makeatletter
 \@ifpackageloaded{xeCJK}{
