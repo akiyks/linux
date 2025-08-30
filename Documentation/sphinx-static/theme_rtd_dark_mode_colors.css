@@ -1,0 +1,46 @@
+/* color of kernel version below Tux logo */
+html[data-theme="light"] .wy-side-nav-search > div.version {
+    color: #eeeeee;
+}
+html[data-theme="dark"] .wy-side-nav-search > div.version {
+    color: #aaaaaa;
+}
+
+/* Language selection menu */
+/* for light mode */
+html[data-theme="light"] div.language-selection {
+    background: #eeeeee;
+    border: 1px solid #cccccc;
+}
+
+html[data-theme="light"] div.language-selection a {
+    color: #333333;
+}
+
+html[data-theme="light"] div.language-selection ul {
+    background: #fafafa;
+    border: 1px solid #cccccc;
+}
+
+html[data-theme="light"] div.language-selection ul li:hover {
+    background: #dddddd;
+}
+
+/* for dark mode */
+html[data-theme="dark"] div.language-selection {
+    background: #111111;
+    border: 1px solid #333333;
+}
+
+html[data-theme="dark"] div.language-selection a {
+    color: #cccccc;
+}
+
+html[data-theme="dark"] div.language-selection ul {
+    background: #050505;
+    border: 1px solid #333333;
+}
+
+html[data-theme="dark"] div.language-selection ul li:hover {
+    background: #222222;
+}
