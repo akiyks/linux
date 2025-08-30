@@ -21,8 +21,8 @@ import sys
 import re
 import os.path
 
-from docutils import statemachine
-from docutils.utils.error_reporting import ErrorString
+from docutils import statemachine, io
+#from docutils.utils.error_reporting import ErrorString
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst.directives.misc import Include
 
@@ -190,6 +190,6 @@ class MaintainersInclude(Include):
             lines = self.parse_maintainers(path)
         except IOError as error:
             raise self.severe('Problems with "%s" directive path:\n%s.' %
-                      (self.name, ErrorString(error)))
+                      (self.name, io.error_string(error)))
 
         return []

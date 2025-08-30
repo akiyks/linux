@@ -6,6 +6,6 @@
 Media Controller Header File
 ****************************
 
-.. kernel-include:: include/uapi/linux/media.h
+.. kernel-include:: $SOURCEDIR/include/uapi/linux/media.h
     :generate-cross-refs:
     :exception-file: media.h.rst.exceptions

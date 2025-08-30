@@ -89,7 +89,7 @@ import sys
 
 from docutils import io, nodes, statemachine
 from docutils.statemachine import ViewList
-from docutils.utils.error_reporting import SafeString, ErrorString
+#from docutils.utils.error_reporting import SafeString, ErrorString
 from docutils.parsers.rst import Directive, directives
 from docutils.parsers.rst.directives.body import CodeBlock, NumberLines
 
@@ -156,14 +156,14 @@ class KernelInclude(Directive):
             except UnicodeEncodeError:
                 raise self.severe('Problems with directive path:\n'
                                 'Cannot encode input file path "%s" '
-                                '(wrong locale?).' % SafeString(path))
+                                '(wrong locale?).' % str(path))
             except IOError as error:
-                raise self.severe('Problems with directive path:\n%s.' % ErrorString(error))
+                raise self.severe('Problems with directive path:\n%s.' % io.error_string(error))
 
             try:
                 return include_file.read()
             except UnicodeError as error:
-                raise self.severe('Problem with directive:\n%s' % ErrorString(error))
+                raise self.severe('Problem with directive:\n%s' % io.error_string(error))
 
     def apply_range(self, rawtext):
         """

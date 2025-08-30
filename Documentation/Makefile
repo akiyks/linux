@@ -89,6 +89,7 @@ loop_cmd = $(echo-cmd) $(cmd_$(1)) || exit;
 #    e.g. "userspace-api/media" for the linux-tv book-set at ./Documentation/userspace-api/media
 
 PYTHONPYCACHEPREFIX ?= $(abspath $(BUILDDIR)/__pycache__)
+export SOURCEDIR = $(abspath $(srctree))
 
 quiet_cmd_sphinx = SPHINX  $@ --> file://$(abspath $(BUILDDIR)/$3/$4)
       cmd_sphinx = \
