@@ -55,6 +55,8 @@ ifeq ($(HAVE_SPHINX),0)
 
 else # HAVE_SPHINX
 
+export SOURCEDIR = $(abspath $(srctree))
+
 # User-friendly check for pdflatex and latexmk
 HAVE_PDFLATEX := $(shell if which $(PDFLATEX) >/dev/null 2>&1; then echo 1; else echo 0; fi)
 HAVE_LATEXMK := $(shell if which latexmk >/dev/null 2>&1; then echo 1; else echo 0; fi)
