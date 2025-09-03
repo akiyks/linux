@@ -22,7 +22,11 @@ import re
 import os.path
 
 from docutils import statemachine
-from docutils.utils.error_reporting import ErrorString
+try:
+    from docutils.utils.error_reporting import ErrorString
+except ImportError:
+    # docutils >= 0.22
+    from docutils.io import error_string as ErrorString
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst.directives.misc import Include
 

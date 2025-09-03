@@ -89,7 +89,12 @@ import sys
 
 from docutils import io, nodes, statemachine
 from docutils.statemachine import ViewList
-from docutils.utils.error_reporting import SafeString, ErrorString
+try:
+    from docutils.utils.error_reporting import SafeString, ErrorString
+except ImportError:
+    # docutils >= 0.22
+    SafeString = str
+    from docutils.io import error_string as ErrorString
 from docutils.parsers.rst import Directive, directives
 from docutils.parsers.rst.directives.body import CodeBlock, NumberLines
 
