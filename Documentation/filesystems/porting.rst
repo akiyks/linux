@@ -1292,7 +1292,7 @@ parameters for the file system to set this state.
 
 Calling conventions for vfs_parse_fs_string() have changed; it does *not*
 take length anymore (value ? strlen(value) : 0 is used).  If you want
-a different length, use
+a different length, use::
 
 	vfs_parse_fs_qstr(fc, key, &QSTR_LEN(value, len))
 
