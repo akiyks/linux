@@ -145,12 +145,13 @@ else # HAVE_PDFLATEX
 pdfdocs: DENY_VF = XDG_CONFIG_HOME=$(FONTS_CONF_DENY_VF)
 pdfdocs: latexdocs
 	@$(srctree)/scripts/sphinx-pre-install --version-check
-	$(foreach var,$(SPHINXDIRS), \
-	   $(MAKE) PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/$(var)/latex || sh $(srctree)/scripts/check-variable-fonts.sh || exit; \
-	   mkdir -p $(BUILDDIR)/$(var)/pdf; \
-	   mv $(subst .tex,.pdf,$(wildcard $(BUILDDIR)/$(var)/latex/*.tex)) $(BUILDDIR)/$(var)/pdf/; \
-	)
-
+ifneq ($(SPHINXDIRS),.)
+	# Prepare $(BUILDDIR)/latex/
+	sh $(srctree)/scripts/collect-tex-source-dir.sh $(BUILDDIR) $(SPHINXDIRS)
+endif # SPHINXDIRS
+	$(MAKE) PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/latex || sh $(srctree)/scripts/check-variable-fonts.sh
+	# Move PDF files into pdf
+	sh $(srctree)/scripts/move-pdf-files.sh $(BUILDDIR)
 endif # HAVE_PDFLATEX
 
 epubdocs:
