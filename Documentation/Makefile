@@ -147,11 +147,11 @@ pdfdocs: latexdocs
 	@$(srctree)/scripts/sphinx-pre-install --version-check
 ifneq ($(SPHINXDIRS),.)
 	# Prepare $(BUILDDIR)/latex/
-	sh $(srctree)/scripts/collect-tex-source-dir.sh $(BUILDDIR) $(SPHINXDIRS)
+	$(Q)sh $(srctree)/scripts/collect-tex-source-dir.sh $(BUILDDIR) $(SPHINXDIRS)
 endif # SPHINXDIRS
-	$(MAKE) PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/latex
+	-$(Q)$(MAKE) -k PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/latex
 	# Move PDF files into pdf
-	sh $(srctree)/scripts/move-pdf-files.sh $(BUILDDIR) || \
+	$(Q)sh $(srctree)/scripts/move-pdf-files.sh $(BUILDDIR) || \
 	  $(DENY_VF) sh $(srctree)/scripts/check-variable-fonts.sh
 endif # HAVE_PDFLATEX
 

@@ -17,7 +17,9 @@ for t in $BUILDDIR/latex/*.tex; do
         if [ $PDFINFO_CMD ] ; then
 	    pdfinfo $tbase.pdf > /dev/null 2>&1
 	    if [ "$?" = "0" ] ; then
-		echo "PASS: $tbase.pdf"
+		if [ "x$KBUILD_VERBOSE" != "x" ] ; then
+		    echo "PASS: $tbase.pdf"
+		fi
 	    else
 		echo "FAIL: $tbase.pdf"
 		errcnt=`expr $errcnt + 1`
