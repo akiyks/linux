@@ -149,9 +149,10 @@ ifneq ($(SPHINXDIRS),.)
 	# Prepare $(BUILDDIR)/latex/
 	sh $(srctree)/scripts/collect-tex-source-dir.sh $(BUILDDIR) $(SPHINXDIRS)
 endif # SPHINXDIRS
-	$(MAKE) PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/latex || sh $(srctree)/scripts/check-variable-fonts.sh
+	$(MAKE) PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/latex
 	# Move PDF files into pdf
-	sh $(srctree)/scripts/move-pdf-files.sh $(BUILDDIR)
+	sh $(srctree)/scripts/move-pdf-files.sh $(BUILDDIR) || \
+	  $(DENY_VF) sh $(srctree)/scripts/check-variable-fonts.sh
 endif # HAVE_PDFLATEX
 
 epubdocs:
