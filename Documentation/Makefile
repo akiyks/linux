@@ -66,11 +66,9 @@ pdfdocs: DENY_VF = XDG_CONFIG_HOME=$(FONTS_CONF_DENY_VF)
 pdfdocs: latexdocs
 	@$(srctree)/tools/docs/sphinx-pre-install --version-check
 ifneq ($(SPHINXDIRS),.)
-	# Prepare $(BUILDDIR)/latex/
 	$(Q)sh $(srctree)/tools/docs/pre-pdfdocs.sh $(BUILDDIR) $(SPHINXDIRS)
 endif # SPHINXDIRS
 	-$(Q)$(MAKE) -k PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/latex
-	# Move PDF files into pdf
 	$(Q)sh $(srctree)/tools/docs/post-pdfdocs.sh $(BUILDDIR) || \
 	  $(DENY_VF) sh $(srctree)/scripts/check-variable-fonts.sh
 else
