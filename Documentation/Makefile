@@ -53,7 +53,7 @@ ifeq ($(HAVE_SPHINX),0)
 else # HAVE_SPHINX
 
 # Common documentation targets
-mandocs infodocs texinfodocs latexdocs epubdocs xmldocs pdfdocs linkcheckdocs:
+mandocs infodocs texinfodocs latexdocs epubdocs xmldocs linkcheckdocs:
 	$(Q)@$(srctree)/tools/docs/sphinx-pre-install --version-check
 	+$(Q)$(PYTHON3) $(BUILD_WRAPPER) $@ \
 		--sphinxdirs="$(SPHINXDIRS)" --conf="$(SPHINX_CONF)" \
@@ -63,6 +63,16 @@ mandocs infodocs texinfodocs latexdocs epubdocs xmldocs pdfdocs linkcheckdocs:
 # Special handling for pdfdocs
 ifeq ($(shell which $(PDFLATEX) >/dev/null 2>&1; echo $$?),0)
 pdfdocs: DENY_VF = XDG_CONFIG_HOME=$(FONTS_CONF_DENY_VF)
+pdfdocs: latexdocs
+	@$(srctree)/tools/docs/sphinx-pre-install --version-check
+ifneq ($(SPHINXDIRS),.)
+	# Prepare $(BUILDDIR)/latex/
+	$(Q)sh $(srctree)/tools/docs/pre-pdfdocs.sh $(BUILDDIR) $(SPHINXDIRS)
+endif # SPHINXDIRS
+	-$(Q)$(MAKE) -k PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/latex
+	# Move PDF files into pdf
+	$(Q)sh $(srctree)/tools/docs/post-pdfdocs.sh $(BUILDDIR) || \
+	  $(DENY_VF) sh $(srctree)/scripts/check-variable-fonts.sh
 else
 pdfdocs:
 	$(warning The '$(PDFLATEX)' command was not found. Make sure you have it installed and in PATH to produce PDF output.)
