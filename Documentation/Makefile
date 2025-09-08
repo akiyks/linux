@@ -61,7 +61,15 @@ mandocs infodocs texinfodocs latexdocs epubdocs xmldocs linkcheckdocs:
 		--theme=$(DOCS_THEME) --css=$(DOCS_CSS) --paper=$(PAPER)
 
 # Special handling for pdfdocs
-ifeq ($(shell which $(PDFLATEX) >/dev/null 2>&1; echo $$?),0)
+# User-friendly check for pdflatex and latexmk
+HAVE_PDFLATEX := $(shell if which $(PDFLATEX) >/dev/null 2>&1; then echo 1; else echo 0; fi)
+HAVE_LATEXMK := $(shell if which latexmk >/dev/null 2>&1; then echo 1; else echo 0; fi)
+
+ifeq ($(HAVE_LATEXMK),1)
+	PDFLATEX := latexmk -$(PDFLATEX)
+endif #HAVE_LATEXMK
+
+ifneq ($(HAVE_PDFLATEX),0)
 pdfdocs: DENY_VF = XDG_CONFIG_HOME=$(FONTS_CONF_DENY_VF)
 pdfdocs: latexdocs
 	@$(srctree)/tools/docs/sphinx-pre-install --version-check
