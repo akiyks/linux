@@ -1050,7 +1050,7 @@ class KernelDoc:
                               f"expecting prototype for typedef {self.entry.identifier}. Prototype was for typedef {declaration_name} instead\n")
                 return
 
-            self.create_parameter_list(ln, 'function',_type, args, ',', declaration_name)
+            self.create_parameter_list(ln, 'function', args, ',', declaration_name)
 
             self.output_declaration('function', declaration_name,
                                     typedef=True,
