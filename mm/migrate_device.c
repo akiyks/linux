@@ -781,7 +781,7 @@ EXPORT_SYMBOL(migrate_vma_setup);
  *
  * @migrate: migrate_vma arguments
  * @addr: address where the folio will be inserted
- * @folio: folio to be inserted at @addr
+ * @page: Need proper description.
  * @src: src pfn which is being migrated
  * @pmdp: pointer to the pmd
  */
