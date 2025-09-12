@@ -54,9 +54,10 @@ import subprocess
 import sys
 
 from concurrent import futures
+from glob import glob
 
 from lib.python_version import PythonVersion
-from glob import glob
+from lib.latex_fonts import LatexFontChecker
 
 LIB_DIR = "../../scripts/lib"
 SRC_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -476,6 +477,10 @@ class SphinxBuilder:
         print()
 
         if build_failed:
+            msg = LatexFontChecker().check()
+            if msg:
+                print(msg)
+
             sys.exit("PDF build failed: not all PDF files were created.")
         else:
             print("All PDF files were built.")
