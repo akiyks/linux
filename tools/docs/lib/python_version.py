@@ -85,9 +85,11 @@ class PythonVersion:
         may need to update it one day, hopefully on a distant future.
         """
         patterns = [
-            "python3.[0-9]",
             "python3.[0-9][0-9]",
+            "python3.[0-9]",
         ]
+
+        python_cmd = []
 
         # Seek for a python binary newer than min_version
         for path in os.getenv("PATH", "").split(":"):
@@ -96,12 +98,13 @@ class PythonVersion:
                     if os.path.isfile(cmd) and os.access(cmd, os.X_OK):
                         version = PythonVersion.get_python_version(cmd)
                         if version >= min_version:
-                            return cmd
+                            python_cmd.append((version, cmd))
 
-        return None
+        return sorted(python_cmd, reverse=True)
 
     @staticmethod
-    def check_python(min_version):
+    def check_python(min_version, show_alternatives=False, bail_out=False,
+                     success_on_error=False):
         """
         Check if the current python binary satisfies our minimal requirement
         for Sphinx build. If not, re-run with a newer version if found.
@@ -113,17 +116,41 @@ class PythonVersion:
 
         python_ver = PythonVersion.ver_str(cur_ver)
 
-        new_python_cmd = PythonVersion.find_python(min_version)
-        if not new_python_cmd:
+        available_versions = PythonVersion.find_python(min_version)
+        if not available_versions:
             print(f"ERROR: Python version {python_ver} is not spported anymore\n")
             print("       Can't find a new version. This script may fail")
             return
 
-        # Restart script using the newer version
         script_path = os.path.abspath(sys.argv[0])
-        args = [new_python_cmd, script_path] + sys.argv[1:]
+
+        # Check possible alternatives
+        if available_versions:
+            new_python_cmd = available_versions[0][1]
+        else:
+            new_python_cmd = None
+
+        if show_alternatives:
+            print("You could run, instead:")
+            for _, cmd in available_versions:
+                args = [cmd, script_path] + sys.argv[1:]
+
+                cmd_str = " ".join(args)
+                print(f"  {cmd_str}")
+            print()
+
+        if bail_out:
+            msg = f"Python {python_ver} not supported. Bailing out"
+            if success_on_error:
+                print(msg, file=sys.stderr)
+                sys.exit(0)
+            else:
+                sys.exit(msg)
 
         print(f"Python {python_ver} not supported. Changing to {new_python_cmd}")
+
+        # Restart script using the newer version
+        args = [new_python_cmd, script_path] + sys.argv[1:]
 
         try:
             os.execv(new_python_cmd, args)
