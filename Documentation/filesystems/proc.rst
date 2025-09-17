@@ -995,6 +995,7 @@ For example if the counters are not accurate, the line will be appended with
 "accurate:no" pair.
 
 Supported markers in v2:
+
 accurate:no
 
               Absolute values of the counters in this line are not accurate
