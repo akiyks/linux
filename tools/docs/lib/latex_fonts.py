@@ -113,6 +113,9 @@ class LatexFontChecker:
 
         self.re_cjk = re.compile(r"([^:]+):\s*Noto\s+(Sans|Sans Mono|Serif) CJK")
 
+    def description(self):
+        return __doc__
+
     def get_noto_cjk_vf_fonts(self):
         """Get Noto CJK fonts"""
 
@@ -154,8 +157,9 @@ class LatexFontChecker:
                 For CJK pages in PDF, they need to be hidden from XeTeX by denylisting.
                 Or, CJK pages can be skipped by uninstalling texlive-xecjk.
 
-                For more info on denylisting, other options, and variable font, see header
-                comments of {rel_file}.
+                For more info on denylisting, other options, and variable font, run:
+
+                    tools/docs/check-variable-fonts.py -h
             """)
         msg += "=" * 77
 

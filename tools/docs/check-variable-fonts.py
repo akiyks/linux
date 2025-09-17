@@ -12,9 +12,16 @@ Detect problematic Noto CJK variable fonts.
 or more details, see lib/latex_fonts.py.
 """
 
+import argparse
 import sys
 
 from lib.latex_fonts import LatexFontChecker
+
+checker = LatexFontChecker()
+
+parser=argparse.ArgumentParser(description=checker.description(),
+                               formatter_class=argparse.RawTextHelpFormatter)
+_=parser.parse_args()
 
 msg = LatexFontChecker().check()
 if msg:
