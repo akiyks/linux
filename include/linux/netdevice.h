@@ -1859,6 +1859,7 @@ enum netdev_reg_state {
  *			discovery handling. Necessary for e.g. 6LoWPAN.
  *	@xfrmdev_ops:	Transformation offload operations
  *	@tlsdev_ops:	Transport Layer Security offload operations
+ *	@netdev_trace_buffer_list: Need proper description.
  *	@header_ops:	Includes callbacks for creating,parsing,caching,etc
  *			of Layer 2 headers.
  *
