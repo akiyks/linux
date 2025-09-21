@@ -275,10 +275,7 @@ class KernelFiles():
                 self.config.log.warning("No kernel-doc for file %s", fname)
                 continue
 
-            symbols = self.results[fname]
-            self.out_style.set_symbols(symbols)
-
-            for arg in symbols:
+            for arg in self.results[fname]:
                 m = self.out_msg(fname, arg.name, arg)
 
                 if m is None:
