@@ -274,8 +274,10 @@ class SphinxBuilder:
 
             if self.venv:
                 cmd = ["python"]
+            elif self.env.get("PYTHON3", "python3") != "python3":
+                cmd = [self.env["PYTHON3"]]
             else:
-                cmd = [sys.executable]
+                cmd = []
 
             cmd += [sphinx_build]
             cmd += [f"-j{n_jobs}"]
