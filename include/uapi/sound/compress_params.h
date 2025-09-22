@@ -335,6 +335,7 @@ struct snd_dec_ape {
  * @output_gain: Gain to apply when decoding (in Q7.8 format).
  * @mapping_family: Order and meaning of output channels. Only values 0 and 1
  * are expected; values 2..255 are not recommended for playback.
+ * @chan_map: Need proper description.
  *
  * @chan_map: Optional channel mapping table. Describes mapping of opus streams
  *            to decoded channels. Fields:
