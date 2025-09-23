@@ -59,14 +59,26 @@ ifeq ($(HAVE_SPHINX),0)
 else # HAVE_SPHINX
 
 # Common documentation targets
-htmldocs mandocs infodocs texinfodocs latexdocs epubdocs xmldocs pdfdocs linkcheckdocs:
+htmldocs mandocs infodocs texinfodocs latexdocs epubdocs xmldocs linkcheckdocs:
 	$(Q)@$(srctree)/tools/docs/sphinx-pre-install --version-check
 	+$(Q)$(PYTHON3) $(BUILD_WRAPPER) $@ \
 		--sphinxdirs="$(SPHINXDIRS)" $(RUSTDOC) \
-		--builddir="$(BUILDDIR)" --deny-vf=$(FONTS_CONF_DENY_VF) \
+		--builddir="$(BUILDDIR)" \
 		--theme=$(DOCS_THEME) --css=$(DOCS_CSS) --paper=$(PAPER)
 
-
+# Special handling for pdfdocs
+ifneq ($(shell which $(PDFLATEX) >/dev/null 2>&1; echo $$?),0)
+pdfdocs:
+	$(warning The '$(PDFLATEX)' command was not found. Make sure you have it installed and in PATH to produce PDF output.)
+	@echo "  SKIP    Sphinx $@ target."
+else
+pdfdocs: latexdocs
+	+$(Q)$(PYTHON3) $(BUILD_WRAPPER) $@ \
+		--skip-sphinx-build \
+		--sphinxdirs="$(SPHINXDIRS)" $(RUSTDOC) \
+		--builddir="$(BUILDDIR)" --deny-vf=$(FONTS_CONF_DENY_VF) \
+		--theme=$(DOCS_THEME) --css=$(DOCS_CSS) --paper=$(PAPER)
+endif
 endif
 
 # The following targets are independent of HAVE_SPHINX, and the rules should
