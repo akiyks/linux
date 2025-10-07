@@ -30,7 +30,7 @@ OPTIONS
 
 .. include:: common_top_options.rst
 
-.. include:: common_options.rst
+.. include:: common_options.txt
 
 .. include:: common_timerlat_aa.rst
 
