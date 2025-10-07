@@ -33,7 +33,7 @@ OPTIONS
 
 .. include:: common_top_options.rst
 
-.. include:: common_options.rst
+.. include:: common_options.txt
 
 EXAMPLE
 =======
