@@ -29,6 +29,13 @@ ifeq ($(HAVE_LATEXMK),1)
 pdfdocs: PDFLATEX := latexmk -$(PDFLATEX)
 endif #HAVE_LATEXMK
 pdfdocs: DENY_VF = XDG_CONFIG_HOME=$(FONTS_CONF_DENY_VF)
+ifeq ($(SPHINXDIRS),.)
+pdfdocs: latexdocs
+	$(Q)$(MAKE) PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/latex || \
+	  PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" $(srctree)/tools/docs/check-variable-fonts.py
+	$(Q)mkdir -p $(BUILDDIR)/pdf
+	$(Q)mv $(subst .tex,.pdf,$(wildcard $(BUILDDIR)/latex/*.tex)) $(BUILDDIR)/pdf/
+else #SPHINXDIRS --- not parallelized
 pdfdocs: latexdocs
 	$(Q)$(foreach var,$(SPHINXDIRS), \
 	   $(MAKE) PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/$(var)/latex || \
@@ -36,5 +43,6 @@ pdfdocs: latexdocs
 	   mkdir -p $(BUILDDIR)/$(var)/pdf; \
 	   mv $(subst .tex,.pdf,$(wildcard $(BUILDDIR)/$(var)/latex/*.tex)) $(BUILDDIR)/$(var)/pdf/; \
 	)
+endif #SPHINXDIRS
 endif #HAVE_PDFLATEX
 endif #PDF_SUBMAKE
