@@ -555,34 +555,34 @@ systems with more than one CPU:
 | **Answer**:                                                           |
 +-----------------------------------------------------------------------+
 | Yes, they really are required. To see why the first guarantee is      |
-| required, consider the following sequence of events:                  |
+| required, consider the following sequence of events::                 |
 |                                                                       |
-| #. CPU 1: rcu_read_lock()                                             |
-| #. CPU 1: ``q = rcu_dereference(gp); /* Very likely to return p. */`` |
-| #. CPU 0: ``list_del_rcu(p);``                                        |
-| #. CPU 0: synchronize_rcu() starts.                                   |
-| #. CPU 1: ``do_something_with(q->a);``                                |
-|    ``/* No smp_mb(), so might happen after kfree(). */``              |
-| #. CPU 1: rcu_read_unlock()                                           |
-| #. CPU 0: synchronize_rcu() returns.                                  |
-| #. CPU 0: ``kfree(p);``                                               |
+|   1. CPU 1: rcu_read_lock()                                           |
+|   2. CPU 1: q = rcu_dereference(gp); /* Very likely to return p. */   |
+|   3. CPU 0: list_del_rcu(p);                                          |
+|   4. CPU 0: synchronize_rcu() starts.                                 |
+|   5. CPU 1: do_something_with(q->a);                                  |
+|             /* No smp_mb(), so might happen after kfree(). */         |
+|   6. CPU 1: rcu_read_unlock()                                         |
+|   7. CPU 0: synchronize_rcu() returns.                                |
+|   8. CPU 0: kfree(p);                                                 |
 |                                                                       |
 | Therefore, there absolutely must be a full memory barrier between the |
 | end of the RCU read-side critical section and the end of the grace    |
 | period.                                                               |
 |                                                                       |
 | The sequence of events demonstrating the necessity of the second rule |
-| is roughly similar:                                                   |
+| is roughly similar::                                                  |
 |                                                                       |
-| #. CPU 0: ``list_del_rcu(p);``                                        |
-| #. CPU 0: synchronize_rcu() starts.                                   |
-| #. CPU 1: rcu_read_lock()                                             |
-| #. CPU 1: ``q = rcu_dereference(gp);``                                |
-|    ``/* Might return p if no memory barrier. */``                     |
-| #. CPU 0: synchronize_rcu() returns.                                  |
-| #. CPU 0: ``kfree(p);``                                               |
-| #. CPU 1: ``do_something_with(q->a); /* Boom!!! */``                  |
-| #. CPU 1: rcu_read_unlock()                                           |
+|   1. CPU 0: list_del_rcu(p);                                          |
+|   2. CPU 0: synchronize_rcu() starts.                                 |
+|   3. CPU 1: rcu_read_lock()                                           |
+|   4. CPU 1: q = rcu_dereference(gp);                                  |
+|             /* Might return p if no memory barrier. */                |
+|   5. CPU 0: synchronize_rcu() returns.                                |
+|   6. CPU 0: kfree(p);                                                 |
+|   7. CPU 1: do_something_with(q->a); /* Boom!!! */                    |
+|   8. CPU 1: rcu_read_unlock()                                         |
 |                                                                       |
 | And similarly, without a memory barrier between the beginning of the  |
 | grace period and the beginning of the RCU read-side critical section, |
