@@ -35,14 +35,11 @@ pdfdocs: latexdocs
 	  PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" $(srctree)/tools/docs/check-variable-fonts.py
 	$(Q)mkdir -p $(BUILDDIR)/pdf
 	$(Q)mv $(subst .tex,.pdf,$(wildcard $(BUILDDIR)/latex/*.tex)) $(BUILDDIR)/pdf/
-else #SPHINXDIRS --- not parallelized
+else #SPHINXDIRS
 pdfdocs: latexdocs
-	$(Q)$(foreach var,$(SPHINXDIRS), \
-	   $(MAKE) PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/$(var)/latex || \
-	     PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" $(srctree)/tools/docs/check-variable-fonts.py || $(EXIT); \
-	   mkdir -p $(BUILDDIR)/$(var)/pdf; \
-	   mv $(subst .tex,.pdf,$(wildcard $(BUILDDIR)/$(var)/latex/*.tex)) $(BUILDDIR)/$(var)/pdf/; \
-	)
+	$(Q)$(MAKE) Q="$(Q)" BUILDDIR="$(BUILDDIR)" SPHINXDIRS="$(SPHINXDIRS)" PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" DENY_VF="$(DENY_VF)" -f $(srctree)/Documentation/pdf_makefile || \
+	  PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" $(srctree)/tools/docs/check-variable-fonts.py
+	$(Q)$(MAKE) Q="$(Q)" BUILDDIR="$(BUILDDIR)" SPHINXDIRS="$(SPHINXDIRS)" -f $(srctree)/Documentation/pdf_makefile symlink-pdf
 endif #SPHINXDIRS
 endif #HAVE_PDFLATEX
 endif #PDF_SUBMAKE

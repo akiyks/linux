@@ -1,0 +1,14 @@
+ALLLATEXDIRS := $(addsuffix /latex,$(addprefix $(BUILDDIR)/,$(SPHINXDIRS)))
+Q =
+
+all: $(ALLLATEXDIRS)
+	@echo "BUILDDIR is $(abspath $(BUILDDIR))."
+
+$(ALLLATEXDIRS): %: $(subst .tex,.pdf,$(wildcard $@/*.tex))
+	$(Q)$(MAKE) -C '$@' PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF)
+
+symlink-pdf:
+	$(Q)mkdir -p $(abspath $(BUILDDIR))/pdf
+	$(Q)ln -sf $(subst .tex,.pdf,$(wildcard $(abspath $(BUILDDIR))/*/latex/*.tex)) -t $(abspath $(BUILDDIR))/pdf
+
+.PHONY: $(ALLLATEXDIRS) symlink-pdf
