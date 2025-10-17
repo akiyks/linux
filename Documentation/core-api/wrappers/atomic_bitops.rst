@@ -6,13 +6,5 @@
 Atomic bitops
 =============
 
-.. raw:: latex
-
-    \footnotesize
-
 .. include:: ../../atomic_bitops.txt
    :literal:
-
-.. raw:: latex
-
-    \normalsize
