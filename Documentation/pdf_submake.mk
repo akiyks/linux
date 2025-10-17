@@ -1,0 +1,48 @@
+# -*- makefile -*-
+# To be included into Documentation/Makefile when $(PDF_SUBMAKE) != 0
+
+# say EXIT=true to ignore errors inside pdfdocs's $(foreach ...) loop
+EXIT          = exit
+
+# In case $(PDF_SUBMAKE) is not set ...
+ifneq ($(PDF_SUBMAKE),0)
+
+htmldocs mandocs infodocs texinfodocs latexdocs epubdocs xmldocs linkcheckdocs:
+	$(Q)PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" \
+		$(srctree)/tools/docs/sphinx-pre-install --version-check
+	+$(Q)PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" \
+		$(PYTHON3) $(BUILD_WRAPPER) $@ \
+		--sphinxdirs="$(SPHINXDIRS)" $(RUSTDOC) \
+		--builddir="$(BUILDDIR)" \
+		--theme=$(DOCS_THEME) --css=$(DOCS_CSS) --paper=$(PAPER)
+# Special handling for pdfdocs
+# User-friendly check for pdflatex and latexmk
+HAVE_PDFLATEX := $(shell if which $(PDFLATEX) >/dev/null 2>&1; then echo 1; else echo 0; fi)
+HAVE_LATEXMK := $(shell if which latexmk >/dev/null 2>&1; then echo 1; else echo 0; fi)
+
+ifeq ($(HAVE_PDFLATEX),0)
+pdfdocs:
+	$(warning The '$(PDFLATEX)' command was not found. Make sure you have it installed and in PATH to produce PDF output.)
+	@echo "  SKIP    Sphinx $@ target."
+else #HAVE_PDFLATEX
+ifeq ($(HAVE_LATEXMK),1)
+pdfdocs: PDFLATEX := latexmk -$(PDFLATEX)
+endif #HAVE_LATEXMK
+pdfdocs: DENY_VF = XDG_CONFIG_HOME=$(FONTS_CONF_DENY_VF)
+ifeq ($(SPHINXDIRS),.)
+pdfdocs: latexdocs
+	$(Q)$(MAKE) PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/latex || \
+	  PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" $(srctree)/tools/docs/check-variable-fonts.py
+	$(Q)mkdir -p $(BUILDDIR)/pdf
+	$(Q)mv $(subst .tex,.pdf,$(wildcard $(BUILDDIR)/latex/*.tex)) $(BUILDDIR)/pdf/
+else #SPHINXDIRS --- not parallelized
+pdfdocs: latexdocs
+	$(Q)$(foreach var,$(SPHINXDIRS), \
+	   $(MAKE) PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF) -C $(BUILDDIR)/$(var)/latex || \
+	     PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" $(srctree)/tools/docs/check-variable-fonts.py || $(EXIT); \
+	   mkdir -p $(BUILDDIR)/$(var)/pdf; \
+	   mv $(subst .tex,.pdf,$(wildcard $(BUILDDIR)/$(var)/latex/*.tex)) $(BUILDDIR)/$(var)/pdf/; \
+	)
+endif #SPHINXDIRS
+endif #HAVE_PDFLATEX
+endif #PDF_SUBMAKE
