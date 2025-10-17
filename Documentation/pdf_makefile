@@ -1,0 +1,17 @@
+# -*- makefile -*-
+# To be invoked from Documentation/pdf_submake.mk when $(PDF_SUBMAKE) != 0
+
+ALLLATEXDIRS := $(addsuffix /latex,$(addprefix $(BUILDDIR)/,$(SPHINXDIRS)))
+Q =
+
+all: $(ALLLATEXDIRS)
+	@echo "Symlinks to PDFs are under $(abspath $(BUILDDIR))/pdf/."
+
+$(ALLLATEXDIRS): %: $(subst .tex,.pdf,$(wildcard $@/*.tex))
+	$(Q)$(MAKE) -C '$@' PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF)
+
+symlink-pdf:
+	$(Q)mkdir -p $(abspath $(BUILDDIR))/pdf
+	$(Q)ln -srf $(subst .tex,.pdf,$(wildcard $(abspath $(BUILDDIR))/*/latex/*.tex)) -t $(abspath $(BUILDDIR))/pdf
+
+.PHONY: $(ALLLATEXDIRS) symlink-pdf
