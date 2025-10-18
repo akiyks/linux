@@ -14,6 +14,7 @@ Trusted Keys as Protected key
 =============================
 It is the secure way of keeping the keys in the kernel key-ring as Trusted-Key,
 such that:
+
 - Key-blob, an encrypted key-data, created to be stored, loaded and seen by
             userspace.
 - Key-data, the plain-key text in the system memory, to be used by
