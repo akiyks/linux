@@ -7,13 +7,5 @@
 Barreras de Memoria del kernel Linux
 ====================================
 
-.. raw:: latex
-
-    \footnotesize
-
-.. include:: ../memory-barriers.txt
+.. include:: ../../memory-barriers.txt
    :literal:
-
-.. raw:: latex
-
-    \normalsize
