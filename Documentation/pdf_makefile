@@ -3,15 +3,30 @@
 
 ALLLATEXDIRS := $(addsuffix /latex,$(addprefix $(BUILDDIR)/,$(SPHINXDIRS)))
 Q =
+_SPHINXDIRS   = $(sort $(patsubst $(srctree)/Documentation/%/index.rst,%,$(wildcard $(srctree)/Documentation/*/index.rst)))
+UNEXPECTED_DIRS := $(filter-out $(_SPHINXDIRS),$(SPHINXDIRS))
 
 all: $(ALLLATEXDIRS)
+ifeq ($(UNEXPECTED_DIRS),)
 	@echo "Symlinks to PDFs are under $(abspath $(BUILDDIR))/pdf/."
+else
+	@echo "Unexpected dirs in SPHINXDIRS: $(UNEXPECTED_DIRS)."
+	@echo "Symlinks to PDFs are next to each $(abspath $(BUILDDIR))/.../latex."
+endif
 
 $(ALLLATEXDIRS): %: $(subst .tex,.pdf,$(wildcard $@/*.tex))
 	$(Q)$(MAKE) -C '$@' PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF)
 
+ifeq ($(UNEXPECTED_DIRS),)
 symlink-pdf:
 	$(Q)mkdir -p $(abspath $(BUILDDIR))/pdf
 	$(Q)ln -srf $(subst .tex,.pdf,$(wildcard $(abspath $(BUILDDIR))/*/latex/*.tex)) -t $(abspath $(BUILDDIR))/pdf
+else # UNEXPECTED_DIR
+symlink-pdf:
+	$(Q)$(foreach dir,$(SPHINXDIRS), \
+	    mkdir -p $(abspath $(BUILDDIR))/$(dir)/pdf ; \
+	    ln -srf $(subst .tex,.pdf,$(wildcard $(abspath $(BUILDDIR))/$(dir)/latex/*.tex)) $(abspath $(BUILDDIR))/$(dir)/pdf ; \
+	)
+endif #UNEXPECTED_DIR
 
 .PHONY: $(ALLLATEXDIRS) symlink-pdf
