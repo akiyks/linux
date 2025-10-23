@@ -6,5 +6,5 @@
 Linux kernel memory barriers
 ============================
 
-.. include:: ../../memory-barriers.txt
+.. kernel-include:: Documentation/memory-barriers.txt
    :literal:
