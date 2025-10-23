@@ -7,5 +7,5 @@
 Barreras de Memoria del kernel Linux
 ====================================
 
-.. include:: ../../memory-barriers.txt
+.. kernel-include:: Documentation/translations/sp_SP/memory-barriers.txt
    :literal:
