@@ -29,4 +29,67 @@ symlink-pdf:
 	)
 endif #UNEXPECTED_DIR
 
-.PHONY: $(ALLLATEXDIRS) symlink-pdf
+PAT_OK = "DEADPATTERN"
+ifneq ($(V),1)
+PAT_OK = "OK"
+endif
+
+PDFINFO_CMD := $(shell which pdfinfo)
+PDFFONTS_CMD := $(shell which pdffonts)
+
+TEXSOURCES := $(shell find $(abspath $(BUILDDIR)) -wholename "$(abspath $(BUILDDIR))/*latex/*.tex")
+
+ifneq ($(PDFINFO_CMD),)
+    CHECK_BY_PDFINFO = \
+        if pdfinfo "$$f" > /dev/null 2>&1 ; then \
+            echo "$$bf: OK" ; \
+        else \
+            echo "$$bf: NG" ; \
+        fi
+else
+    CHECK_BY_PDFINFO = \
+	echo "$$bf: OK"
+endif
+
+CHECK_PDF = \
+	for f in $(subst .tex,.pdf,$(TEXSOURCES)) ; do \
+	    bf=`basename $$f` ; \
+	    if [ -e $$f ] ; then \
+	        $(CHECK_BY_PDFINFO) ; \
+	    else \
+		echo "$$bf: not found!" ; \
+	    fi \
+	done | sort | grep -v $(PAT_OK) || true
+
+ifneq ($(PDFFONTS_CMD),)
+    INFO_PDFFONTS = \
+	for f in $(subst .tex,.pdf,$(TEXSOURCES)) ; do \
+	    bf=`basename $$f` ; \
+	    if echo "$$f" | grep -q translations ; then \
+	        if pdffonts $$f > /dev/null 2>&1 ; then \
+	            if pdffonts $$f 2> /dev/null | grep -q -i cjk ; then \
+		        if pdffonts $$f 2> /dev/null | grep -q -i sarasa ; then \
+	                    echo "Info: $$bf: with CJK pages + sarasa mono" ; \
+	                else \
+	                    echo "Info: $$bf: with CJK pages" ; \
+	                fi \
+	            else \
+	                echo "Info: $$bf: with CJK pages skipped" ; \
+		    fi \
+	        fi \
+	    fi \
+	done
+else
+	echo '"pdffonts" unavailable.'
+endif
+
+check-pdf:
+ifneq ($(PDFINFO_CMD),)
+	@echo "Checking PDFs with $(PDFINFO_CMD) ..."
+else # PDFINFO_CMD
+	@echo 'Checking expected PDFs ("pdfinfo" unavailable) ...'
+endif # PDFINFO_CMD
+	@$(CHECK_PDF)
+	@$(INFO_PDFFONTS)
+
+.PHONY: $(ALLLATEXDIRS) symlink-pdf check-pdf
