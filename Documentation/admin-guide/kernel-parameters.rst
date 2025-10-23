@@ -226,5 +226,5 @@ a fixed number of characters. This limit depends on the architecture
 and is between 256 and 4096 characters. It is defined in the file
 ./include/uapi/asm-generic/setup.h as COMMAND_LINE_SIZE.
 
-.. include:: kernel-parameters.txt
+.. kernel-include:: Documentation/admin-guide/kernel-parameters.txt
    :literal:

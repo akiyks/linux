@@ -56,7 +56,7 @@ an unreasonable effort.
 
   Your cooperation is appreciated.
 
-.. include:: devices.txt
+.. kernel-include:: Documentation/admin-guide/devices.txt
    :literal:
 
 Additional ``/dev/`` directory entries
