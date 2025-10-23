@@ -29,4 +29,25 @@ symlink-pdf:
 	)
 endif #UNEXPECTED_DIR
 
-.PHONY: $(ALLLATEXDIRS) symlink-pdf
+check-pdf: TEXSOURCES := $(shell find $(abspath $(BUILDDIR)) -wholename "$(abspath $(BUILDDIR))/*latex/*.tex")
+
+PAT_OK = "DEADPATTERN"
+ifneq ($(V),1)
+PAT_OK = "OK"
+endif
+
+check-pdf:
+	@echo "Checking PDFs ..."
+	@for f in $(subst .tex,.pdf,$(TEXSOURCES)) ; do \
+	    if [ -e $$f ] ; then \
+	        if pdfinfo "$$f" > /dev/null ; then \
+	            echo "$$f: OK" ; \
+	        else \
+	            echo "$$f: NG" ; \
+		fi \
+	    else \
+		echo "$$f: not found!" ; \
+	    fi \
+	done | sort | grep -v $(PAT_OK) || true
+
+.PHONY: $(ALLLATEXDIRS) symlink-pdf check-pdf
