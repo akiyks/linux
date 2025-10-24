@@ -469,8 +469,8 @@ class RestFormat(OutputFormat):
                 self.data += f"{self.lineprefix}*undescribed*\n\n"
             self.data += "\n"
 
-        self.lineprefix = oldprefix
         self.out_section(args)
+        self.lineprefix = oldprefix
 
     def out_typedef(self, fname, name, args):
 
@@ -486,8 +486,8 @@ class RestFormat(OutputFormat):
 
         self.data += "\n"
 
-        self.lineprefix = oldprefix
         self.out_section(args)
+        self.lineprefix = oldprefix
 
     def out_struct(self, fname, name, args):
 
@@ -539,8 +539,8 @@ class RestFormat(OutputFormat):
 
         self.data += "\n"
 
-        self.lineprefix = oldprefix
         self.out_section(args)
+        self.lineprefix = oldprefix
 
 
 class ManFormat(OutputFormat):
