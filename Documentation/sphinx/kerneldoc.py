@@ -289,13 +289,8 @@ def setup_kfiles(app):
 
     kerneldoc_bin = app.env.config.kerneldoc_bin
 
-    if kerneldoc_bin and kerneldoc_bin.endswith("kernel-doc.py"):
-        print("Using Python kernel-doc")
-        out_style = RestFormat()
-        kfiles = KernelFiles(out_style=out_style, logger=logger)
-    else:
-        print(f"Using {kerneldoc_bin}")
-
+    out_style = RestFormat()
+    kfiles = KernelFiles(out_style=out_style, logger=logger)
 
 def setup(app):
     app.add_config_value('kerneldoc_bin', None, 'env')
