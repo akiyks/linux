@@ -1842,8 +1842,8 @@ static noinline_for_stack bool rcu_gp_init(void)
 	 * scan below. Otherwise we risk a race where a newly onlining CPU could
 	 * be missed by the current grace period, potentially leading to
 	 * use-after-free errors. For a detailed explanation of this race, see
-	 * Documentation/RCU/Design/Requirements/Requirements.rst in the
-	 * "Hotplug CPU" section.
+	 * Documentation/core-api/RCU/Design/Requirements/Requirements.rst in
+	 * the "Hotplug CPU" section.
 	 *
 	 * Also note that the root rnp's gp_seq is kept separate from, and lags,
 	 * the rcu_state's gp_seq, for a reason. See the Quick-Quiz on
