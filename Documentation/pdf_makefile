@@ -41,7 +41,7 @@ TEXSOURCES := $(shell find $(abspath $(BUILDDIR)) -wholename "$(abspath $(BUILDD
 
 ifneq ($(PDFINFO_CMD),)
     CHECK_BY_PDFINFO = \
-        if pdfinfo "$$f" > /dev/null ; then \
+        if pdfinfo "$$f" > /dev/null 2>&1 ; then \
             echo "$$bf: OK" ; \
         else \
             echo "$$bf: NG" ; \
@@ -66,8 +66,8 @@ ifneq ($(PDFFONTS_CMD),)
 	for f in $(subst .tex,.pdf,$(TEXSOURCES)) ; do \
 	    bf=`echo $$f | sed -e 's|/\([^/]\+/\)\+||'` ; \
 	    if echo "$$f" | grep -q translations ; then \
-	        if pdffonts $$f | grep -q -i cjk ; then \
-		    if pdffonts $$f | grep -q -i sarasa ; then \
+	        if pdffonts $$f 2> /dev/null | grep -q -i cjk ; then \
+		    if pdffonts $$f 2> /dev/null | grep -q -i sarasa ; then \
 	                echo "Info: $$bf: with CJK pages with sarasa mono" ; \
 	            else \
 	                echo "Info: $$bf: with CJK pages" ; \
