@@ -43,37 +43,40 @@ check-pdf:
 ifneq ($(PDFINFO_CMD),)
 	@echo "Checking PDFs with $(PDFINFO_CMD) ..."
 	@for f in $(subst .tex,.pdf,$(TEXSOURCES)) ; do \
+	    bf=`echo $$f | sed -e 's|/\([^/]\+/\)\+||'` ; \
 	    if [ -e $$f ] ; then \
 	        if pdfinfo "$$f" > /dev/null ; then \
-	            echo "$$f: OK" ; \
+	            echo "$$bf: OK" ; \
 	        else \
-	            echo "$$f: NG" ; \
+	            echo "$$bf: NG" ; \
 	        fi \
 	    else \
-		echo "$$f: not found!" ; \
+		echo "$$bf: not found!" ; \
 	    fi \
 	done | sort | grep -v $(PAT_OK) || true
 else # PDFINFO_CMD
 	@echo 'Checking expected PDFs ("pdfinfo" unavailable) ...'
 	@for f in $(subst .tex,.pdf,$(TEXSOURCES)) ; do \
+	    bf=`echo $$f | sed -e 's|/\([^/]\+/\)\+||'` ; \
 	    if [ -e $$f ] ; then \
-	        echo "$$f: OK" ; \
+	        echo "$$bf: OK" ; \
 	    else \
-		echo "$$f: not found!" ; \
+		echo "$$bf: not found!" ; \
 	    fi \
 	done | sort | grep -v $(PAT_OK) || true
 endif # PDFINFO_CMD
 ifneq ($(PDFFONTS_CMD),)
 	@for f in $(subst .tex,.pdf,$(TEXSOURCES)) ; do \
+	    bf=`echo $$f | sed -e 's|/\([^/]\+/\)\+||'` ; \
 	    if echo "$$f" | grep -q translations ; then \
 	        if pdffonts $$f | grep -q -i cjk ; then \
 		    if pdffonts $$f | grep -q -i sarasa ; then \
-	                echo "$$f: with CJK pages with sarasa mono" ; \
+	                echo "$$bf: with CJK pages with sarasa mono" ; \
 	            else \
-	                echo "$$f: with CJK pages" ; \
+	                echo "$$bf: with CJK pages" ; \
 	            fi \
 	        else \
-	            echo "$$f: without CJK pages" ; \
+	            echo "$$bf: without CJK pages" ; \
 		fi \
 	    fi \
 	done
