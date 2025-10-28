@@ -53,7 +53,7 @@ endif
 
 CHECK_PDF = \
 	for f in $(subst .tex,.pdf,$(TEXSOURCES)) ; do \
-	    bf=`echo $$f | sed -e 's|/\([^/]\+/\)\+||'` ; \
+	    bf=`basename $$f` ; \
 	    if [ -e $$f ] ; then \
 	        $(CHECK_BY_PDFINFO) ; \
 	    else \
@@ -64,7 +64,7 @@ CHECK_PDF = \
 ifneq ($(PDFFONTS_CMD),)
     INFO_PDFFONTS = \
 	for f in $(subst .tex,.pdf,$(TEXSOURCES)) ; do \
-	    bf=`echo $$f | sed -e 's|/\([^/]\+/\)\+||'` ; \
+	    bf=`basename $$f` ; \
 	    if echo "$$f" | grep -q translations ; then \
 	        if pdffonts $$f > /dev/null 2>&1 ; then \
 	            if pdffonts $$f 2> /dev/null | grep -q -i cjk ; then \
