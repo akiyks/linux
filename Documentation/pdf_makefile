@@ -66,15 +66,17 @@ ifneq ($(PDFFONTS_CMD),)
 	for f in $(subst .tex,.pdf,$(TEXSOURCES)) ; do \
 	    bf=`echo $$f | sed -e 's|/\([^/]\+/\)\+||'` ; \
 	    if echo "$$f" | grep -q translations ; then \
-	        if pdffonts $$f 2> /dev/null | grep -q -i cjk ; then \
-		    if pdffonts $$f 2> /dev/null | grep -q -i sarasa ; then \
-	                echo "Info: $$bf: with CJK pages with sarasa mono" ; \
+	        if pdffonts $$f > /dev/null 2>&1 ; then \
+	            if pdffonts $$f 2> /dev/null | grep -q -i cjk ; then \
+		        if pdffonts $$f 2> /dev/null | grep -q -i sarasa ; then \
+	                    echo "Info: $$bf: with CJK pages + sarasa mono" ; \
+	                else \
+	                    echo "Info: $$bf: with CJK pages" ; \
+	                fi \
 	            else \
-	                echo "Info: $$bf: with CJK pages" ; \
-	            fi \
-	        else \
-	            echo "Info: $$bf: without CJK pages" ; \
-		fi \
+	                echo "Info: $$bf: with CJK pages skipped" ; \
+		    fi \
+	        fi \
 	    fi \
 	done
 else
