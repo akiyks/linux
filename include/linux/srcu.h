@@ -330,8 +330,8 @@ static inline struct srcu_ctr __percpu *srcu_read_lock_fast(struct srcu_struct *
  * hand or initialized with init_srcu_struct_fast_updown() on the other.
  * Such an srcu_struct structure cannot be passed to any non-fast-updown
  * variant of srcu_read_{,un}lock() or srcu_{down,up}_read().  In kernels
- * built with CONFIG_PROVE_RCU=y, () will complain bitterly if you ignore
- * this * restriction.
+ * built with CONFIG_PROVE_RCU=y, __srcu_check_read_flavor() will
+ * complain bitterly if you ignore this restriction.
  *
  * Grace-period auto-expediting is disabled for SRCU-fast-updown
  * srcu_struct structures because SRCU-fast-updown expedited grace periods
@@ -339,9 +339,9 @@ static inline struct srcu_ctr __percpu *srcu_read_lock_fast(struct srcu_struct *
  * SRCU-fast-updown grace periods, use synchronize_srcu_expedited().
  *
  * The srcu_read_lock_fast_updown() function can be invoked only from
- those contexts where RCU is watching, that is, from contexts where
- it would be legal to invoke rcu_read_lock().  Otherwise, lockdep will
- complain.
+ * those contexts where RCU is watching, that is, from contexts where
+ * it would be legal to invoke rcu_read_lock().  Otherwise, lockdep will
+ * complain.
  */
 static inline struct srcu_ctr __percpu *srcu_read_lock_fast_updown(struct srcu_struct *ssp)
 __acquires(ssp)
