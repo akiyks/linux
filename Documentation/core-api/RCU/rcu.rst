@@ -74,7 +74,8 @@ Frequently Asked Questions
 - I hear that RCU is patented?  What is with that?
 
   Yes, it is.  There are several known patents related to RCU,
-  search for the string "Patent" in Documentation/RCU/RTFP.txt to find them.
+  search for the string "Patent" in Documentation/core-api/RCU/RTFP.txt
+  to find them.
   Of these, one was allowed to lapse by the assignee, and the
   others have been contributed to the Linux kernel under GPL.
   Many (but not all) have long since expired.
@@ -88,6 +89,6 @@ Frequently Asked Questions
 
 - Where can I find more information on RCU?
 
-  See the Documentation/RCU/RTFP.txt file.
+  See the Documentation/core-api/RCU/RTFP.txt file.
   Or point your browser at (https://docs.google.com/document/d/1X0lThx8OK0ZgLMqVoXiR4ZrGURHrXK6NyLRbeXe3Xac/edit)
   or (https://docs.google.com/document/d/1GCdQC8SDbb54W1shjEXqGZ0Rq8a6kIeYutdSIajfpLA/edit?usp=sharing).
