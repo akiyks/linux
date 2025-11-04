@@ -2576,7 +2576,7 @@ struct sock *sk_clone(const struct sock *sk, const gfp_t priority,
 	newsk->sk_incoming_cpu = raw_smp_processor_id();
 
 	/* Before updating sk_refcnt, we must commit prior changes to memory
-	 * (Documentation/RCU/rculist_nulls.rst for details)
+	 * (Documentation/core-api/RCU/rculist_nulls.rst for details)
 	 */
 	smp_wmb();
 	refcount_set(&newsk->sk_refcnt, 2);
@@ -3756,7 +3756,7 @@ void sock_init_data_uid(struct socket *sock, struct sock *sk, kuid_t uid)
 	sk_rx_queue_clear(sk);
 	/*
 	 * Before updating sk_refcnt, we must commit prior changes to memory
-	 * (Documentation/RCU/rculist_nulls.rst for details)
+	 * (Documentation/core-api/RCU/rculist_nulls.rst for details)
 	 */
 	smp_wmb();
 	refcount_set(&sk->sk_refcnt, 1);
