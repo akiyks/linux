@@ -160,8 +160,8 @@ and "do not update anything that is visible to and accessed by readers",
 and "protect updates with locking".
 
 These rules are illustrated by the functions foo_update_a() and
-foo_get_a() shown in Documentation/RCU/whatisRCU.rst.  Additional
-RCU usage patterns maybe found in Documentation/RCU and in the
+foo_get_a() shown in Documentation/core-api/RCU/whatisRCU.rst.  Additional
+RCU usage patterns maybe found in Documentation/core-api/RCU and in the
 source code.
 
 
