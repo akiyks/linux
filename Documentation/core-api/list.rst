@@ -761,8 +761,8 @@ Concurrency considerations
 Concurrent access and modification of a list needs to be protected with a lock
 in most cases. Alternatively and preferably, one may use the RCU primitives for
 lists in read-mostly use-cases, where read accesses to the list are common but
-modifications to the list less so. See Documentation/RCU/listRCU.rst for more
-details.
+modifications to the list less so. See Documentation/core-api/RCU/listRCU.rst
+for more details.
 
 Further reading
 ---------------

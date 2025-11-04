@@ -7,7 +7,7 @@
  * Author: Paul E. McKenney <paulmck@linux.ibm.com>
  *
  * For detailed explanation of Read-Copy Update mechanism see -
- *		Documentation/RCU
+ *		Documentation/core-api/RCU
  */
 #include <linux/completion.h>
 #include <linux/interrupt.h>
