@@ -399,7 +399,7 @@ Memory barriers come in four basic varieties:
      smp_read_barrier_depends() macro, the semantics of which are now
      implicit in all marked accesses.  For more up-to-date information,
      including how compiler transformations can sometimes break address
-     dependencies, see Documentation/RCU/rcu_dereference.rst.
+     dependencies, see Documentation/core-api/RCU/rcu_dereference.rst.
 
      An address-dependency barrier is a weaker form of read barrier.  In the
      case where two loads are performed such that the second depends on the
@@ -564,7 +564,7 @@ ADDRESS-DEPENDENCY BARRIERS (HISTORICAL)
 smp_read_barrier_depends() macro, the semantics of which are now implicit
 in all marked accesses.  For more up-to-date information, including
 how compiler transformations can sometimes break address dependencies,
-see Documentation/RCU/rcu_dereference.rst.
+see Documentation/core-api/RCU/rcu_dereference.rst.
 
 As of v4.15 of the Linux kernel, an smp_mb() was added to READ_ONCE() for
 DEC Alpha, which means that about the only people who need to pay attention
@@ -640,8 +640,8 @@ because the CPUs that the Linux kernel supports don't do writes until they
 are certain (1) that the write will actually happen, (2) of the location of
 the write, and (3) of the value to be written.
 But please carefully read the "CONTROL DEPENDENCIES" section and the
-Documentation/RCU/rcu_dereference.rst file:  The compiler can and does break
-dependencies in a great many highly creative ways.
+Documentation/core-api/RCU/rcu_dereference.rst file:  The compiler can and
+does break dependencies in a great many highly creative ways.
 
 	CPU 1		      CPU 2
 	===============	      ===============
