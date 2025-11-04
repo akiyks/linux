@@ -169,7 +169,7 @@ static inline void hlist_nulls_add_fake(struct hlist_nulls_node *n)
  * The barrier() is needed to make sure compiler doesn't cache first element [1],
  * as this loop can be restarted [2]
  * [1] Documentation/memory-barriers.txt around line 1533
- * [2] Documentation/RCU/rculist_nulls.rst around line 146
+ * [2] Documentation/core-api/RCU/rculist_nulls.rst around line 146
  */
 #define hlist_nulls_for_each_entry_rcu(tpos, pos, head, member)			\
 	for (({barrier();}),							\
