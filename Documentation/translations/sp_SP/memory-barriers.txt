@@ -675,8 +675,8 @@ escrituras dependientes porque las CPU que admite el kernel Linux no
 escriben hasta que están seguros (1) de que la escritura realmente
 sucederá, (2) de la ubicación de la escritura, y (3) del valor a escribir.
 Pero, por favor, lea atentamente la sección "DEPENDENCIAS DEL CONTROL" y el
-archivo Documentation/RCU/rcu_dereference.rst: el compilador puede romperse
-y romper dependencias en muchas formas altamente creativas.
+archivo Documentation/core-api/RCU/rcu_dereference.rst: el compilador puede
+romperse y romper dependencias en muchas formas altamente creativas.
 
 	CPU 1		      CPU 2
 	===============	      ===============
