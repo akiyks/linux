@@ -9,7 +9,7 @@
  *	   Lai Jiangshan <laijs@cn.fujitsu.com>
  *
  * For detailed explanation of Read-Copy Update mechanism see -
- *		Documentation/RCU/ *.txt
+ *		Documentation/core-api/RCU/ *.rst
  *
  */
 

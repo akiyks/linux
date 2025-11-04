@@ -12,7 +12,7 @@
  * and inputs from Rusty Russell, Andrea Arcangeli and Andi Kleen.
  *
  * For detailed explanation of Read-Copy Update mechanism see -
- *	Documentation/RCU
+ *	Documentation/core-api/RCU
  */
 
 #define pr_fmt(fmt) "rcu: " fmt
@@ -1843,8 +1843,8 @@ static noinline_for_stack bool rcu_gp_init(void)
 	 * scan below. Otherwise we risk a race where a newly onlining CPU could
 	 * be missed by the current grace period, potentially leading to
 	 * use-after-free errors. For a detailed explanation of this race, see
-	 * Documentation/RCU/Design/Requirements/Requirements.rst in the
-	 * "Hotplug CPU" section.
+	 * Documentation/core-api/RCU/Design/Requirements/Requirements.rst in
+	 * the "Hotplug CPU" section.
 	 *
 	 * Also note that the root rnp's gp_seq is kept separate from, and lags,
 	 * the rcu_state's gp_seq, for a reason. See the Quick-Quiz on
@@ -3237,7 +3237,7 @@ EXPORT_SYMBOL_GPL(call_rcu_hurry);
  * more than one CPU).
  *
  * Implementation of these memory-ordering guarantees is described here:
- * Documentation/RCU/Design/Memory-Ordering/Tree-RCU-Memory-Ordering.rst.
+ * Documentation/core-api/RCU/Design/Memory-Ordering/Tree-RCU-Memory-Ordering.rst.
  *
  * Specific to call_rcu() (as opposed to the other call_rcu*() functions),
  * in kernels built with CONFIG_RCU_LAZY=y, call_rcu() might delay for many
@@ -3344,7 +3344,7 @@ trace_complete_out:
  * again only if the system has more than one CPU).
  *
  * Implementation of these memory-ordering guarantees is described here:
- * Documentation/RCU/Design/Memory-Ordering/Tree-RCU-Memory-Ordering.rst.
+ * Documentation/core-api/RCU/Design/Memory-Ordering/Tree-RCU-Memory-Ordering.rst.
  */
 void synchronize_rcu(void)
 {
