@@ -178,4 +178,4 @@ stampa (usando printk()) di "SUCCESS", "FAILURE", oppure "RCU_HOTPLUG". I primi
 due si piegano da soli, mentre l'ultimo indica che non stati trovati problemi di
 sincronizzazione, tuttavia ne sono stati trovati in CPU-hotplug.
 
-Consultate anche: Documentation/translations/it_IT/RCU/torture.rst
+Consultate anche: Documentation/translations/it_IT/core-api/RCU/torture.rst
