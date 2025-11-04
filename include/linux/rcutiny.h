@@ -7,7 +7,7 @@
  * Author: Paul E. McKenney <paulmck@linux.ibm.com>
  *
  * For detailed explanation of Read-Copy Update mechanism see -
- *		Documentation/RCU
+ *		Documentation/core-api/RCU
  */
 #ifndef __LINUX_TINY_H
 #define __LINUX_TINY_H
