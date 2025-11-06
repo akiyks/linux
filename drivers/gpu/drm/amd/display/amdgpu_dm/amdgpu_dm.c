@@ -7242,6 +7242,8 @@ finish:
 
 /**
  * amdgpu_dm_connector_poll() - Poll a connector to see if it's connected to a display
+ * @aconnector: Need proper description.
+ * @force: Need proper description.
  *
  * Used for connectors that don't support HPD (hotplug detection)
  * to periodically checked whether the connector is connected to a display.
@@ -7301,6 +7303,8 @@ amdgpu_dm_connector_poll(struct amdgpu_dm_connector *aconnector, bool force)
 
 /**
  * amdgpu_dm_connector_detect() - Detect whether a DRM connector is connected to a display
+ * @connector: Need proper description.
+ * @force: Need proper description.
  *
  * A connector is considered connected when it has a sink that is not NULL.
  * For connectors that support HPD (hotplug detection), the connection is
