@@ -36,7 +36,7 @@
  * eg. echo 2 phy_id > <debugfs_dir>/dri/xxx/securedisplay_test
  *
  * opcode:
- * 1：Query whether TA is responding used only for validation pupose
+ * 1: Query whether TA is responding used only for validation pupose
  * 2: Send region of Interest and CRC value to I2C. (uint32)phy_id is
  * send to determine which DIO scratch register should be used to get
  * ROI and receive i2c_buf as the output.
