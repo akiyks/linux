@@ -916,7 +916,7 @@ static struct rcu_torture_ops srcu_ops = {
 	.cb_barrier	= srcu_torture_barrier,
 	.stats		= srcu_torture_stats,
 	.get_gp_data	= srcu_get_gp_data,
-	.cbflood_max	= 50000,
+	.cbflood_max	= !IS_ENABLED(CONFIG_SMP) && IS_ENABLED(CONFIG_PREEMPTION) ? 1000 : 50000,
 	.irq_capable	= 1,
 	.no_pi_lock	= IS_ENABLED(CONFIG_TINY_SRCU),
 	.debug_objects	= 1,
@@ -979,7 +979,7 @@ static struct rcu_torture_ops srcud_ops = {
 	.cb_barrier	= srcu_torture_barrier,
 	.stats		= srcu_torture_stats,
 	.get_gp_data	= srcu_get_gp_data,
-	.cbflood_max	= 50000,
+	.cbflood_max	= !IS_ENABLED(CONFIG_SMP) && IS_ENABLED(CONFIG_PREEMPTION) ? 1000 : 50000,
 	.irq_capable	= 1,
 	.no_pi_lock	= IS_ENABLED(CONFIG_TINY_SRCU),
 	.debug_objects	= 1,
@@ -1178,10 +1178,9 @@ static struct rcu_torture_ops tasks_tracing_ops = {
 	.deferred_free	= rcu_tasks_tracing_torture_deferred_free,
 	.sync		= synchronize_rcu_tasks_trace,
 	.exp_sync	= synchronize_rcu_tasks_trace,
+	.exp_current	= rcu_tasks_trace_expedite_current,
 	.call		= call_rcu_tasks_trace,
 	.cb_barrier	= rcu_barrier_tasks_trace,
-	.gp_kthread_dbg	= show_rcu_tasks_trace_gp_kthread,
-	.get_gp_data    = rcu_tasks_trace_get_gp_data,
 	.cbflood_max	= 50000,
 	.irq_capable	= 1,
 	.slow_gps	= 1,
@@ -2455,6 +2454,9 @@ static DEFINE_TORTURE_RANDOM_PERCPU(rcu_torture_timer_rand);
  */
 static void rcu_torture_timer(struct timer_list *unused)
 {
+	WARN_ON_ONCE(!in_serving_softirq());
+	WARN_ON_ONCE(in_hardirq());
+	WARN_ON_ONCE(in_nmi());
 	atomic_long_inc(&n_rcu_torture_timers);
 	(void)rcu_torture_one_read(this_cpu_ptr(&rcu_torture_timer_rand), -1);
 
