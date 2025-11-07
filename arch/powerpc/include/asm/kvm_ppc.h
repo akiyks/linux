@@ -494,7 +494,7 @@ static inline u32 kvmppc_get_xics_latch(void)
  *       42: doorbell_exception(): // from CPU X
  *       42:   ppc_msgsync()
  *      105: smp_muxed_ipi_set_message():
- *      105:   smb_mb()
+ *      105:   smp_mb()
  *           // STORE DEFERRED DUE TO RE-ORDERING
  *    --105:   message[CALL_FUNCTION] = 1
  *    | 105: doorbell_global_ipi(42):
@@ -527,7 +527,7 @@ static inline u32 kvmppc_get_xics_latch(void)
  *    -- 42:   kvmppc_clear_host_ipi(42)
  *    |  42: smp_ipi_demux_relaxed()
  *    | 105: smp_muxed_ipi_set_message():
- *    | 105:   smb_mb()
+ *    | 105:   smp_mb()
  *    | 105:   message[CALL_FUNCTION] = 1
  *    | 105: doorbell_global_ipi(42):
  *    | 105:   kvmppc_set_host_ipi(42)
