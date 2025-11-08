@@ -443,3 +443,8 @@ Excer[t from UltraSPARC Virtual Machine Specification
 
  .. include:: dax-hv-api.txt
     :literal:
+    :end-line: 994
+
+ .. include:: dax-hv-api.txt
+    :literal:
+    :start-line: 994
