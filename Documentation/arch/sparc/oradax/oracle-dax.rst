@@ -441,5 +441,5 @@ completion status indicates success.
 Excer[t from UltraSPARC Virtual Machine Specification
 =====================================================
 
- .. kernel-include:: Documentation/arch/sparc/oradax/dax-hv-api.txt
+ .. include:: dax-hv-api.txt
     :literal:
