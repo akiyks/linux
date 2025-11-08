@@ -228,3 +228,34 @@ and is between 256 and 4096 characters. It is defined in the file
 
 .. include:: kernel-parameters.txt
    :literal:
+   :end-line:   1300
+
+..
+ .. include:: kernel-parameters.txt
+   :literal:
+   :start-line: 1300
+   :end-line:   2600
+
+ .. include:: kernel-parameters.txt
+   :literal:
+   :start-line: 2600
+   :end-line:   3928
+
+ .. include:: kernel-parameters.txt
+   :literal:
+   :start-line: 3928
+   :end-line:   5199
+
+ .. include:: kernel-parameters.txt
+   :literal:
+   :start-line: 5199
+   :end-line:   6503
+
+ .. include:: kernel-parameters.txt
+   :literal:
+   :start-line: 6503
+   :end-line:   7804
+
+ .. include:: kernel-parameters.txt
+   :literal:
+   :start-line: 7804

@@ -58,6 +58,17 @@ an unreasonable effort.
 
 .. include:: devices.txt
    :literal:
+   :end-line:   1300
+
+.. include:: devices.txt
+   :literal:
+   :start-line: 1300
+   :end-line:   2603
+
+.. include:: devices.txt
+   :literal:
+   :start-line: 2603
+
 
 Additional ``/dev/`` directory entries
 --------------------------------------
