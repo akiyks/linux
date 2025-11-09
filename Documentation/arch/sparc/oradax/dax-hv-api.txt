@@ -254,30 +254,30 @@ bits set, and terminate at a CCB that has the Conditional bit set, but not the P
 
           Code        Format                              Description
           0x0         Fixed width byte packed             Up to 16 bytes
-          0x1         Fixed width bit packed              Up to 15 bits (CCB version 0) or 23 bits (CCB version
-                                                          1); bits are read most significant bit to least significant bit
+          0x1         Fixed width bit packed              Up to 15 bits (CCB version 0) or 23 bits (CCB version 1);
+                                                          bits are read most significant bit to least significant bit
                                                           within a byte
           0x2         Variable width byte packed          Data stream of lengths must be provided as a secondary
                                                           input
-          0x4         Fixed width byte packed with run Up to 16 bytes; data stream of run lengths must be
-                      length encoding                  provided as a secondary input
-          0x5         Fixed width bit packed with run Up to 15 bits (CCB version 0) or 23 bits (CCB version
-                      length encoding                 1); bits are read most significant bit to least significant bit
-                                                      within a byte; data stream of run lengths must be provided
-                                                      as a secondary input
-          0x8         Fixed width byte packed with Up to 16 bytes before the encoding; compressed stream
-                      Huffman (CCB version 0) or bits are read most significant bit to least significant bit
-                      OZIP (CCB version 1) encoding within a byte; pointer to the encoding table must be
-                                                    provided
-          0x9         Fixed width bit packed with Up to 15 bits (CCB version 0) or 23 bits (CCB version
-                      Huffman (CCB version 0) or 1); compressed stream bits are read most significant bit to
-                      OZIP (CCB version 1) encoding least significant bit within a byte; pointer to the encoding
-                                                    table must be provided
-          0xA         Variable width byte packed with Up to 16 bytes before the encoding; compressed stream
-                      Huffman (CCB version 0) or bits are read most significant bit to least significant bit
-                      OZIP (CCB version 1) encoding within a byte; data stream of lengths must be provided as
-                                                      a secondary input; pointer to the encoding table must be
-                                                      provided
+          0x4         Fixed width byte packed with run    Up to 16 bytes; data stream of run lengths must be
+                      length encoding                     provided as a secondary input
+          0x5         Fixed width bit packed with run     Up to 15 bits (CCB version 0) or 23 bits (CCB version 1);
+                      length encoding                     bits are read most significant bit to least significant bit
+                                                          within a byte; data stream of run lengths must be provided
+                                                          as a secondary input
+          0x8         Fixed width byte packed with        Up to 16 bytes before the encoding; compressed stream
+                      Huffman (CCB version 0) or          bits are read most significant bit to least significant bit
+                      OZIP (CCB version 1) encoding       within a byte; pointer to the encoding table must be
+                                                          provided
+          0x9         Fixed width bit packed with         Up to 15 bits (CCB version 0) or 23 bits (CCB version 1);
+                      Huffman (CCB version 0) or          compressed stream bits are read most significant bit to
+                      OZIP (CCB version 1) encoding       least significant bit within a byte; pointer to the encoding
+                                                          table must be provided
+          0xA         Variable width byte packed with     Up to 16 bytes before the encoding; compressed stream
+                      Huffman (CCB version 0) or          bits are read most significant bit to least significant bit
+                      OZIP (CCB version 1) encoding       within a byte; data stream of lengths must be provided as
+                                                          a secondary input; pointer to the encoding table must be
+                                                          provided
 
 
                                                         513
