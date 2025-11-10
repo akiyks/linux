@@ -736,7 +736,7 @@ Offset   Size   Field Description
         If the values match, the value from the bit table is used as the output element value. If the values do not
         match, the output data element value is forced to 0.
 
-        In the inverted translate operation, the bit value read from bit table is inverted prior to its use. The additional
+        In the inverted translate operation, the bit value read from bit table is inverted prior to its use. The
         additional processing based on any additional non-index bits remains unchanged, and still forces the output
         element value to 0 on a mismatch. The specific type of translate command is indicated by the command
         code in the CCB header.
