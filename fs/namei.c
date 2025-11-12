@@ -659,6 +659,9 @@ EXPORT_SYMBOL(inode_permission);
 
 /*
  * lookup_inode_permission_may_exec - Check traversal right for given inode
+ * @idmap: Need proper desc.
+ * @inode: Need proper desc.
+ * @mask: Need proper desc.
  *
  * This is a special case routine for may_lookup() making assumptions specific
  * to path traversal. Use inode_permission() if you are doing something else.
