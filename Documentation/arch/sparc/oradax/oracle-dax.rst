@@ -441,5 +441,14 @@ completion status indicates success.
 Excer[t from UltraSPARC Virtual Machine Specification
 =====================================================
 
- .. kernel-include:: Documentation/arch/sparc/oradax/dax-hv-api.txt
-    :literal:
+.. raw:: latex
+
+	\begingroup
+	\setliteralfontsize{\tiny}
+
+.. literalinclude:: dax-hv-api.txt
+    :tab-width: 8
+
+.. raw:: latex
+
+	\endgroup
