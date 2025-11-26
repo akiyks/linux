@@ -441,5 +441,14 @@ completion status indicates success.
 Excer[t from UltraSPARC Virtual Machine Specification
 =====================================================
 
- .. include:: dax-hv-api.txt
-    :literal:
+.. raw:: latex
+
+	\begingroup
+	\setliteralfontsize{\tiny}
+
+.. include:: dax-hv-api.txt
+   :literal:
+
+.. raw:: latex
+
+	\endgroup
