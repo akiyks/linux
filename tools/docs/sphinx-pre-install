@@ -446,7 +446,7 @@ class MissingCheckers(AncillaryMethods):
             return None
 
         for line in result.stdout.split("\n"):
-            match = re.match(r"^sphinx-build\s+([\d\.]+)(?:\+(?:/[\da-f]+)|b\d+)?\s*$", line)
+            match = re.match(r"^sphinx-build\s+([\d\.]+)(?:\+(?:/[\da-f]+)|b\d+|rc\d+)?\s*$", line)
             if match:
                 return PythonVersion.parse_version(match.group(1))
 
