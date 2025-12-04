@@ -107,6 +107,7 @@ Cleaning Overhead
 Mount Options
 =============
 
+.. tabularcolumns:: >{\ttfamily}\Y{.35}\Y{.65}
 
 ======================== ============================================================
 background_gc=%s	 Turn on/off cleaning operations, namely garbage
@@ -260,9 +261,8 @@ fsync_mode=%s		 Control the policy of fsync. Currently supports "posix",
 			 pass, but the performance will regress. "nobarrier" is
 			 based on "posix", but doesn't issue flush command for
 			 non-atomic files likewise "nobarrier" mount option.
-test_dummy_encryption
-test_dummy_encryption=%s
-			 Enable dummy encryption, which provides a fake fscrypt
+test_dummy_encryption	 See below.
+test_dummy_encryption=%s Enable dummy encryption, which provides a fake fscrypt
 			 context. The fake fscrypt context is used by xfstests.
 			 The argument may be either "v1" or "v2", in order to
 			 select the corresponding fscrypt policy version.
@@ -322,10 +322,13 @@ nocompress_extension=%s	 Support adding specified extension, so that f2fs can di
 			 If the compress extension specifies all files, the types specified by the
 			 nocompress extension will be treated as special cases and will not be compressed.
 			 Don't allow use '*' to specifie all file in nocompress extension.
-			 After add nocompress_extension, the priority should be:
-			 dir_flag < comp_extention,nocompress_extension < comp_file_flag,no_comp_file_flag.
-			 See more in compression sections.
+			 After add nocompress_extension, the priority should be::
 
+			  dir_flag <
+			      comp_extention,nocompress_extension <
+			          comp_file_flag,no_comp_file_flag
+
+			 See more in compression sections.
 compress_chksum		 Support verifying chksum of raw data in compressed cluster.
 compress_mode=%s	 Control file compression mode. This supports "fs" and "user"
 			 modes. In "fs" mode (default), f2fs does automatic compression
