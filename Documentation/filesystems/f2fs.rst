@@ -107,11 +107,13 @@ Cleaning Overhead
 Mount Options
 =============
 
-.. only:: not latex
+.. only:: (not latex) or tblnest
+
+  .. tabularcolumns:: >{\ttfamily}\Y{.35}\Y{.65}
 
   .. include:: f2fs-mount-opts.rst
 
-.. only:: latex
+.. only:: latex and (not tblnest)
 
   .. literalinclude:: f2fs-mount-opts.rst
      :tab-width: 8
