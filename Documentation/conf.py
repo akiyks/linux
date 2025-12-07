@@ -509,6 +509,10 @@ latex_elements = {
     """)
 }
 
+# Add tag for nested table support in latex builder
+if (major >= 9):
+    tags.add('tblnest')
+
 # This will be filled up by config-inited event
 latex_documents = []
 
