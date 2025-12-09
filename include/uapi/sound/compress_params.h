@@ -334,8 +334,7 @@ struct snd_dec_ape {
  * @sample_rate: Sample rate of original input.
  * @output_gain: Gain to apply when decoding (in Q7.8 format).
  * @mapping_family: Order and meaning of output channels. Only values 0 and 1
- * are expected; values 2..255 are not recommended for playback.
- *
+ *                  are expected; values 2..255 are not recommended for playback.
  * @chan_map: Optional channel mapping table. Describes mapping of opus streams
  *            to decoded channels. Fields:
  * @chan_map.stream_count: Number of streams encoded in each Ogg packet.
