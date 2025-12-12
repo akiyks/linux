@@ -1,0 +1,7 @@
+% Translations have Asian (CJK) characters which are only displayed if
+% xeCJK is used
+\IfFontExistsTF{Noto Sans CJK SC}{
+    \IfFileExists{xeCJK.sty}{
+	\usepackage{xeCJK}
+    }{}
+}{}
