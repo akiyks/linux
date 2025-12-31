@@ -2,7 +2,6 @@
 
 	\renewcommand\thesection*
 	\renewcommand\thesubsection*
-	\kerneldocCJKon
 	\kerneldocBeginJP{
 
 日本語訳
