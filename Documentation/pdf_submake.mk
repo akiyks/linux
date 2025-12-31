@@ -1,9 +1,6 @@
 # -*- makefile -*-
 # To be included into Documentation/Makefile when $(PDF_SUBMAKE) != 0
 
-# say EXIT=true to ignore errors inside pdfdocs's $(foreach ...) loop
-EXIT          = exit
-
 # In case $(PDF_SUBMAKE) is not set ...
 ifneq ($(PDF_SUBMAKE),0)
 
