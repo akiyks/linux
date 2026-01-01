@@ -206,15 +206,10 @@
     % Suppress extra white space at latin .. non-latin in literal blocks
     \AtBeginEnvironment{sphinxVerbatim}{\CJKsetecglue{}}
 }{ % Don't enable CJK
-    % Custom macros to on/off CJK and switch CJK fonts (Dummy)
-    \newcommand{\kerneldocCJKon}{}
-    \newcommand{\kerneldocCJKoff}{}
-    %% By defining \kerneldocBegin(SC|TC|KR|JP) as commands with an argument
-    %% and ignore the argument (#1) in their definitions, whole contents of
-    %% CJK chapters can be ignored.
-    \newcommand{\kerneldocBeginSC}[1]{%
+    \newcommand{\kerneldocNoCJKnote}{
 	%% Put a note on missing CJK fonts or the xecjk package in place of
 	%% zh_CN translation.
+	\cleardoublepage
 	\begin{sphinxadmonition}{note}{Note on missing fonts and a package:}
 	    Translations of Simplified Chinese (zh\_CN), Traditional Chinese
 	    (zh\_TW), Korean (ko\_KR), and Japanese (ja\_JP) were skipped
@@ -227,12 +222,24 @@
 	    \sphinxcode{./tools/docs/sphinx-pre-install}.
 	    Having optional non-variable ``Noto Serif CJK'' font families will
 	    improve the looks of those translations.
-	\end{sphinxadmonition}}
+	\end{sphinxadmonition}
+    }
+    \newcommand{\kerneldocPrintNoCJKnoteOnce}{
+        \kerneldocNoCJKnote
+        \renewcommand{\kerneldocNoCJKnote}{}
+    }
+    % Custom macros to on/off CJK and switch CJK fonts (Dummy)
+    \newcommand{\kerneldocCJKon}{}
+    \newcommand{\kerneldocCJKoff}{}
+    %% By defining \kerneldocBegin(SC|TC|KR|JP) as commands with an argument
+    %% and ignore the argument (#1) in their definitions, whole contents of
+    %% CJK chapters can be ignored.
+    \newcommand{\kerneldocBeginSC}[1]{\kerneldocPrintNoCJKnoteOnce}
     \newcommand{\kerneldocEndSC}{}
-    \newcommand{\kerneldocBeginTC}[1]{}
+    \newcommand{\kerneldocBeginTC}[1]{\kerneldocPrintNoCJKnoteOnce}
     \newcommand{\kerneldocEndTC}{}
-    \newcommand{\kerneldocBeginKR}[1]{}
+    \newcommand{\kerneldocBeginKR}[1]{\kerneldocPrintNoCJKnoteOnce}
     \newcommand{\kerneldocEndKR}{}
-    \newcommand{\kerneldocBeginJP}[1]{}
+    \newcommand{\kerneldocBeginJP}[1]{\kerneldocPrintNoCJKnoteOnce}
     \newcommand{\kerneldocEndJP}{}
 }
