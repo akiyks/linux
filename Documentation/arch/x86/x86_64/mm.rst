@@ -4,6 +4,13 @@
 Memory Management
 =================
 
+.. Shrink default font size for wide literal blocks
+
+.. raw:: latex
+
+    \begingroup
+    \setliteralfontsize{\tiny}
+
 Complete virtual memory map with 4-level page tables
 ====================================================
 
@@ -178,3 +185,9 @@ correct as KASAN disables KASLR.
 
 For both 4- and 5-level layouts, the KSTACK_ERASE_POISON value in the last 2MB
 hole: ffffffffffff4111
+
+.. Restore default settings for PDF
+
+.. raw:: latex
+
+    \endgroup
