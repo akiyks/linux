@@ -40,7 +40,9 @@ pending requests waiting the request will be immediately submitted
 to the daemon again.
 
 Initial SQE
------------::
+-----------
+
+::
 
  |                                    |  FUSE filesystem daemon
  |                                    |
@@ -56,7 +58,9 @@ Initial SQE
 
 
 Sending requests with CQEs
---------------------------::
+--------------------------
+
+::
 
  |                                           |  FUSE filesystem daemon
  |                                           |  [waiting for CQEs]
