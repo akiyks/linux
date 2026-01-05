@@ -8,6 +8,7 @@ Fuse supports the following I/O modes:
 
 - direct-io
 - cached
+
   + write-through
   + writeback-cache
 
