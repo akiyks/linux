@@ -51,6 +51,7 @@ applications.
 
    events
    events-kmem
+   events-pci
    events-power
    events-nmi
    events-msr
