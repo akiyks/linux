@@ -68,7 +68,7 @@ static inline int kref_put(struct kref *kref, void (*release)(struct kref *kref)
 	return 0;
 }
 
-/**
+/*
  * kref_put_mutex - Decrement refcount for object
  * @kref: Object
  * @release: Pointer to the function that will clean up the object when the
@@ -90,7 +90,7 @@ static inline int kref_put_mutex(struct kref *kref,
 	return 0;
 }
 
-/**
+/*
  * kref_put_lock - Decrement refcount for object
  * @kref: Object
  * @release: Pointer to the function that will clean up the object when the
