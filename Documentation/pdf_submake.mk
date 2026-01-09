@@ -34,6 +34,7 @@ ifeq ($(SPHINXDIRS),.)
 	$(Q)ln -srf $(subst .tex,.pdf,$(abspath $(wildcard $(BUILDDIR)/latex/*.tex))) -t $(BUILDDIR)/pdf/
 	@echo "Symlinks to PDFs are under $(abspath $(BUILDDIR))/pdf/."
 else #SPHINXDIRS
+	$(Q)$(MAKE) Q="$(Q)" BUILDDIR="$(BUILDDIR)" SPHINXDIRS="$(SPHINXDIRS)" -f $(srctree)/Documentation/pdf_makefile afterlatex
 	$(Q)$(MAKE) Q="$(Q)" BUILDDIR="$(BUILDDIR)" SPHINXDIRS="$(SPHINXDIRS)" PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" DENY_VF="$(DENY_VF)" srctree="$(srctree)" -f $(srctree)/Documentation/pdf_makefile || \
 	  PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" $(srctree)/tools/docs/check-variable-fonts.py
 	$(Q)$(MAKE) Q="$(Q)" BUILDDIR="$(BUILDDIR)" SPHINXDIRS="$(SPHINXDIRS)" srctree="$(srctree)" -f $(srctree)/Documentation/pdf_makefile symlink-pdf
