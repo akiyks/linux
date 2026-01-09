@@ -3,15 +3,30 @@
 
 ALLLATEXDIRS := $(addsuffix /latex,$(addprefix $(BUILDDIR)/,$(SPHINXDIRS)))
 Q =
+_SPHINXDIRS   = $(sort $(patsubst $(srctree)/Documentation/%/index.rst,%,$(wildcard $(srctree)/Documentation/*/index.rst)))
+DEEP_SUBDIRS := $(filter-out $(_SPHINXDIRS),$(SPHINXDIRS))
 
 all: $(ALLLATEXDIRS)
+ifeq ($(DEEP_SUBDIRS),)
 	@echo "Symlinks to PDFs are under $(abspath $(BUILDDIR))/pdf/."
+else
+	@echo "Deep subdirs in SPHINXDIRS: $(DEEP_SUBDIRS)."
+	@echo "Symlinks to PDFs are next to each $(abspath $(BUILDDIR))/<.../subdir>/latex."
+endif
 
 $(ALLLATEXDIRS): %: $(subst .tex,.pdf,$(wildcard $@/*.tex))
 	$(Q)$(MAKE) -C '$@' PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF)
 
+ifeq ($(DEEP_SUBDIRS),)
 symlink-pdf:
 	$(Q)mkdir -p $(abspath $(BUILDDIR))/pdf
 	$(Q)ln -srf $(subst .tex,.pdf,$(wildcard $(abspath $(BUILDDIR))/*/latex/*.tex)) -t $(abspath $(BUILDDIR))/pdf
+else # DEEP_SUBDIR
+symlink-pdf:
+	$(Q)$(foreach dir,$(SPHINXDIRS), \
+	    mkdir -p $(abspath $(BUILDDIR))/$(dir)/pdf ; \
+	    ln -srf $(subst .tex,.pdf,$(wildcard $(abspath $(BUILDDIR))/$(dir)/latex/*.tex)) $(abspath $(BUILDDIR))/$(dir)/pdf ; \
+	)
+endif #DEEP_SUBDIR
 
 .PHONY: $(ALLLATEXDIRS) symlink-pdf
