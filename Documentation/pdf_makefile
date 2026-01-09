@@ -93,4 +93,11 @@ endif # PDFINFO_CMD
 	@$(CHECK_PDF)
 	@$(INFO_PDFFONTS)
 
-.PHONY: $(ALLLATEXDIRS) symlink-pdf check-pdf
+afterlatex:
+	@for dir in $(SPHINXDIRS); do \
+	    TEX=`ls $(BUILDDIR)/$$dir/latex/*.tex` ; \
+	    sed -i -e '/^\\title{/ s/_/\\_/g' \
+		   -e '/^\\title{/ s/\\\\/\\/g' $$TEX ; \
+	done
+
+.PHONY: $(ALLLATEXDIRS) symlink-pdf check-pdf afterlatex
