@@ -36,6 +36,7 @@ The Slab Cache
 
 .. kernel-doc:: include/linux/slab.h
    :internal:
+   :no-identifiers: ksize
 
 .. kernel-doc:: mm/slub.c
    :export:
