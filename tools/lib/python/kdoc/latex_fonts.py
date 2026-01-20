@@ -38,7 +38,7 @@ Workarounds for building translations.pdf
 * Denylist "variable font" Noto CJK fonts.
 
   - Create $HOME/deny-vf/fontconfig/fonts.conf from template below, with
-    tweaks if necessary.  Remove leading "".
+    tweaks if necessary.
 
   - Path of fontconfig/fonts.conf can be overridden by setting an env
     variable FONTS_CONF_DENY_VF.
@@ -99,8 +99,8 @@ Workarounds for building translations.pdf
 .. caution::
     Uninstalling "variable font" packages can be dangerous.
     They might be depended upon by other packages important for your work.
-    Denylisting should be less invasive, as it is effective only while
-    XeLaTeX runs in "make pdfdocs".
+    Denylisting should be less invasive, as it can be activated only while
+    specific commands run.
 """
 
 import os
