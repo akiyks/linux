@@ -7,6 +7,11 @@ The realtime Linux analysis tool
 RTLA provides a set of tools for the analysis of the kernel's realtime
 behavior on specific hardware.
 
+.. raw:: latex
+
+	\begingroup
+	\setliteralfontsize{\tiny}
+
 .. toctree::
    :maxdepth: 1
 
@@ -18,3 +23,7 @@ behavior on specific hardware.
    rtla-timerlat-hist
    rtla-timerlat-top
    rtla-hwnoise
+
+.. raw:: latex
+
+	\endgroup
