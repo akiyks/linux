@@ -12,6 +12,7 @@
 
    disclaimer-ja_JP
    process/howto
+   process/submitting-patches
    process/submit-checklist
 
 .. raw:: latex
