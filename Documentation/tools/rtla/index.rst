@@ -27,10 +27,3 @@ behavior on specific hardware.
 .. raw:: latex
 
 	\endgroup
-
-.. only::  subproject and html
-
-   Indices
-   =======
-
-   * :ref:`genindex`
