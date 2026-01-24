@@ -87,5 +87,3 @@ See Also
    :maxdepth: 1
 
    abi.rst
-   concepts
-   fdt
