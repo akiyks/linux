@@ -6,10 +6,6 @@
 La documentazione del kernel Linux
 ==================================
 
-.. raw:: latex
-
-	\kerneldocCJKoff
-
 :manutentore: Federico Vaga <federico.vaga@vaga.pv.it>
 
 Questo è il livello principale della documentazione del kernel in
