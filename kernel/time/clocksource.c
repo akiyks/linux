@@ -285,7 +285,7 @@ static enum wd_read_status cs_watchdog_read(struct clocksource *cs, u64 *csnow, 
 		 * watchdog test.
 		 */
 		wd_seq_delay = cycles_to_nsec_safe(watchdog, wd_end, wd_end2);
-		if (wd_seq_delay > md)
+		if (wd_seq_delay > 2 * md)
 			goto skip_test;
 	}
 
