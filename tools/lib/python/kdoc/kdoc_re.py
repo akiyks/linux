@@ -234,10 +234,7 @@ class NestedMatch:
         It matches a regex that it is followed by a delimiter,
         replacing occurrences only if all delimiters are paired.
 
-        if the sub argument contains::
-
-            r'\1'
-
+        If the sub argument contains ``r'\1'``,
         it will work just like re: it places there the matched paired data
         with the delimiter stripped.
 
