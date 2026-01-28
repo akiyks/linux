@@ -22,6 +22,11 @@ div[class^="highlight"] pre {
 	color: black;
 }
 
+/* color of kernel version below Tux logo */
+.wy-side-nav-search > div.version {
+    color: rgba(212, 224, 230, 0.9);
+}
+
 @media screen {
 
     /* Menu selection and keystrokes */
@@ -34,4 +39,24 @@ div[class^="highlight"] pre {
 	color: white;
 	background-color: darkblue;
     }
+}
+
+/* Language selection menu */
+
+div.language-selection {
+    background: #eeeeee;
+    border: 1px solid #cccccc;
+}
+
+div.language-selection a {
+    color: #333333;
+}
+
+div.language-selection ul {
+    background: #fafafa;
+    border: 1px solid #cccccc;
+}
+
+div.language-selection ul li:hover {
+    background: #dddddd;
 }
