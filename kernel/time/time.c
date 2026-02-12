@@ -366,7 +366,7 @@ SYSCALL_DEFINE1(adjtimex_time32, struct old_timex32 __user *, utp)
 #endif
 
 #if HZ > MSEC_PER_SEC || (MSEC_PER_SEC % HZ)
-/**
+/*
  * jiffies_to_msecs - Convert jiffies to milliseconds
  * @j: jiffies value
  *
@@ -389,7 +389,7 @@ EXPORT_SYMBOL(jiffies_to_msecs);
 #endif
 
 #if (USEC_PER_SEC % HZ)
-/**
+/*
  * jiffies_to_usecs - Convert jiffies to microseconds
  * @j: jiffies value
  *
