@@ -60,14 +60,29 @@ else # HAVE_SPHINX
 
 ifeq ($(PDF_SUBMAKE),0)
 # Common documentation targets
-htmldocs mandocs infodocs texinfodocs latexdocs epubdocs xmldocs pdfdocs linkcheckdocs:
+htmldocs mandocs infodocs texinfodocs latexdocs epubdocs xmldocs linkcheckdocs:
 	$(Q)PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" \
 		$(srctree)/tools/docs/sphinx-pre-install --version-check
 	+$(Q)PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" \
 		$(PYTHON3) $(BUILD_WRAPPER) $@ \
 		--sphinxdirs="$(SPHINXDIRS)" $(RUSTDOC) \
-		--builddir="$(BUILDDIR)" --deny-vf=$(FONTS_CONF_DENY_VF) \
+		--builddir="$(BUILDDIR)" \
 		--theme=$(DOCS_THEME) --css=$(DOCS_CSS) --paper=$(PAPER)
+
+afterlatex: latexdocs
+	$(Q)for DIR in $(SPHINXDIRS); do \
+		TEX=`ls $(BUILDDIR)/$$DIR/latex/*.tex` ; \
+		sed -i -e '/^\\title{/ s/_/\\_/g' \
+		       -e '/^\\title{/ s/\\\\/\\/g' $$TEX ; \
+	done
+
+pdfdocs: afterlatex
+	+$(Q)PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" \
+		$(PYTHON3) $(BUILD_WRAPPER) $@ \
+		--sphinxdirs="$(SPHINXDIRS)" $(RUSTDOC) \
+		--builddir="$(BUILDDIR)" --deny-vf=$(FONTS_CONF_DENY_VF) \
+		--theme=$(DOCS_THEME) --css=$(DOCS_CSS) --paper=$(PAPER) \
+		--skip-sphinx-build
 
 else #PDF_SUBMAKE
     include $(srctree)/Documentation/pdf_submake.mk
