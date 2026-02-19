@@ -32,6 +32,8 @@ PAPER         =
 BUILDDIR      = $(obj)/output
 PDFLATEX      = xelatex
 LATEXOPTS     = -interaction=batchmode -no-shell-escape
+# say PDF_SUBMAKE=1 to build via output/.../latex/Makefile
+PDF_SUBMAKE ?= 0
 
 PYTHONPYCACHEPREFIX ?= $(abspath $(BUILDDIR)/__pycache__)
 
@@ -56,6 +58,7 @@ ifeq ($(HAVE_SPHINX),0)
 
 else # HAVE_SPHINX
 
+ifeq ($(PDF_SUBMAKE),0)
 # Common documentation targets
 htmldocs mandocs infodocs texinfodocs latexdocs epubdocs xmldocs pdfdocs linkcheckdocs:
 	$(Q)PYTHONPYCACHEPREFIX="$(PYTHONPYCACHEPREFIX)" \
@@ -66,8 +69,10 @@ htmldocs mandocs infodocs texinfodocs latexdocs epubdocs xmldocs pdfdocs linkche
 		--builddir="$(BUILDDIR)" --deny-vf=$(FONTS_CONF_DENY_VF) \
 		--theme=$(DOCS_THEME) --css=$(DOCS_CSS) --paper=$(PAPER)
 
-
-endif
+else #PDF_SUBMAKE
+    include $(srctree)/Documentation/pdf_submake.mk
+endif #PDF_SUBMAKE
+endif #HAVE_SPHINX
 
 # The following targets are independent of HAVE_SPHINX, and the rules should
 # work or silently pass without Sphinx.

@@ -1,0 +1,103 @@
+# -*- makefile -*-
+# To be invoked from Documentation/pdf_submake.mk when $(PDF_SUBMAKE) != 0
+
+ALLLATEXDIRS := $(addsuffix /latex,$(addprefix $(BUILDDIR)/,$(SPHINXDIRS)))
+Q =
+_SPHINXDIRS   = $(sort $(patsubst $(srctree)/Documentation/%/index.rst,%,$(wildcard $(srctree)/Documentation/*/index.rst)))
+DEEP_SUBDIRS := $(filter-out $(_SPHINXDIRS),$(SPHINXDIRS))
+
+all: $(ALLLATEXDIRS)
+ifeq ($(DEEP_SUBDIRS),)
+	@echo "Symlinks to PDFs are under $(abspath $(BUILDDIR))/pdf/."
+else
+	@echo "Deep subdirs in SPHINXDIRS: $(DEEP_SUBDIRS)."
+	@echo "Symlinks to PDFs are next to each $(abspath $(BUILDDIR))/<.../subdir>/latex."
+endif
+
+$(ALLLATEXDIRS): %: $(subst .tex,.pdf,$(wildcard $@/*.tex))
+	$(Q)$(MAKE) -C '$@' PDFLATEX="$(PDFLATEX)" LATEXOPTS="$(LATEXOPTS)" $(DENY_VF)
+
+ifeq ($(DEEP_SUBDIRS),)
+symlink-pdf:
+	$(Q)mkdir -p $(abspath $(BUILDDIR))/pdf
+	$(Q)ln -srf $(subst .tex,.pdf,$(wildcard $(abspath $(BUILDDIR))/*/latex/*.tex)) -t $(abspath $(BUILDDIR))/pdf
+else # DEEP_SUBDIR
+symlink-pdf:
+	$(Q)$(foreach dir,$(SPHINXDIRS), \
+	    mkdir -p $(abspath $(BUILDDIR))/$(dir)/pdf ; \
+	    ln -srf $(subst .tex,.pdf,$(wildcard $(abspath $(BUILDDIR))/$(dir)/latex/*.tex)) $(abspath $(BUILDDIR))/$(dir)/pdf ; \
+	)
+endif #DEEP_SUBDIR
+
+PAT_OK = "DEADPATTERN"
+ifneq ($(V),1)
+PAT_OK = "OK"
+endif
+
+PDFINFO_CMD := $(shell command -v pdfinfo)
+PDFFONTS_CMD := $(shell command -v pdffonts)
+
+TEXSOURCES := $(shell find $(abspath $(BUILDDIR)) -wholename "$(abspath $(BUILDDIR))/*latex/*.tex")
+
+ifneq ($(PDFINFO_CMD),)
+    CHECK_BY_PDFINFO = \
+        if pdfinfo "$$f" > /dev/null 2>&1 ; then \
+            echo "$$bf: OK" ; \
+        else \
+            echo "$$bf: NG" ; \
+        fi
+else
+    CHECK_BY_PDFINFO = \
+	echo "$$bf: OK"
+endif
+
+CHECK_PDF = \
+	for f in $(subst .tex,.pdf,$(TEXSOURCES)) ; do \
+	    bf=`basename $$f` ; \
+	    if [ -e $$f ] ; then \
+	        $(CHECK_BY_PDFINFO) ; \
+	    else \
+		echo "$$bf: not found!" ; \
+	    fi \
+	done | sort | grep -v $(PAT_OK) || true
+
+ifneq ($(PDFFONTS_CMD),)
+    INFO_PDFFONTS = \
+	for f in $(subst .tex,.pdf,$(TEXSOURCES)) ; do \
+	    bf=`basename $$f` ; \
+	    if echo "$$f" | grep -q translations ; then \
+	        if pdffonts $$f > /dev/null 2>&1 ; then \
+	            if pdffonts $$f 2> /dev/null | grep -q -i cjk ; then \
+		        if pdffonts $$f 2> /dev/null | grep -q -i sarasa ; then \
+	                    echo "Info: $$bf: with CJK pages + sarasa mono" ; \
+	                else \
+	                    echo "Info: $$bf: with CJK pages" ; \
+	                fi \
+	            else \
+	                echo "Info: $$bf: with CJK pages skipped" ; \
+		    fi \
+	        fi \
+	    fi \
+	done
+else
+    INFO_PDFFONTS = \
+	echo '"pdffonts" unavailable... Skipping font info.'
+endif
+
+check-pdf:
+ifneq ($(PDFINFO_CMD),)
+	@echo "Checking PDFs with $(PDFINFO_CMD) ..."
+else # PDFINFO_CMD
+	@echo 'Checking expected PDFs ("pdfinfo" unavailable) ...'
+endif # PDFINFO_CMD
+	@$(CHECK_PDF)
+	@$(INFO_PDFFONTS)
+
+afterlatex:
+	@for dir in $(SPHINXDIRS); do \
+	    TEX=`ls $(BUILDDIR)/$$dir/latex/*.tex` ; \
+	    sed -i -e '/^\\title{/ s/_/\\_/g' \
+		   -e '/^\\title{/ s/\\\\/\\/g' $$TEX ; \
+	done
+
+.PHONY: $(ALLLATEXDIRS) symlink-pdf check-pdf afterlatex
