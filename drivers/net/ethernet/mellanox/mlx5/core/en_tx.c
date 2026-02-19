@@ -656,7 +656,7 @@ netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 	 * queue being changed is disabled, and smp_wmb guarantees that the
 	 * changes are visible before mlx5e_xmit tries to read from txq2sq. It
 	 * guarantees that the value of txq2sq[qid] doesn't change while
-	 * mlx5e_xmit is running on queue number qid. smb_wmb is paired with
+	 * mlx5e_xmit is running on queue number qid. smp_wmb is paired with
 	 * HARD_TX_LOCK around ndo_start_xmit, which serves as an ACQUIRE.
 	 */
 	sq = priv->txq2sq[skb_get_queue_mapping(skb)];

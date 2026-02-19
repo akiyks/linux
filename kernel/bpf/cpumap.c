@@ -812,7 +812,7 @@ void __cpu_map_flush(struct list_head *flush_list)
 	list_for_each_entry_safe(bq, tmp, flush_list, flush_node) {
 		bq_flush_to_queue(bq);
 
-		/* If already running, costs spin_lock_irqsave + smb_mb */
+		/* If already running, costs spin_lock_irqsave + smp_mb */
 		wake_up_process(bq->obj->kthread);
 	}
 }
