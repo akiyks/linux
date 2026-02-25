@@ -1522,8 +1522,10 @@ static bool memcg_accounts_hugetlb(void)
  * The function checks for overflow at each step and returns early if any
  * operation would cause the buffer to overflow.
  *
- * Example: memcg_seq_buf_print_stat(s, "total_", "cache", ' ', 1048576)
- *          Output: "total_cache 1048576\n"
+ * Example::
+ *
+ *     memcg_seq_buf_print_stat(s, "total_", "cache", ' ', 1048576)
+ *     Output: "total_cache 1048576\n"
  */
 void memcg_seq_buf_print_stat(struct seq_buf *s, const char *prefix,
 			      const char *name, char sep, u64 val)
