@@ -408,7 +408,7 @@ static inline spinlock_t *dma_fence_spinlock(struct dma_fence *fence)
 /**
  * dma_fence_unlock_irqrestore - unlock the fence and irqrestore
  * @fence: the fence to unlock
- * @flags the CPU flags to restore
+ * @flags: the CPU flags to restore
  *
  * Unlock the fence, allowing it to change it's state to signaled again.
  */
