@@ -438,8 +438,17 @@ that in user land::
 The output bitmap is ready for consumption immediately after the
 completion status indicates success.
 
-Excer[t from UltraSPARC Virtual Machine Specification
+Excerpt from UltraSPARC Virtual Machine Specification
 =====================================================
 
- .. include:: dax-hv-api.txt
-    :literal:
+.. raw:: latex
+
+	\begingroup
+	\setliteralfontsize{\tiny}
+
+.. include:: dax-hv-api.txt
+   :literal:
+
+.. raw:: latex
+
+	\endgroup
