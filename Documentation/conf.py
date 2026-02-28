@@ -461,6 +461,7 @@ htmlhelp_basename = "TheLinuxKerneldoc"
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
+    "latex_engine": "xelatex",
     # The paper size ('letterpaper' or 'a4paper').
     "papersize": "a4paper",
     "passoptionstopackages": dedent(r"""
@@ -472,10 +473,11 @@ latex_elements = {
     "printindex": r"\footnotesize\raggedright\printindex",
     # Latex figure (float) alignment
     # 'figure_align': 'htbp',
-    # Don't mangle with UTF-8 chars
+    # Don't mangle with Type1 fonts
+    "cmappkg": "",
     "fontenc": "",
     "inputenc": "",
-    "utf8extra": "",
+    "textgreek": "",
     # Set document margins
     "sphinxsetup": dedent(r"""
         hmargin=0.5in, vmargin=1in,
@@ -495,6 +497,8 @@ latex_elements = {
         \setsansfont{DejaVu Sans}
         \setmonofont{DejaVu Sans Mono}
         \newfontfamily\headingfont{DejaVu Serif}
+        % Load kerneldoc specific CJK font settings
+        \input{kerneldoc-cjkfontpkg.sty}
     """),
     "preamble": dedent(r"""
         % Load kerneldoc specific LaTeX settings
@@ -528,6 +532,7 @@ latex_documents = []
 # Additional LaTeX stuff to be copied to build directory
 latex_additional_files = [
     "sphinx/kerneldoc-preamble.sty",
+    "sphinx/kerneldoc-cjkfontpkg.sty",
 ]
 
 

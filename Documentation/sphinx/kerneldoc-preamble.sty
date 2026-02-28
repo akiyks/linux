@@ -96,23 +96,8 @@
 \addtolength{\headheight}{1.6pt}
 \addtolength{\topmargin}{-1.6pt}
 
-% Environmet for kernelindent container
-\let\sphinxclasskernelindent\sphinxShadowBox
-\let\endsphinxclasskernelindent\endsphinxShadowBox
-
-% Translations have Asian (CJK) characters which are only displayed if
-% xeCJK is used
-\usepackage{ifthen}
-\newboolean{enablecjk}
-\setboolean{enablecjk}{false}
-\IfFontExistsTF{Noto Sans CJK SC}{
-    \IfFileExists{xeCJK.sty}{
-	\setboolean{enablecjk}{true}
-    }{}
-}{}
-\ifthenelse{\boolean{enablecjk}}{
-    % Load xeCJK when both the Noto Sans CJK font and xeCJK.sty are available.
-    \usepackage{xeCJK}
+\makeatletter
+\@ifpackageloaded{xeCJK}{
     % Noto CJK fonts don't provide slant shape. [AutoFakeSlant] permits
     % its emulation.
     % Select KR variant at the beginning of each document so that quotation
@@ -266,3 +251,4 @@
     \newcommand{\kerneldocBeginJP}[1]{}
     \newcommand{\kerneldocEndJP}{}
 }
+\makeatother
