@@ -1537,7 +1537,7 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
 		 * Ensure loaded_vmcs->cpu is read before adding loaded_vmcs to
 		 * this cpu's percpu list, otherwise it may not yet be deleted
 		 * from its previous cpu's percpu list.  Pairs with the
-		 * smb_wmb() in __loaded_vmcs_clear().
+		 * smp_wmb() in __loaded_vmcs_clear().
 		 */
 		smp_rmb();
 
@@ -4452,7 +4452,7 @@ static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
 		 * vcpu_enter_guest() to guarantee the vCPU sees the event
 		 * request if triggering a posted interrupt "fails" because
 		 * vcpu->mode != IN_GUEST_MODE.  The extra barrier is needed as
-		 * the smb_wmb() in kvm_make_request() only ensures everything
+		 * the smp_wmb() in kvm_make_request() only ensures everything
 		 * done before making the request is visible when the request
 		 * is visible, it doesn't ensure ordering between the store to
 		 * vcpu->requests and the load from vcpu->mode.
