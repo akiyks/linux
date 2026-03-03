@@ -1,10 +1,5 @@
 .. SPDX-License-Identifier: GPL-2.0
 
-.. raw:: latex
-
-	\renewcommand\thesection*
-	\renewcommand\thesubsection*
-
 .. include:: ../disclaimer-zh_TW.rst
 
 :Original: :ref:`Documentation/process/index.rst <process_index>`
