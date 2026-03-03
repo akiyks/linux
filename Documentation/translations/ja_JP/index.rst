@@ -1,7 +1,5 @@
 .. raw:: latex
 
-	\renewcommand\thesection*
-	\renewcommand\thesubsection*
 	\kerneldocBeginJP{
 
 日本語訳

@@ -1,8 +1,3 @@
-.. raw:: latex
-
-	\renewcommand\thesection*
-	\renewcommand\thesubsection*
-
 .. include:: ../disclaimer-zh_CN.rst
 
 :Original: Documentation/process/index.rst
