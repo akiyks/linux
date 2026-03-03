@@ -2,8 +2,6 @@
 
 .. raw:: latex
 
-	\renewcommand\thesection*
-	\renewcommand\thesubsection*
 	\kerneldocBeginSC{
 
 .. _linux_doc_zh:
