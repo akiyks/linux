@@ -1,8 +1,3 @@
-.. raw:: latex
-
-	\renewcommand\thesection*
-	\renewcommand\thesubsection*
-
 .. _process_index:
 
 =============================================
