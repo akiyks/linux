@@ -1,10 +1,5 @@
 .. SPDX-License-Identifier: GPL-2.0
 
-.. raw:: latex
-
-	\renewcommand\thesection*
-	\renewcommand\thesubsection*
-
 ===============================================
 Trabalhando com a comunidade de desenvolvimento
 ===============================================
