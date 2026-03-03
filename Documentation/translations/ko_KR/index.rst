@@ -1,7 +1,5 @@
 .. raw:: latex
 
-	\renewcommand\thesection*
-	\renewcommand\thesubsection*
 	\kerneldocBeginKR{
 
 한국어 번역
