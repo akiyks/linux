@@ -43,11 +43,11 @@ how to translate the device into a serial number from SCSI EVPD 0x80::
 
 If the nfsd server needs to fence a non-responding client and the
 fencing operation fails, the server logs a warning message in the
-system log with the following format:
+system log with the following format::
 
     FENCE failed client[IP_address] clid[#n] device[dev_name]
 
-    where:
+, where:
 
     - IP_address: refers to the IP address of the affected client.
     - #n: indicates the unique client identifier.
@@ -67,6 +67,6 @@ needs to take the following actions:
 
         echo 'expire' > /proc/fs/nfsd/clients/clid/ctl
 
-    where:
+      , where:
 
-      - clid: is the unique client identifier displayed in the system log.
+        - clid: is the unique client identifier displayed in the system log.
