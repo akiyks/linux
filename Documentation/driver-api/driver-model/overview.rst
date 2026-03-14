@@ -9,7 +9,7 @@ Updated 31 January 2006
 
 
 Overview
-~~~~~~~~
+========
 
 The Linux Kernel Driver Model is a unification of all the disparate driver
 models that were previously used in the kernel. It is intended to augment the
@@ -36,7 +36,7 @@ buses support most of those operations.
 
 
 Downstream Access
-~~~~~~~~~~~~~~~~~
+=================
 
 Common data fields have been moved out of individual bus layers into a common
 data structure. These fields must still be accessed by the bus layers,
@@ -74,7 +74,7 @@ layer that needs to change.
 
 
 User Interface
-~~~~~~~~~~~~~~
+==============
 
 By virtue of having a complete hierarchical view of all the devices in the
 system, exporting a complete hierarchical view to userspace becomes relatively
