@@ -126,9 +126,9 @@ everyone will fail reverting to RO mode for "Others".
 
 For the common cases sysfs.h provides convenience macros to make
 defining attributes easier as well as making code more concise and
-readable. The above case could be shortened to:
+readable. The above case could be shortened to::
 
-static struct device_attribute dev_attr_foo = __ATTR_RW(foo);
+    static struct device_attribute dev_attr_foo = __ATTR_RW(foo);
 
 the list of helpers available to define your wrapper function is:
 
