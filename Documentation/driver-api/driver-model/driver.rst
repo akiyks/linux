@@ -5,7 +5,7 @@ Device Drivers
 See the kerneldoc for the struct device_driver.
 
 Allocation
-~~~~~~~~~~
+==========
 
 Device drivers are statically allocated structures. Though there may
 be multiple devices in a system that a driver supports, struct
@@ -13,7 +13,7 @@ device_driver represents the driver as a whole (not a particular
 device instance).
 
 Initialization
-~~~~~~~~~~~~~~
+==============
 
 The driver must initialize at least the name and bus fields. It should
 also initialize the devclass field (when it arrives), so it may obtain
@@ -21,7 +21,7 @@ the proper linkage internally. It should also initialize as many of
 the callbacks as possible, though each is optional.
 
 Declaration
-~~~~~~~~~~~
+===========
 
 As stated above, struct device_driver objects are statically
 allocated. Below is an example declaration of the eepro100
@@ -75,7 +75,7 @@ Some may find the syntax of embedded struct initialization awkward or
 even a bit ugly. So far, it's the best way we've found to do what we want...
 
 Registration
-~~~~~~~~~~~~
+============
 
 ::
 
@@ -97,7 +97,7 @@ used by the device model core or the bus driver.
 
 
 Transition Bus Drivers
-~~~~~~~~~~~~~~~~~~~~~~
+======================
 
 By defining wrapper functions, the transition to the new model can be
 made easier. Drivers can ignore the generic structure altogether and
@@ -112,7 +112,7 @@ complexity and code size, it is recommended that they are converted as
 class information is added.
 
 Access
-~~~~~~
+======
 
 Once the object has been registered, it may access the common fields of
 the object, like the lock and the list of devices::
@@ -128,7 +128,7 @@ accesses it.
 
 
 sysfs
-~~~~~
+=====
 
 When a driver is registered, a sysfs directory is created in its
 bus's directory. In this directory, the driver can export an interface
@@ -142,7 +142,7 @@ supports.
 
 
 Callbacks
-~~~~~~~~~
+=========
 
 ::
 
@@ -256,7 +256,7 @@ Resume is used to bring a device back from a low power state.
 
 
 Attributes
-~~~~~~~~~~
+==========
 
 ::
 
