@@ -11,7 +11,8 @@ formally specified ones like PCI or USB.
 
 
 Platform devices
-~~~~~~~~~~~~~~~~
+================
+
 Platform devices are devices that typically appear as autonomous
 entities in the system. This includes legacy port-based devices and
 host bridges to peripheral buses, and most controllers integrated
@@ -33,7 +34,8 @@ list of resources such as addresses and IRQs::
 
 
 Platform drivers
-~~~~~~~~~~~~~~~~
+================
+
 Platform drivers follow the standard driver model convention, where
 discovery/enumeration is handled outside the drivers, and drivers
 provide probe() and remove() methods.  They support power management
@@ -83,7 +85,8 @@ macro that passes THIS_MODULE as owner parameter::
 
 
 Device Enumeration
-~~~~~~~~~~~~~~~~~~
+==================
+
 As a rule, platform specific (and often board-specific) setup code will
 register platform devices::
 
@@ -115,7 +118,8 @@ calls to clk_get(&pdev->dev, clock_name) return them as needed.
 
 
 Legacy Drivers:  Device Probing
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===============================
+
 Some drivers are not fully converted to the driver model, because they take
 on a non-driver role:  the driver registers its platform device, rather than
 leaving that for system infrastructure.  Such drivers can't be hotplugged
@@ -155,7 +159,8 @@ and register a device.
 
 
 Device Naming and Driver Binding
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+================================
+
 The platform_device.dev.bus_id is the canonical name for the devices.
 It's built from two components:
 
@@ -164,9 +169,9 @@ It's built from two components:
     * platform_device.id ... the device instance number, or else "-1"
       to indicate there's only one.
 
-These are concatenated, so name/id "serial"/0 indicates bus_id "serial.0", and
+These are concatenated, so name/id "serial/0" indicates bus_id "serial.0", and
 "serial/3" indicates bus_id "serial.3"; both would use the platform_driver
-named "serial".  While "my_rtc"/-1 would be bus_id "my_rtc" (no instance id)
+named "serial".  While "my_rtc/-1" would be bus_id "my_rtc" (no instance id)
 and use the platform_driver called "my_rtc".
 
 Driver binding is performed automatically by the driver core, invoking
@@ -189,7 +194,8 @@ three different ways to find such a match:
 
 
 Early Platform Devices and Drivers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==================================
+
 The early platform interfaces provide platform data to platform device
 drivers early on during the system boot. The code is built on top of the
 early_param() command line parsing and can be executed very early on.
@@ -197,14 +203,16 @@ early_param() command line parsing and can be executed very early on.
 Example: "earlyprintk" class early serial console in 6 steps
 
 1. Registering early platform device data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
+
 The architecture code registers platform device data using the function
 early_platform_add_devices(). In the case of early serial console this
 should be hardware configuration for the serial port. Devices registered
 at this point will later on be matched against early platform drivers.
 
 2. Parsing kernel command line
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
+
 The architecture code calls parse_early_param() to parse the kernel
 command line. This will execute all matching early_param() callbacks.
 User specified early platform devices will be registered at this point.
@@ -215,7 +223,8 @@ the class string, "serial" is the name of the platform driver and
 id can be omitted.
 
 3. Installing early platform drivers belonging to a certain class
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------------
+
 The architecture code may optionally force registration of all early
 platform drivers belonging to a certain class using the function
 early_platform_driver_register_all(). User specified devices from
@@ -224,21 +233,24 @@ driver example since the early serial driver code should be disabled
 unless the user has specified port on the kernel command line.
 
 4. Early platform driver registration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
+
 Compiled-in platform drivers making use of early_platform_init() are
 automatically registered during step 2 or 3. The serial driver example
 should use early_platform_init("earlyprintk", &platform_driver).
 
 5. Probing of early platform drivers belonging to a certain class
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------------
+
 The architecture code calls early_platform_driver_probe() to match
 registered early platform devices associated with a certain class with
-registered early platform drivers. Matched devices will get probed().
+registered early platform drivers. Matched devices will get probe()'d.
 This step can be executed at any point during the early boot. As soon
 as possible may be good for the serial port case.
 
 6. Inside the early platform driver probe()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------
+
 The driver code needs to take special care during early boot, especially
 when it comes to memory allocation and interrupt registration. The code
 in the probe() function can use is_early_platform_device() to check if
