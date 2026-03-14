@@ -3,14 +3,15 @@ Bus Types
 =========
 
 Definition
-~~~~~~~~~~
-See the kerneldoc for the struct bus_type.
+==========
 
-int bus_register(struct bus_type * bus);
+See the kerneldoc for the struct bus_type::
+
+   int bus_register(struct bus_type * bus);
 
 
 Declaration
-~~~~~~~~~~~
+===========
 
 Each bus type in the kernel (PCI, USB, etc) should declare one static
 object of this type. They must initialize the name field, and may
@@ -21,13 +22,13 @@ optionally initialize the match callback::
           .match	= pci_bus_match,
    };
 
-The structure should be exported to drivers in a header file:
+The structure should be exported to drivers in a header file::
 
-extern struct bus_type pci_bus_type;
+   extern struct bus_type pci_bus_type;
 
 
 Registration
-~~~~~~~~~~~~
+============
 
 When a bus driver is initialized, it calls bus_register. This
 initializes the rest of the fields in the bus object and inserts it
@@ -36,10 +37,10 @@ the fields in it are usable by the bus driver.
 
 
 Callbacks
-~~~~~~~~~
+=========
 
 match(): Attaching Drivers to Devices
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 The format of device ID structures and the semantics for comparing
 them are inherently bus-specific. Drivers typically declare an array
@@ -59,7 +60,7 @@ does not have a driver associated with it.
 
 
 Device and Driver Lists
-~~~~~~~~~~~~~~~~~~~~~~~
+=======================
 
 The lists of devices and drivers are intended to replace the local
 lists that many buses keep. They are lists of struct devices and
@@ -85,7 +86,8 @@ lock is not held when calling the callback.
 
 
 sysfs
-~~~~~~~~
+-----
+
 There is a top-level directory named 'bus'.
 
 Each bus gets a directory in the bus directory, along with two default
@@ -119,7 +121,7 @@ hierarchy::
 
 
 Exporting Attributes
-~~~~~~~~~~~~~~~~~~~~
+====================
 
 ::
 
