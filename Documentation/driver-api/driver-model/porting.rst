@@ -8,9 +8,10 @@ Patrick Mochel
 
 
 Overview
+========
 
-Please refer to `Documentation/driver-api/driver-model/*.rst` for definitions of
-various driver types and concepts.
+Please refer to ``Documentation/driver-api/driver-model/*.rst`` for
+definitions of various driver types and concepts.
 
 Most of the work of porting devices drivers to the new model happens
 at the bus driver layer. This was intentional, to minimize the
@@ -30,20 +31,24 @@ mounted by doing::
 
 
 The Process
+===========
 
-Step 0: Read include/linux/device.h for object and function definitions.
+Step 0: Object and function definitions
+---------------------------------------
 
-Step 1: Registering the bus driver.
+Read include/linux/device.h.
 
+Step 1: Registering the bus driver
+----------------------------------
 
-- Define a struct bus_type for the bus driver::
+# Define a struct bus_type for the bus driver::
 
     struct bus_type pci_bus_type = {
           .name           = "pci",
     };
 
 
-- Register the bus type.
+# Register the bus type.
 
   This should be done in the initialization function for the bus type,
   which is usually the module_init(), or equivalent, function::
@@ -62,23 +67,23 @@ Step 1: Registering the bus driver.
      bus_unregister(&pci_bus_type);
 
 
-- Export the bus type for others to use.
+# Export the bus type for others to use.
 
   Other code may wish to reference the bus type, so declare it in a
   shared header file and export the symbol.
 
-From include/linux/pci.h::
+  From include/linux/pci.h::
 
-  extern struct bus_type pci_bus_type;
-
-
-From file the above code appears in::
-
-  EXPORT_SYMBOL(pci_bus_type);
+    extern struct bus_type pci_bus_type;
 
 
+  From file the above code appears in::
 
-- This will cause the bus to show up in /sys/bus/pci/ with two
+    EXPORT_SYMBOL(pci_bus_type);
+
+
+
+# This will cause the bus to show up in /sys/bus/pci/ with two
   subdirectories: 'devices' and 'drivers'::
 
     # tree -d /sys/bus/pci/
@@ -88,13 +93,14 @@ From file the above code appears in::
 
 
 
-Step 2: Registering Devices.
+Step 2: Registering Devices
+---------------------------
 
 struct device represents a single device. It mainly contains metadata
 describing the relationship the device has to other entities.
 
 
-- Embed a struct device in the bus-specific device type::
+# Embed a struct device in the bus-specific device type::
 
 
     struct pci_dev {
@@ -122,7 +128,7 @@ describing the relationship the device has to other entities.
   that are performed (which is Good).
 
 
-- Initialize the device on registration.
+# Initialize the device on registration.
 
   When devices are discovered or registered with the bus type, the
   bus driver should initialize the generic device. The most important
@@ -162,7 +168,7 @@ describing the relationship the device has to other entities.
   been released. More on this in a moment.
 
 
-- Register the device.
+# Register the device.
 
   Once the generic device has been initialized, it can be registered
   with the driver model core by doing::
@@ -225,13 +231,14 @@ describing the relationship the device has to other entities.
 
 
 
-Step 3: Registering Drivers.
+Step 3: Registering Drivers
+---------------------------
 
 struct device_driver is a simple driver structure that contains a set
 of operations that the driver model core may call.
 
 
-- Embed a struct device_driver in the bus-specific driver.
+# Embed a struct device_driver in the bus-specific driver.
 
   Just like with devices, do something like::
 
@@ -241,14 +248,14 @@ of operations that the driver model core may call.
     };
 
 
-- Initialize the generic driver structure.
+# Initialize the generic driver structure.
 
   When the driver registers with the bus (e.g. doing pci_register_driver()),
   initialize the necessary fields of the driver: the name and bus
   fields.
 
 
-- Register the driver.
+# Register the driver.
 
   After the generic driver has been initialized, call::
 
@@ -265,7 +272,7 @@ of operations that the driver model core may call.
   gone away. Normally, there will not be any.
 
 
-- Sysfs representation.
+# Sysfs representation.
 
   Drivers are exported via sysfs in their bus's 'driver's directory.
   For example::
@@ -278,7 +285,8 @@ of operations that the driver model core may call.
     `-- serial
 
 
-Step 4: Define Generic Methods for Drivers.
+Step 4: Define Generic Methods for Drivers
+------------------------------------------
 
 struct device_driver defines a set of operations that the driver model
 core calls. Most of these operations are probably similar to
@@ -325,7 +333,8 @@ already set. This allows the drivers to implement their own generic
 methods.
 
 
-Step 5: Support generic driver binding.
+Step 5: Support generic driver binding
+--------------------------------------
 
 The model assumes that a device or driver can be dynamically
 registered with the bus at any time. When registration happens,
@@ -374,7 +383,8 @@ This driver binding should replace the existing driver binding
 mechanism the bus currently uses.
 
 
-Step 6: Supply a hotplug callback.
+Step 6: Supply a hotplug callback
+---------------------------------
 
 Whenever a device is registered with the driver model core, the
 userspace program /sbin/hotplug is called to notify userspace.
@@ -397,52 +407,53 @@ struct bus_type::
 This is called immediately before /sbin/hotplug is executed.
 
 
-Step 7: Cleaning up the bus driver.
+Step 7: Cleaning up the bus driver
+----------------------------------
 
 The generic bus, device, and driver structures provide several fields
 that can replace those defined privately to the bus driver.
 
-- Device list.
+# Device list.
 
-struct bus_type contains a list of all devices registered with the bus
-type. This includes all devices on all instances of that bus type.
-An internal list that the bus uses may be removed, in favor of using
-this one.
+  struct bus_type contains a list of all devices registered with the bus
+  type. This includes all devices on all instances of that bus type.
+  An internal list that the bus uses may be removed, in favor of using
+  this one.
 
-The core provides an iterator to access these devices::
+  The core provides an iterator to access these devices::
 
-  int bus_for_each_dev(struct bus_type * bus, struct device * start,
+    int bus_for_each_dev(struct bus_type * bus, struct device * start,
                        void * data, int (*fn)(struct device *, void *));
 
 
-- Driver list.
+# Driver list.
 
-struct bus_type also contains a list of all drivers registered with
-it. An internal list of drivers that the bus driver maintains may
-be removed in favor of using the generic one.
+  struct bus_type also contains a list of all drivers registered with
+  it. An internal list of drivers that the bus driver maintains may
+  be removed in favor of using the generic one.
 
-The drivers may be iterated over, like devices::
+  The drivers may be iterated over, like devices::
 
-  int bus_for_each_drv(struct bus_type * bus, struct device_driver * start,
-                       void * data, int (*fn)(struct device_driver *, void *));
-
-
-Please see drivers/base/bus.c for more information.
+    int bus_for_each_drv(struct bus_type * bus, struct device_driver * start,
+                         void * data, int (*fn)(struct device_driver *, void *));
 
 
-- rwsem
-
-struct bus_type contains an rwsem that protects all core accesses to
-the device and driver lists. This can be used by the bus driver
-internally, and should be used when accessing the device or driver
-lists the bus maintains.
+  Please see drivers/base/bus.c for more information.
 
 
-- Device and driver fields.
+# rwsem
 
-Some of the fields in struct device and struct device_driver duplicate
-fields in the bus-specific representations of these objects. Feel free
-to remove the bus-specific ones and favor the generic ones. Note
-though, that this will likely mean fixing up all the drivers that
-reference the bus-specific fields (though those should all be 1-line
-changes).
+  struct bus_type contains an rwsem that protects all core accesses to
+  the device and driver lists. This can be used by the bus driver
+  internally, and should be used when accessing the device or driver
+  lists the bus maintains.
+
+
+# Device and driver fields.
+
+  Some of the fields in struct device and struct device_driver duplicate
+  fields in the bus-specific representations of these objects. Feel free
+  to remove the bus-specific ones and favor the generic ones. Note
+  though, that this will likely mean fixing up all the drivers that
+  reference the bus-specific fields (though those should all be 1-line
+  changes).

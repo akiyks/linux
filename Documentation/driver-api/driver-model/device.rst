@@ -6,7 +6,8 @@ See the kerneldoc for the struct device.
 
 
 Programming Interface
-~~~~~~~~~~~~~~~~~~~~~
+=====================
+
 The bus driver that discovers the device uses this to register the
 device with the core::
 
@@ -19,8 +20,8 @@ The bus should initialize the following fields:
     - bus_id
     - bus
 
-A device is removed from the core when its reference count goes to
-0. The reference count can be adjusted using::
+A device is removed from the core when its reference count goes to 0.
+The reference count can be adjusted using::
 
   struct device * get_device(struct device * dev);
   void put_device(struct device * dev);
@@ -36,7 +37,7 @@ A driver can access the lock in the device structure using::
 
 
 Attributes
-~~~~~~~~~~
+==========
 
 ::
 
@@ -106,15 +107,17 @@ The device_register() function will use the 'groups' pointer to create the
 device attributes and the device_unregister() function will use this pointer
 to remove the device attributes.
 
-Word of warning:  While the kernel allows device_create_file() and
-device_remove_file() to be called on a device at any time, userspace has
-strict expectations on when attributes get created.  When a new device is
-registered in the kernel, a uevent is generated to notify userspace (like
-udev) that a new device is available.  If attributes are added after the
-device is registered, then userspace won't get notified and userspace will
-not know about the new attributes.
+.. warning::
 
-This is important for device driver that need to publish additional
-attributes for a device at driver probe time.  If the device driver simply
-calls device_create_file() on the device structure passed to it, then
-userspace will never be notified of the new attributes.
+   **Word of warning:**  While the kernel allows device_create_file() and
+   device_remove_file() to be called on a device at any time, userspace has
+   strict expectations on when attributes get created.  When a new device is
+   registered in the kernel, a uevent is generated to notify userspace (like
+   udev) that a new device is available.  If attributes are added after the
+   device is registered, then userspace won't get notified and userspace will
+   not know about the new attributes.
+
+   This is important for device driver that need to publish additional
+   attributes for a device at driver probe time.  If the device driver simply
+   calls device_create_file() on the device structure passed to it, then
+   userspace will never be notified of the new attributes.
