@@ -17,7 +17,7 @@ First draft	10 January 2007
 
 
 1. Intro
---------
+========
 
 devres came up while trying to convert libata to use iomap.  Each
 iomapped address should be kept and unmapped on driver detach.  For
@@ -45,7 +45,7 @@ adds more to this mix.  So do msi and msix.
 
 
 2. Devres
----------
+=========
 
 devres is basically linked list of arbitrarily sized memory areas
 associated with a struct device.  Each devres entry is associated with
@@ -135,15 +135,15 @@ to better maintained higher layer.  Also, as init failure path is
 shared with exit path, both can get more testing.
 
 Note though that when converting current calls or assignments to
-managed devm_* versions it is up to you to check if internal operations
+``managed devm_*`` versions it is up to you to check if internal operations
 like allocating memory, have failed. Managed resources pertains to the
 freeing of these resources *only* - all other checks needed are still
 on you. In some cases this may mean introducing checks that were not
-necessary before moving to the managed devm_* calls.
+necessary before moving to the managed ``devm_*`` calls.
 
 
 3. Devres group
----------------
+===============
 
 Devres entries can be grouped using devres group.  When a group is
 released, all contained normal devres entries and properly nested
@@ -174,7 +174,7 @@ like above are usually useful in midlayer driver (e.g. libata core
 layer) where interface function shouldn't have side effect on failure.
 For LLDs, just returning error code suffices in most cases.
 
-Each group is identified by `void *id`.  It can either be explicitly
+Each group is identified by ``void *id``.  It can either be explicitly
 specified by @id argument to devres_open_group() or automatically
 created by passing NULL as @id as in the above example.  In both
 cases, devres_open_group() returns the group's id.  The returned id
@@ -202,7 +202,7 @@ For example, you can do something like the following::
 
 
 4. Details
-----------
+==========
 
 Lifetime of a devres entry begins on devres allocation and finishes
 when it is released or destroyed (removed and freed) - no reference
@@ -223,7 +223,7 @@ right gfp mask is given.
 
 
 5. Overhead
------------
+===========
 
 Each devres bookkeeping info is allocated together with requested data
 area.  With debug option turned off, bookkeeping info occupies 16
@@ -240,231 +240,232 @@ certainly invest a bit more effort into libata core layer).
 
 
 6. List of managed interfaces
------------------------------
+=============================
 
 CLOCK
-  devm_clk_get()
-  devm_clk_get_optional()
-  devm_clk_put()
-  devm_clk_bulk_get()
-  devm_clk_bulk_get_all()
-  devm_clk_bulk_get_optional()
-  devm_get_clk_from_child()
-  devm_clk_hw_register()
-  devm_of_clk_add_hw_provider()
-  devm_clk_hw_register_clkdev()
+ - devm_clk_get()
+ - devm_clk_get_optional()
+ - devm_clk_put()
+ - devm_clk_bulk_get()
+ - devm_clk_bulk_get_all()
+ - devm_clk_bulk_get_optional()
+ - devm_get_clk_from_child()
+ - devm_clk_hw_register()
+ - devm_of_clk_add_hw_provider()
+ - devm_clk_hw_register_clkdev()
 
 DMA
-  dmaenginem_async_device_register()
-  dmam_alloc_coherent()
-  dmam_alloc_attrs()
-  dmam_free_coherent()
-  dmam_pool_create()
-  dmam_pool_destroy()
+ - dmaenginem_async_device_register()
+ - dmam_alloc_coherent()
+ - dmam_alloc_attrs()
+ - dmam_free_coherent()
+ - dmam_pool_create()
+ - dmam_pool_destroy()
 
 DRM
-  devm_drm_dev_alloc()
+ - devm_drm_dev_alloc()
 
 GPIO
-  devm_gpiod_get()
-  devm_gpiod_get_array()
-  devm_gpiod_get_array_optional()
-  devm_gpiod_get_index()
-  devm_gpiod_get_index_optional()
-  devm_gpiod_get_optional()
-  devm_gpiod_put()
-  devm_gpiod_unhinge()
-  devm_gpiochip_add_data()
-  devm_gpio_request_one()
+ - devm_gpiod_get()
+ - devm_gpiod_get_array()
+ - devm_gpiod_get_array_optional()
+ - devm_gpiod_get_index()
+ - devm_gpiod_get_index_optional()
+ - devm_gpiod_get_optional()
+ - devm_gpiod_put()
+ - devm_gpiod_unhinge()
+ - devm_gpiochip_add_data()
+ - devm_gpio_request_one()
 
 I2C
-  devm_i2c_add_adapter()
-  devm_i2c_new_dummy_device()
+ - devm_i2c_add_adapter()
+ - devm_i2c_new_dummy_device()
 
 IIO
-  devm_iio_device_alloc()
-  devm_iio_device_register()
-  devm_iio_dmaengine_buffer_setup()
-  devm_iio_kfifo_buffer_setup()
-  devm_iio_kfifo_buffer_setup_ext()
-  devm_iio_map_array_register()
-  devm_iio_triggered_buffer_setup()
-  devm_iio_triggered_buffer_setup_ext()
-  devm_iio_trigger_alloc()
-  devm_iio_trigger_register()
-  devm_iio_channel_get()
-  devm_iio_channel_get_all()
-  devm_iio_hw_consumer_alloc()
-  devm_fwnode_iio_channel_get_by_name()
+ - devm_iio_device_alloc()
+ - devm_iio_device_register()
+ - devm_iio_dmaengine_buffer_setup()
+ - devm_iio_kfifo_buffer_setup()
+ - devm_iio_kfifo_buffer_setup_ext()
+ - devm_iio_map_array_register()
+ - devm_iio_triggered_buffer_setup()
+ - devm_iio_triggered_buffer_setup_ext()
+ - devm_iio_trigger_alloc()
+ - devm_iio_trigger_register()
+ - devm_iio_channel_get()
+ - devm_iio_channel_get_all()
+ - devm_iio_hw_consumer_alloc()
+ - devm_fwnode_iio_channel_get_by_name()
 
 INPUT
-  devm_input_allocate_device()
+ - devm_input_allocate_device()
 
 IO region
-  devm_release_mem_region()
-  devm_release_region()
-  devm_release_resource()
-  devm_request_mem_region()
-  devm_request_free_mem_region()
-  devm_request_region()
-  devm_request_resource()
+ - devm_release_mem_region()
+ - devm_release_region()
+ - devm_release_resource()
+ - devm_request_mem_region()
+ - devm_request_free_mem_region()
+ - devm_request_region()
+ - devm_request_resource()
 
 IOMAP
-  devm_ioport_map()
-  devm_ioport_unmap()
-  devm_ioremap()
-  devm_ioremap_uc()
-  devm_ioremap_wc()
-  devm_ioremap_resource() : checks resource, requests memory region, ioremaps
-  devm_ioremap_resource_wc()
-  devm_platform_ioremap_resource() : calls devm_ioremap_resource() for platform device
-  devm_platform_ioremap_resource_byname()
-  devm_platform_get_and_ioremap_resource()
-  devm_iounmap()
+ - devm_ioport_map()
+ - devm_ioport_unmap()
+ - devm_ioremap()
+ - devm_ioremap_uc()
+ - devm_ioremap_wc()
+ - devm_ioremap_resource() : checks resource, requests memory region, ioremaps
+ - devm_ioremap_resource_wc()
+ - devm_platform_ioremap_resource() : calls devm_ioremap_resource() for platform device
+ - devm_platform_ioremap_resource_byname()
+ - devm_platform_get_and_ioremap_resource()
+ - devm_iounmap()
 
-  Note: For the PCI devices the specific pcim_*() functions may be used, see below.
+ .. note::
+    For the PCI devices the specific pcim_*() functions may be used, see below.
 
 IRQ
-  devm_free_irq()
-  devm_request_any_context_irq()
-  devm_request_irq()
-  devm_request_threaded_irq()
-  devm_irq_alloc_descs()
-  devm_irq_alloc_desc()
-  devm_irq_alloc_desc_at()
-  devm_irq_alloc_desc_from()
-  devm_irq_alloc_descs_from()
-  devm_irq_alloc_generic_chip()
-  devm_irq_setup_generic_chip()
-  devm_irq_domain_create_sim()
+ - devm_free_irq()
+ - devm_request_any_context_irq()
+ - devm_request_irq()
+ - devm_request_threaded_irq()
+ - devm_irq_alloc_descs()
+ - devm_irq_alloc_desc()
+ - devm_irq_alloc_desc_at()
+ - devm_irq_alloc_desc_from()
+ - devm_irq_alloc_descs_from()
+ - devm_irq_alloc_generic_chip()
+ - devm_irq_setup_generic_chip()
+ - devm_irq_domain_create_sim()
 
 LED
-  devm_led_classdev_register()
-  devm_led_classdev_register_ext()
-  devm_led_classdev_unregister()
-  devm_led_trigger_register()
-  devm_of_led_get()
+ - devm_led_classdev_register()
+ - devm_led_classdev_register_ext()
+ - devm_led_classdev_unregister()
+ - devm_led_trigger_register()
+ - devm_of_led_get()
 
 MDIO
-  devm_mdiobus_alloc()
-  devm_mdiobus_alloc_size()
-  devm_mdiobus_register()
-  devm_of_mdiobus_register()
+ - devm_mdiobus_alloc()
+ - devm_mdiobus_alloc_size()
+ - devm_mdiobus_register()
+ - devm_of_mdiobus_register()
 
 MEM
-  devm_free_pages()
-  devm_get_free_pages()
-  devm_kasprintf()
-  devm_kcalloc()
-  devm_kfree()
-  devm_kmalloc()
-  devm_kmalloc_array()
-  devm_kmemdup()
-  devm_krealloc()
-  devm_krealloc_array()
-  devm_kstrdup()
-  devm_kstrdup_const()
-  devm_kvasprintf()
-  devm_kzalloc()
+ - devm_free_pages()
+ - devm_get_free_pages()
+ - devm_kasprintf()
+ - devm_kcalloc()
+ - devm_kfree()
+ - devm_kmalloc()
+ - devm_kmalloc_array()
+ - devm_kmemdup()
+ - devm_krealloc()
+ - devm_krealloc_array()
+ - devm_kstrdup()
+ - devm_kstrdup_const()
+ - devm_kvasprintf()
+ - devm_kzalloc()
 
 MFD
-  devm_mfd_add_devices()
+ - devm_mfd_add_devices()
 
 MUX
-  devm_mux_chip_alloc()
-  devm_mux_chip_register()
-  devm_mux_control_get()
-  devm_mux_state_get()
+ - devm_mux_chip_alloc()
+ - devm_mux_chip_register()
+ - devm_mux_control_get()
+ - devm_mux_state_get()
 
 NET
-  devm_alloc_etherdev()
-  devm_alloc_etherdev_mqs()
-  devm_register_netdev()
+ - devm_alloc_etherdev()
+ - devm_alloc_etherdev_mqs()
+ - devm_register_netdev()
 
 PER-CPU MEM
-  devm_alloc_percpu()
+ - devm_alloc_percpu()
 
 PCI
-  devm_pci_alloc_host_bridge()  : managed PCI host bridge allocation
-  devm_pci_remap_cfgspace()	: ioremap PCI configuration space
-  devm_pci_remap_cfg_resource()	: ioremap PCI configuration space resource
+ - devm_pci_alloc_host_bridge()  : managed PCI host bridge allocation
+ - devm_pci_remap_cfgspace()	: ioremap PCI configuration space
+ - devm_pci_remap_cfg_resource()	: ioremap PCI configuration space resource
 
-  pcim_enable_device()		: after success, the PCI device gets disabled automatically on driver detach
-  pcim_iomap()			: do iomap() on a single BAR
-  pcim_iomap_regions()		: do request_region() and iomap() on multiple BARs
-  pcim_iomap_table()		: array of mapped addresses indexed by BAR
-  pcim_iounmap()		: do iounmap() on a single BAR
-  pcim_pin_device()		: keep PCI device enabled after release
-  pcim_set_mwi()		: enable Memory-Write-Invalidate PCI transaction
+ - pcim_enable_device()		: after success, the PCI device gets disabled automatically on driver detach
+ - pcim_iomap()			: do iomap() on a single BAR
+ - pcim_iomap_regions()		: do request_region() and iomap() on multiple BARs
+ - pcim_iomap_table()		: array of mapped addresses indexed by BAR
+ - pcim_iounmap()		: do iounmap() on a single BAR
+ - pcim_pin_device()		: keep PCI device enabled after release
+ - pcim_set_mwi()		: enable Memory-Write-Invalidate PCI transaction
 
 PHY
-  devm_usb_get_phy()
-  devm_usb_get_phy_by_node()
-  devm_usb_get_phy_by_phandle()
+ - devm_usb_get_phy()
+ - devm_usb_get_phy_by_node()
+ - devm_usb_get_phy_by_phandle()
 
 PINCTRL
-  devm_pinctrl_get()
-  devm_pinctrl_put()
-  devm_pinctrl_get_select()
-  devm_pinctrl_register()
-  devm_pinctrl_register_and_init()
+ - devm_pinctrl_get()
+ - devm_pinctrl_put()
+ - devm_pinctrl_get_select()
+ - devm_pinctrl_register()
+ - devm_pinctrl_register_and_init()
 
 POWER
-  devm_reboot_mode_register()
-  devm_reboot_mode_unregister()
+ - devm_reboot_mode_register()
+ - devm_reboot_mode_unregister()
 
 PWM
-  devm_pwmchip_alloc()
-  devm_pwmchip_add()
-  devm_pwm_get()
-  devm_fwnode_pwm_get()
+ - devm_pwmchip_alloc()
+ - devm_pwmchip_add()
+ - devm_pwm_get()
+ - devm_fwnode_pwm_get()
 
 REGULATOR
-  devm_regulator_bulk_register_supply_alias()
-  devm_regulator_bulk_get()
-  devm_regulator_bulk_get_const()
-  devm_regulator_bulk_get_enable()
-  devm_regulator_bulk_put()
-  devm_regulator_get()
-  devm_regulator_get_enable()
-  devm_regulator_get_enable_read_voltage()
-  devm_regulator_get_enable_optional()
-  devm_regulator_get_exclusive()
-  devm_regulator_get_optional()
-  devm_regulator_irq_helper()
-  devm_regulator_put()
-  devm_regulator_register()
-  devm_regulator_register_notifier()
-  devm_regulator_register_supply_alias()
-  devm_regulator_unregister_notifier()
+ - devm_regulator_bulk_register_supply_alias()
+ - devm_regulator_bulk_get()
+ - devm_regulator_bulk_get_const()
+ - devm_regulator_bulk_get_enable()
+ - devm_regulator_bulk_put()
+ - devm_regulator_get()
+ - devm_regulator_get_enable()
+ - devm_regulator_get_enable_read_voltage()
+ - devm_regulator_get_enable_optional()
+ - devm_regulator_get_exclusive()
+ - devm_regulator_get_optional()
+ - devm_regulator_irq_helper()
+ - devm_regulator_put()
+ - devm_regulator_register()
+ - devm_regulator_register_notifier()
+ - devm_regulator_register_supply_alias()
+ - devm_regulator_unregister_notifier()
 
 RESET
-  devm_reset_control_get()
-  devm_reset_controller_register()
+ - devm_reset_control_get()
+ - devm_reset_controller_register()
 
 RTC
-  devm_rtc_device_register()
-  devm_rtc_allocate_device()
-  devm_rtc_register_device()
-  devm_rtc_nvmem_register()
+ - devm_rtc_device_register()
+ - devm_rtc_allocate_device()
+ - devm_rtc_register_device()
+ - devm_rtc_nvmem_register()
 
 SERDEV
-  devm_serdev_device_open()
+ - devm_serdev_device_open()
 
 SLAVE DMA ENGINE
-  devm_acpi_dma_controller_register()
+ - devm_acpi_dma_controller_register()
 
 SPI
-  devm_spi_alloc_host()
-  devm_spi_alloc_target()
-  devm_spi_optimize_message()
-  devm_spi_register_controller()
-  devm_spi_register_host()
-  devm_spi_register_target()
+ - devm_spi_alloc_host()
+ - devm_spi_alloc_target()
+ - devm_spi_optimize_message()
+ - devm_spi_register_controller()
+ - devm_spi_register_host()
+ - devm_spi_register_target()
 
 WATCHDOG
-  devm_watchdog_register_device()
+ - devm_watchdog_register_device()
 
 WORKQUEUE
-  devm_alloc_workqueue()
-  devm_alloc_ordered_workqueue()
+ - devm_alloc_workqueue()
+ - devm_alloc_ordered_workqueue()

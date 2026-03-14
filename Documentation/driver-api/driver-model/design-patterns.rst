@@ -11,7 +11,7 @@ conform to these design patterns.
 
 
 1. State Container
-~~~~~~~~~~~~~~~~~~
+==================
 
 While the kernel contains a few device drivers that assume that they will
 only be probed() once on a certain system (singletons), it is custom to assume
@@ -64,7 +64,7 @@ your interrupt handler.
 
 
 2. container_of()
-~~~~~~~~~~~~~~~~~
+=================
 
 Continuing on the above example we add an offloaded work::
 
@@ -104,6 +104,7 @@ return a single argument which is a pointer to a struct member in the
 callback.
 
 container_of() is a macro defined in <linux/container_of.h>
+-----------------------------------------------------------
 
 What container_of() does is to obtain a pointer to the containing struct from
 a pointer to a member by a simple subtraction using the offsetof() macro from
@@ -111,6 +112,6 @@ standard C, which allows something similar to object oriented behaviours.
 Notice that the contained member must not be a pointer, but an actual member
 for this to work.
 
-We can see here that we avoid having global pointers to our struct foo *
+We can see here that we avoid having global pointers to our ``struct foo *``
 instance this way, while still keeping the number of parameters passed to the
 work function to a single pointer.
