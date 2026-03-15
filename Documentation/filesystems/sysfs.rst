@@ -13,7 +13,7 @@ Mike Murphy <mamurph@cs.clemson.edu>
 
 
 What it is
-~~~~~~~~~~
+==========
 
 sysfs is a RAM-based filesystem initially based on ramfs. It provides
 a means to export kernel data structures, their attributes, and the
@@ -25,7 +25,7 @@ interface.
 
 
 Using sysfs
-~~~~~~~~~~~
+===========
 
 sysfs is always compiled in if CONFIG_SYSFS is defined. You can access
 it by doing::
@@ -34,7 +34,7 @@ it by doing::
 
 
 Directory Creation
-~~~~~~~~~~~~~~~~~~
+==================
 
 For every kobject that is registered with the system, a directory is
 created for it in sysfs. That directory is created as a subdirectory
@@ -52,7 +52,7 @@ only modified directly by the function sysfs_schedule_callback().
 
 
 Attributes
-~~~~~~~~~~
+==========
 
 Attributes can be exported for kobjects in the form of regular files in
 the filesystem. sysfs forwards file I/O operations to methods defined
@@ -132,24 +132,24 @@ readable. The above case could be shortened to::
 
 the list of helpers available to define your wrapper function is:
 
-__ATTR_RO(name):
+``__ATTR_RO(name)``:
 		 assumes default name_show and mode 0444
-__ATTR_WO(name):
+``__ATTR_WO(name)``:
 		 assumes a name_store only and is restricted to mode
                  0200 that is root write access only.
-__ATTR_RO_MODE(name, mode):
+``__ATTR_RO_MODE(name, mode)``:
 	         for more restrictive RO access; currently
                  only use case is the EFI System Resource Table
                  (see drivers/firmware/efi/esrt.c)
-__ATTR_RW(name):
+``__ATTR_RW(name)``:
 	         assumes default name_show, name_store and setting
                  mode to 0644.
-__ATTR_NULL:
+``__ATTR_NULL``:
 	         which sets the name to NULL and is used as end of list
                  indicator (see: kernel/workqueue.c)
 
 Subsystem-Specific Callbacks
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+============================
 
 When a subsystem defines a new attribute type, it must implement a
 set of sysfs operations for forwarding read and write calls to the
@@ -160,9 +160,11 @@ show and store methods of the attribute owners::
 	    ssize_t (*store)(struct kobject *, struct attribute *, const char *, size_t);
     };
 
-[ Subsystems should have already defined a struct kobj_type as a
-descriptor for this type, which is where the sysfs_ops pointer is
-stored. See the kobject documentation for more information. ]
+.. note::
+
+   Subsystems should have already defined a struct kobj_type as a
+   descriptor for this type, which is where the sysfs_ops pointer is
+   stored. See the kobject documentation for more information.
 
 When a file is read or written, sysfs calls the appropriate method
 for the type. The method then translates the generic struct kobject
@@ -193,7 +195,7 @@ To illustrate::
 
 
 Reading/Writing Attribute Data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==============================
 
 To read or write attributes, show() or store() methods must be
 specified when declaring the attribute. The method types should be as
@@ -277,12 +279,14 @@ A very simple (and naive) implementation of a device attribute is::
     static DEVICE_ATTR(name, S_IRUGO, show_name, store_name);
 
 
-(Note that the real implementation doesn't allow userspace to set the
-name for a device.)
+.. note::
+
+   Note that the real implementation doesn't allow userspace to set the
+   name for a device.
 
 
 Top Level Directory Layout
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+==========================
 
 The sysfs directory arrangement exposes the relationship of kernel
 data structures.
@@ -353,13 +357,14 @@ sleep states, suspend/resume capabilities, and policies.
 
 
 Current Interfaces
-~~~~~~~~~~~~~~~~~~
+==================
 
 The following interface layers currently exist in sysfs.
 
 
 devices (include/linux/device.h)
 --------------------------------
+
 Structure::
 
     struct device_attribute {
@@ -382,6 +387,7 @@ Creation/Removal::
 
 bus drivers (include/linux/device.h)
 ------------------------------------
+
 Structure::
 
     struct bus_attribute {
@@ -426,7 +432,7 @@ Creation/Removal::
 
 
 Documentation
-~~~~~~~~~~~~~
+=============
 
 The sysfs directory structure and the attributes in each directory define an
 ABI between the kernel and user space. As for any ABI, it is important that
