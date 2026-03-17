@@ -119,6 +119,7 @@ struct xe_ggtt {
 	/**
 	 * @flags: Flags for this GGTT
 	 * Acceptable flags:
+	 *
 	 * - %XE_GGTT_FLAGS_64K - if PTE size is 64K. Otherwise, regular is 4K.
 	 * - %XE_GGTT_FLAGS_ONLINE - is GGTT online, protected by ggtt->lock
 	 *   after init
