@@ -1018,8 +1018,8 @@ struct drm_xe_vm_destroy {
 	__u64 reserved[2];
 };
 
-/**
- * struct drm_xe_vm_bind_op - run bind operations
+/* Non-kernel-doc comment for:
+ * struct drm_xe_vm_bind_op
  *
  * The @op can be:
  *  - %DRM_XE_VM_BIND_OP_MAP
@@ -1076,6 +1076,9 @@ struct drm_xe_vm_destroy {
  * The @prefetch_mem_region_instance for %DRM_XE_VM_BIND_OP_PREFETCH can also be:
  *  - %DRM_XE_CONSULT_MEM_ADVISE_PREF_LOC, which ensures prefetching occurs in
  *    the memory region advised by madvise.
+ */
+/**
+ * struct drm_xe_vm_bind_op - run bind operations
  */
 struct drm_xe_vm_bind_op {
 	/** @extensions: Pointer to the first extension struct, if any */
@@ -1200,8 +1203,8 @@ struct drm_xe_vm_bind_op {
 	__u64 reserved[3];
 };
 
-/**
- * struct drm_xe_vm_bind - Input of &DRM_IOCTL_XE_VM_BIND
+/* Non-kernel-doc comment for:
+ * struct drm_xe_vm_bind
  *
  * Below is an example of a minimal use of &struct drm_xe_vm_bind to
  * asynchronously bind the buffer `data` at address `BIND_ADDRESS` to
@@ -1226,6 +1229,9 @@ struct drm_xe_vm_bind_op {
  *     };
  *     ioctl(fd, DRM_IOCTL_XE_VM_BIND, &bind);
  *
+ */
+/**
+ * struct drm_xe_vm_bind - Input of &DRM_IOCTL_XE_VM_BIND
  */
 struct drm_xe_vm_bind {
 	/** @extensions: Pointer to the first extension struct, if any */
