@@ -708,7 +708,7 @@ struct amdgpu_display_manager {
 	} fused_io[8];
 
 	/**
-	 * @dm_boot_time_crc_info:
+	 * @boot_time_crc_info:
 	 *
 	 * Buffer info for the boot time crc.
 	 */
