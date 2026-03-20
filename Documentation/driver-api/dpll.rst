@@ -192,6 +192,7 @@ computed as the average of prior values and the current measurement, using
 the following formula:
 
 .. math::
+
    curr\_avg = prev\_avg * \frac{2^N-1}{2^N} + new\_val * \frac{1}{2^N}
 
 where `curr_avg` is the current reported phase offset, `prev_avg` is the
