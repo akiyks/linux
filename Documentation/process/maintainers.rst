@@ -1,1 +1,7 @@
-.. maintainers-include::
+.. _maintainers:
+
+List of maintainers
+===================
+
+.. kernel-include:: MAINTAINERS
+   :literal:
