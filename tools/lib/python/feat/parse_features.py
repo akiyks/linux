@@ -244,18 +244,31 @@ class ParseFeature:
         self.emit("=" * len(title))
         self.emit()
 
+        self.emit(".. raw:: latex")
+        self.emit()
+        self.emit(r"   \begingroup")
+        self.emit(r"   \tiny")
+        self.emit()
+        self.emit(".. table:: " + title)
+        self.emit(" :class: longtable")
+        self.emit(" :widths: 8 20 45 8 40")
+        self.emit()
+
+        self.emit(" ", end="")
         self.emit("=" * self.max_size_subsys + "  ", end="")
         self.emit("=" * self.max_size_name + "  ", end="")
         self.emit("=" * self.max_size_kconfig + "  ", end="")
         self.emit("=" * self.max_size_status + "  ", end="")
         self.emit("=" * self.max_size_description)
 
+        self.emit(" ", end="")
         self.emit(f"{self.h_subsys:<{self.max_size_subsys}}  ", end="")
         self.emit(f"{self.h_name:<{self.max_size_name}}  ", end="")
         self.emit(f"{self.h_kconfig:<{self.max_size_kconfig}}  ", end="")
         self.emit(f"{self.h_status:<{self.max_size_status}}  ", end="")
         self.emit(f"{self.h_description:<{self.max_size_description}}")
 
+        self.emit(" ", end="")
         self.emit("=" * self.max_size_subsys + "  ", end="")
         self.emit("=" * self.max_size_name + "  ", end="")
         self.emit("=" * self.max_size_kconfig + "  ", end="")
@@ -275,6 +288,7 @@ class ParseFeature:
             if not arch in arch_table:
                 continue
 
+            self.emit(" ", end="")
             self.emit(f"{self.data[name]['subsys']:<{self.max_size_subsys}}  ",
                   end="")
             self.emit(f"{name:<{self.max_size_name}}  ", end="")
@@ -284,11 +298,17 @@ class ParseFeature:
                   end="")
             self.emit(f"{self.data[name]['description']}")
 
+        self.emit(" ", end="")
         self.emit("=" * self.max_size_subsys + "  ", end="")
         self.emit("=" * self.max_size_name + "  ", end="")
         self.emit("=" * self.max_size_kconfig + "  ", end="")
         self.emit("=" * self.max_size_status + "  ", end="")
         self.emit("=" * self.max_size_description)
+
+        self.emit()
+        self.emit(".. raw:: latex")
+        self.emit()
+        self.emit(r"   \endgroup")
 
         return self.msg
 
@@ -352,6 +372,7 @@ class ParseFeature:
         else:
             ln_marker = "-"
 
+        self.emit(" ", end="")
         self.emit("+" + ln_marker * self.max_size_name + "+", end="")
         self.emit(ln_marker * desc_size, end="")
         self.emit("+" + ln_marker * max_size_status + "+")
@@ -394,6 +415,11 @@ class ParseFeature:
             if not cur_subsys or cur_subsys != self.data[name]["subsys"]:
                 if cur_subsys:
                     self.emit()
+                    # For LaTeX
+                    self.emit(".. raw:: latex")
+                    self.emit()
+                    self.emit(r"    \endgroup")
+                    self.emit()
 
                 cur_subsys = self.data[name]["subsys"]
 
@@ -402,8 +428,20 @@ class ParseFeature:
                 self.emit("=" * len(title))
                 self.emit()
 
+                # For LaTeX
+                self.emit(".. raw:: latex")
+                self.emit()
+                self.emit(r"    \begingroup")
+                self.emit(r"    \scriptsize")
+                self.emit()
+                self.emit(".. table:: " + title)
+                self.emit(" :class: longtable")
+                self.emit(" :widths: 20 40 40")
+                self.emit()
+
                 self.matrix_lines(desc_size, max_size_status, 0)
 
+                self.emit(" ", end="")
                 self.emit(f"|{self.h_name:<{self.max_size_name}}", end="")
                 self.emit(f"|{desc_title:<{desc_size}}", end="")
                 self.emit(f"|{h_status_per_arch:<{max_size_status}}|")
@@ -468,11 +506,18 @@ class ParseFeature:
                     if ln >= 2 and descs:
                         col[1] = descs.pop(0)
 
+                self.emit(" ", end="")
                 self.emit(f"|{col[0]:<{self.max_size_name}}", end="")
                 self.emit(f"|{col[1]:<{desc_size}}", end="")
                 self.emit(f"|{line:<{max_size_status}}|")
 
             self.matrix_lines(desc_size, max_size_status, 0)
+
+        # For LaTeX
+        self.emit(".. raw:: latex")
+        self.emit()
+        self.emit(r"    \endgroup")
+        self.emit()
 
         return self.msg
 
