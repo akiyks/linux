@@ -113,6 +113,31 @@ config RCU_REF_SCALE_TEST
 	  Say M if you want to build it as a module instead.
 	  Say N if you are unsure.
 
+config HAZPTR_TORTURE_TEST
+	tristate "Torture tests for hazard pointers"
+	depends on DEBUG_KERNEL
+	select TORTURE_TEST
+	default n
+	help
+	  This option provides in-kernel hazard-pointer stress tests.
+
+	  Say Y here if you want hazard-pointer testing built into the kernel.
+	  Say M if you want to build them as a module instead.
+	  Say N if you are unsure.
+
+config REPRO_TEST
+	tristate "Bug-reproducibility kernel code"
+	depends on DEBUG_KERNEL
+	select TORTURE_TEST
+	default n
+	help
+	  This option provides a kernel module that runs the kernel portion of
+	  attempted bug reproducers.
+
+	  Say Y here if you want these attempted reproducers built into the kernel.
+	  Say M if you want to build them as a module instead.
+	  Say N if you are unsure.
+
 config RCU_CPU_STALL_TIMEOUT
 	int "RCU CPU stall timeout in seconds"
 	depends on RCU_STALL_COMMON
@@ -174,6 +199,30 @@ config RCU_CPU_STALL_NOTIFIER
 
 	  Say Y here if you want RCU CPU stall notifiers (you don't want them)
 	  Say N if you are unsure.
+
+config BOOTPARAM_RCU_STALL_PANIC
+	bool "Panic (reboot) on RCU CPU stall"
+	depends on RCU_STALL_COMMON
+	default n
+	help
+	  Say Y here to enable the kernel to panic when an RCU CPU stall
+	  is detected.
+
+	  The panic can be used in combination with panic_timeout,
+	  to cause the system to reboot automatically after an
+	  RCU CPU stall has been detected. This feature is useful for
+	  high-availability systems that have uptime guarantees and
+	  where a CPU stall must be resolved ASAP.
+
+	  The kernel.max_rcu_stall_to_panic sysctl can be used to set
+	  a minimum number of stalls before panicking, allowing the
+	  system to tolerate a given number of RCU CPU stalls before
+	  triggering a panic.
+
+	  This setting can be overridden at runtime via the
+	  kernel.panic_on_rcu_stall sysctl parameter.
+
+	  Say N if unsure.
 
 config RCU_TRACE
 	bool "Enable tracing for RCU"
