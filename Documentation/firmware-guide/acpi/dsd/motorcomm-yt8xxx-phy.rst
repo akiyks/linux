@@ -65,9 +65,13 @@ defaults as [motorcomm-yt8xxx]_.
   [motorcomm-yt8xxx]_.
 
 ``motorcomm,tx-clk-10-inverted`` (boolean, optional)
+  Per-speed TX clock inversion option; see [motorcomm-yt8xxx]_.
+
 ``motorcomm,tx-clk-100-inverted`` (boolean, optional)
+  Ditto.
+
 ``motorcomm,tx-clk-1000-inverted`` (boolean, optional)
-  Per-speed TX clock inversion options; see [motorcomm-yt8xxx]_.
+  Ditto.
 
 ASL example (illustrative)
 ==========================
