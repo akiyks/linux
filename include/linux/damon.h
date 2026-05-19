@@ -848,6 +848,7 @@ struct damon_attrs {
  * @pause:	Pause kdamond main loop.
  * @adaptive_targets:	Head of monitoring targets (&damon_target) list.
  * @schemes:		Head of schemes (&damos) list.
+ * @rnd_state: Need proper description.
  */
 struct damon_ctx {
 	struct damon_attrs attrs;
