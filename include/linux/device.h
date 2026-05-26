@@ -95,11 +95,11 @@ struct device_type {
 	const struct dev_pm_ops *pm;
 };
 
-/**
- * struct device_attribute - Interface for exporting device attributes.
- * @attr: sysfs attribute definition.
- * @show: Show handler.
- * @store: Store handler.
+/*
+ * struct device_attribute - Interface for exporting device attributes.	@@@
+ * @attr: sysfs attribute definition.					@@@
+ * @show: Show handler.							@@@
+ * @store: Store handler.						@@@
  */
 struct device_attribute {
 	struct attribute	attr;
