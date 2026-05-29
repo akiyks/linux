@@ -416,7 +416,7 @@ amdgpu_dm_create_color_properties(struct amdgpu_device *adev)
 }
 #endif
 
-/**
+/*@@@@@@@@@@@@@@@@ STATIC_IFN_KUNIT @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
  * __extract_blob_lut - Extracts the DRM lut and lut size from a blob.
  * @blob: DRM color mgmt property blob
  * @size: lut size
@@ -433,7 +433,7 @@ __extract_blob_lut(const struct drm_property_blob *blob, uint32_t *size)
 }
 EXPORT_IF_KUNIT(__extract_blob_lut);
 
-/**
+/*@@@@@@@@@@@@@@@@ STATIC_IFN_KUNIT @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
  * __extract_blob_lut32 - Extracts the DRM lut and lut size from a blob.
  * @blob: DRM color mgmt property blob
  * @size: lut size
@@ -450,7 +450,7 @@ __extract_blob_lut32(const struct drm_property_blob *blob, uint32_t *size)
 }
 EXPORT_IF_KUNIT(__extract_blob_lut32);
 
-/**
+/*@@@@@@@@@@@@@@@@ STATIC_IFN_KUNIT @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
  * __is_lut_linear - check if the given lut is a linear mapping of values
  * @lut: given lut to check values
  * @size: lut size
@@ -486,7 +486,7 @@ bool __is_lut_linear(const struct drm_color_lut *lut, uint32_t size)
 }
 EXPORT_IF_KUNIT(__is_lut_linear);
 
-/**
+/*@@@@@@@@@@@@@@@@ STATIC_IFN_KUNIT @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
  * __drm_lut_to_dc_gamma - convert the drm_color_lut to dc_gamma.
  * @lut: DRM lookup table for color conversion
  * @gamma: DC gamma to set entries
@@ -527,7 +527,7 @@ void __drm_lut_to_dc_gamma(const struct drm_color_lut *lut,
 }
 EXPORT_IF_KUNIT(__drm_lut_to_dc_gamma);
 
-/**
+/*@@@@@@@@@@@@@@@@ STATIC_IFN_KUNIT @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
  * __drm_lut32_to_dc_gamma - convert the drm_color_lut to dc_gamma.
  * @lut: DRM lookup table for color conversion
  * @gamma: DC gamma to set entries
@@ -547,7 +547,7 @@ void __drm_lut32_to_dc_gamma(const struct drm_color_lut32 *lut, struct dc_gamma 
 }
 EXPORT_IF_KUNIT(__drm_lut32_to_dc_gamma);
 
-/**
+/*@@@@@@@@@@@@@@@@ STATIC_IFN_KUNIT @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
  * __drm_ctm_to_dc_matrix - converts a DRM CTM to a DC CSC float matrix
  * @ctm: DRM color transformation matrix
  * @matrix: DC CSC float matrix
@@ -581,7 +581,7 @@ void __drm_ctm_to_dc_matrix(const struct drm_color_ctm *ctm,
 }
 EXPORT_IF_KUNIT(__drm_ctm_to_dc_matrix);
 
-/**
+/*@@@@@@@@@@@@@@@@ STATIC_IFN_KUNIT @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
  * __drm_ctm_3x4_to_dc_matrix - converts a DRM CTM 3x4 to a DC CSC float matrix
  * @ctm: DRM color transformation matrix with 3x4 dimensions
  * @matrix: DC CSC float matrix
