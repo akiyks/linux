@@ -705,13 +705,26 @@ struct amdgpu_display_manager {
 		struct completion replied;
 		char reply_data[0x40];  // Cannot include dmub_cmd here
 	} fused_io[8];
+
 	/**
-	 * @hdmi_frl_status_polling_work:
+	 * @hdmi_frl_status_polling_wq:
 	 *
 	 * workqueue for 200ms frl status polling
 	 */
 	struct workqueue_struct *hdmi_frl_status_polling_wq;
+
+	/**
+	 * @hdmi_frl_status_polling_work:
+	 *
+	 * Need proper description.
+	 */
 	struct delayed_work hdmi_frl_status_polling_work;
+
+	/**
+	 * @hdmi_frl_status_polling_delay_ms:
+	 *
+	 * Need proper description.
+	 */
 	unsigned int hdmi_frl_status_polling_delay_ms;
 
 	/**
