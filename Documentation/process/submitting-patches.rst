@@ -529,12 +529,12 @@ some testing has been performed, provides a means to locate testers for
 future patches, and ensures credit for the testers.
 
 Reviewed-by:, instead, indicates that the patch has been reviewed and found
-acceptable according to the Reviewer's Statement:
+acceptable according to the Reviewer's Statement::
 
-Reviewer's statement of oversight
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  Reviewer's statement of oversight
 
-By offering my Reviewed-by: tag, I state that:
+
+  By offering my Reviewed-by: tag, I state that:
 
 	 (a) I have carried out a technical review of this patch to
 	     evaluate its appropriateness and readiness for inclusion into
