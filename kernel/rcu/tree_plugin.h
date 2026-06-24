@@ -194,6 +194,7 @@ static void rcu_preempt_ctxt_queue(struct rcu_node *rnp, struct rcu_data *rdp)
 		 * blocking the already-waiting GPs.
 		 */
 		list_add(&t->rcu_node_entry, &rnp->blkd_tasks);
+		t->rcu_node_entry_dqs = 0;
 		break;
 
 	case                                              RCU_EXP_BLKD:
@@ -212,6 +213,7 @@ static void rcu_preempt_ctxt_queue(struct rcu_node *rnp, struct rcu_data *rdp)
 		 * already queued tasks that are not blocking it.
 		 */
 		list_add_tail(&t->rcu_node_entry, &rnp->blkd_tasks);
+		t->rcu_node_entry_dqs = 0;
 		break;
 
 	case                RCU_EXP_TASKS |               RCU_EXP_BLKD:
@@ -225,6 +227,7 @@ static void rcu_preempt_ctxt_queue(struct rcu_node *rnp, struct rcu_data *rdp)
 		 * the first task blocking the expedited GP.
 		 */
 		list_add(&t->rcu_node_entry, rnp->exp_tasks);
+		t->rcu_node_entry_dqs = 0;
 		break;
 
 	case RCU_GP_TASKS |                 RCU_GP_BLKD:
@@ -236,6 +239,7 @@ static void rcu_preempt_ctxt_queue(struct rcu_node *rnp, struct rcu_data *rdp)
 		 * after the first task blocking the normal GP.
 		 */
 		list_add(&t->rcu_node_entry, rnp->gp_tasks);
+		t->rcu_node_entry_dqs = 0;
 		break;
 
 	default:
@@ -380,8 +384,30 @@ EXPORT_SYMBOL_GPL(rcu_note_context_switch);
  */
 static int rcu_preempt_blocked_readers_cgp(struct rcu_node *rnp)
 {
+	return READ_ONCE(rnp->gp_tasks) != NULL || !list_empty(&rnp->dqs_blkd_tasks);
+}
+
+#ifdef CONFIG_RCU_BOOST
+
+/*
+ * Check for preempted RCU readers blocking the current grace period
+ * for the specified rcu_node structure, but excluding any tasks that are
+ * currently deferring quiescent states, that is, they were preempted in
+ * an earlier rcu_read_lock() segment, preemption has been disabled since
+ * before the end of that segment, and they have not yet been preempted
+ * within some later rcu_read_lock() segment.  As in RCU-preempt has
+ * preempted tasks blocking the current grace period, even excluding
+ * those with deferred quiescent states.
+ *
+ * If the caller needs a reliable answer, it must hold the rcu_node's
+ * ->lock.
+ */
+static int rcu_preempt_blocked_readers_cgp_ndqs(struct rcu_node *rnp)
+{
 	return READ_ONCE(rnp->gp_tasks) != NULL;
 }
+
+#endif // #ifdef CONFIG_RCU_BOOST
 
 /* limit value for ->rcu_read_lock_nesting. */
 #define RCU_NEST_PMAX (INT_MAX / 2)
@@ -466,6 +492,23 @@ static struct list_head *rcu_next_node_entry(struct task_struct *t,
  */
 static bool rcu_preempt_has_tasks(struct rcu_node *rnp)
 {
+	return !list_empty(&rnp->blkd_tasks) || !list_empty(&rnp->dqs_blkd_tasks);
+}
+
+/*
+ * Return true if the specified rcu_node structure has tasks that were
+ * preempted within an RCU read-side critical section, but excluding any
+ * tasks that are currently deferring quiescent states, that is, they were
+ * preempted in an earlier rcu_read_lock() segment, preemption has been
+ * disabled since before the end of that segment, and they have not yet been
+ * preempted within some later rcu_read_lock() segment.  As in RCU-preempt
+ * has preempted tasks, even excluding those with deferred quiescent states.
+ *
+ * This is used when grace-period-end checks might race with later readers
+ * being preempted and then having deferred quiescent states.
+ */
+static bool rcu_preempt_has_tasks_ndqs(struct rcu_node *rnp)
+{
 	return !list_empty(&rnp->blkd_tasks);
 }
 
@@ -542,16 +585,22 @@ rcu_preempt_deferred_qs_irqrestore(struct task_struct *t, unsigned long flags)
 		t->rcu_blocked_node = NULL;
 		trace_rcu_unlock_preempted_task(TPS("rcu_preempt"),
 						rnp->gp_seq, t->pid);
-		if (&t->rcu_node_entry == rnp->gp_tasks)
+		if (&t->rcu_node_entry == rnp->gp_tasks) {
+			WARN_ON_ONCE(t->rcu_node_entry_dqs);
 			WRITE_ONCE(rnp->gp_tasks, np);
-		if (&t->rcu_node_entry == rnp->exp_tasks)
+		}
+		if (&t->rcu_node_entry == rnp->exp_tasks) {
+			WARN_ON_ONCE(t->rcu_node_entry_dqs);
 			WRITE_ONCE(rnp->exp_tasks, np);
+		}
 		if (IS_ENABLED(CONFIG_RCU_BOOST)) {
 			/* Snapshot ->boost_mtx ownership w/rnp->lock held. */
 			drop_boost_mutex = rt_mutex_owner(&rnp->boost_mtx.rtmutex) == t;
+			WARN_ON_ONCE(drop_boost_mutex && t->rcu_node_entry_dqs);
 			if (&t->rcu_node_entry == rnp->boost_tasks)
 				WRITE_ONCE(rnp->boost_tasks, np);
 		}
+		t->rcu_node_entry_dqs = -1;
 
 		/*
 		 * If this was the last task on the current list, and if
@@ -678,7 +727,8 @@ static bool rcu_unlock_needs_exp_handling(struct task_struct *t,
 	 * check because 't' might not be on the exp_tasks list at all - its
 	 * just a fast heuristic that can be false-positive sometimes.
 	 */
-	if (t->rcu_blocked_node && READ_ONCE(t->rcu_blocked_node->exp_tasks))
+	if (t->rcu_blocked_node &&
+	    (READ_ONCE(t->rcu_blocked_node->exp_tasks) || !list_empty(&rnp->dqs_blkd_tasks)))
 		return true;
 
 	/*
@@ -789,7 +839,7 @@ static void rcu_preempt_check_blocked_tasks(struct rcu_node *rnp)
 	raw_lockdep_assert_held_rcu_node(rnp);
 	if (WARN_ON_ONCE(rcu_preempt_blocked_readers_cgp(rnp)))
 		dump_blkd_tasks(rnp, 10);
-	if (rcu_preempt_has_tasks(rnp) &&
+	if (rcu_preempt_has_tasks_ndqs(rnp) &&
 	    (rnp->qsmaskinit || rnp->wait_blkd_tasks)) {
 		WRITE_ONCE(rnp->gp_tasks, rnp->blkd_tasks.next);
 		t = container_of(rnp->gp_tasks, struct task_struct,
@@ -889,6 +939,11 @@ dump_blkd_tasks(struct rcu_node *rnp, int ncheck)
 		if (++i >= ncheck)
 			break;
 	}
+	list_for_each(lhp, &rnp->dqs_blkd_tasks) {
+		if (i++ >= ncheck)
+			break;
+		pr_cont(" Q%p", lhp);
+	}
 	pr_cont("\n");
 	for (cpu = rnp->grplo; cpu <= rnp->grphi; cpu++) {
 		rdp = per_cpu_ptr(&rcu_data, cpu);
@@ -923,7 +978,7 @@ void rcu_read_unlock_strict(void)
 	 *
 	 * The in_atomic_preempt_off() check ensures that we come here holding
 	 * the last preempt_count (which will get dropped once we return to
-	 * __rcu_read_unlock().
+	 * __rcu_read_unlock()).
 	 */
 	rdp = this_cpu_ptr(&rcu_data);
 	rdp->cpu_no_qs.b.norm = false;
@@ -1026,6 +1081,14 @@ static bool rcu_preempt_has_tasks(struct rcu_node *rnp)
 }
 
 /*
+ * Because there is no preemptible RCU, there can be no readers blocked.
+ */
+static bool rcu_preempt_has_tasks_ndqs(struct rcu_node *rnp)
+{
+	return false;
+}
+
+/*
  * Because there is no preemptible RCU, there can be no deferred quiescent
  * states.
  */
@@ -1099,7 +1162,7 @@ void exit_rcu(void)
 static void
 dump_blkd_tasks(struct rcu_node *rnp, int ncheck)
 {
-	WARN_ON_ONCE(!list_empty(&rnp->blkd_tasks));
+	WARN_ON_ONCE(!list_empty(&rnp->blkd_tasks) || !list_empty(&rnp->dqs_blkd_tasks));
 }
 
 static void rcu_preempt_deferred_qs_init(struct rcu_data *rdp) { }
@@ -1261,7 +1324,7 @@ static void rcu_initiate_boost(struct rcu_node *rnp, unsigned long flags)
 {
 	raw_lockdep_assert_held_rcu_node(rnp);
 	if (!rnp->boost_kthread_task ||
-	    (!rcu_preempt_blocked_readers_cgp(rnp) && !rnp->exp_tasks)) {
+	    (!rcu_preempt_blocked_readers_cgp_ndqs(rnp) && !rnp->exp_tasks)) {
 		raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
 		return;
 	}
@@ -1319,6 +1382,36 @@ static void rcu_spawn_one_boost_kthread(struct rcu_node *rnp)
 	rcu_thread_affine_rnp(t, rnp);
 	wake_up_process(t); /* get to TASK_INTERRUPTIBLE quickly. */
 }
+
+#ifdef CONFIG_RCU_TORTURE_TEST
+
+/*
+ * Is the current task RCU priority boosted?  This is used by
+ * rcutorture to check that tasks are always deboosted once then exit
+ * an RCU read-side critical section, no matter how many overlapping
+ * segments of rcu_read_lock(), preempt_disable(), local_bh_disable(),
+ * or local_irq_disable() made up that reader.
+ *
+ * The lockless accesses in rt_mutex_owner(&rnp->boost_mtx.rtmutex)
+ * are safe because tasks release ->boost_mtx when they own it, they
+ * cannot be boosted unless current->rcu_blocked_node is non-NULL,
+ * current->rcu_blocked_node is modified only by the current task,
+ * rt_mutex_owner() uses READ_ONCE() on the ->owner field, and the owner
+ * switching among other tasks cannot force an equality comparison.
+ */
+bool rcu_is_task_rcu_boosted(void)
+{
+	struct rcu_node *rnp;
+	struct task_struct *t = current;
+
+	rnp = t->rcu_blocked_node;
+	if (!rnp)
+		return false;
+	return rt_mutex_owner(&rnp->boost_mtx.rtmutex) == t;
+}
+EXPORT_SYMBOL_GPL(rcu_is_task_rcu_boosted);
+
+#endif // #ifdef CONFIG_RCU_TORTURE_TEST
 
 #else /* #ifdef CONFIG_RCU_BOOST */
 
