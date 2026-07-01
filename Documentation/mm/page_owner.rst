@@ -65,14 +65,14 @@ un-tracking state.
 Usage
 =====
 
-1) Build user-space helpers::
+1) Build user-space helpers:
 
-To filter page_owner output:
+   To filter page_owner output::
 
 	cd tools/mm
 	make page_owner_filter
 
-To sort and analyze page_owner output:
+   To sort and analyze page_owner output::
 
 	cd tools/mm
 	make page_owner_sort
@@ -169,11 +169,12 @@ To sort and analyze page_owner output:
 	Page allocated via order XXX, ...
 	PFN XXX ...
 	// Detailed stack
-    By default, it will do full pfn dump, to start with a given pfn,
-    page_owner supports fseek.
 
-    FILE *fp = fopen("/sys/kernel/debug/page_owner", "r");
-    fseek(fp, pfn_start, SEEK_SET);
+   By default, it will do full pfn dump, to start with a given pfn,
+   page_owner supports fseek. ::
+
+        FILE *fp = fopen("/sys/kernel/debug/page_owner", "r");
+        fseek(fp, pfn_start, SEEK_SET);
 
    The ``page_owner_sort`` tool ignores ``PFN`` rows, puts the remaining rows
    in buf, uses regexp to extract the page order value, counts the times
@@ -285,6 +286,7 @@ The page_owner_filter tool provides a convenient interface for this filtering
 capability. It supports two types of filters:
 
 1. **print_mode filter**: Control what information is printed for each page
+
 	- ``stack``: Print full stack traces (default, compatible with existing usage)
 	- ``handle``: Print only stack handle numbers (much faster, smaller output)
 	- ``stack_handle``: Print both stack traces and handle numbers
@@ -294,12 +296,13 @@ capability. It supports two types of filters:
 	show_stacks_handles interface.
 
 2. **NUMA node filter**: Filter pages by NUMA node ID
+
 	- Supports single node: ``-n 0``
 	- Multiple nodes: ``-n 0,1,2``
 	- Ranges: ``-n 0-3``
 	- Mixed format: ``-n 0,2-3,5``
 
-Usage examples::
+   Usage examples::
 
 	# Filter by print mode
 	./page_owner_filter -m handle
