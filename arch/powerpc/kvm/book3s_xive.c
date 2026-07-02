@@ -1794,7 +1794,7 @@ void xive_cleanup_single_escalation(struct kvm_vcpu *vcpu, int irq)
 	 * we race with xive_esc_irq() and xive_irq_eoi().
 	 */
 	xd->stale_p = false;
-	smp_mb();		/* paired with smb_wmb in xive_esc_irq */
+	smp_mb();		/* paired with smp_wmb in xive_esc_irq */
 	if (!vcpu->arch.xive_esc_on)
 		xd->stale_p = true;
 }
