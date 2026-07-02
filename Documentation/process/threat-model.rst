@@ -49,7 +49,8 @@ suit their expectations (relax or restrict).
 By default, the Linux Kernel guarantees the following protections when running
 on common processors featuring privilege levels and memory management units:
 
-* **User-based isolation**: an unprivileged user may restrict access to their
+User-based isolation:
+  an unprivileged user may restrict access to their
   own data from other unprivileged users running on the same system. This
   includes:
 
@@ -60,8 +61,7 @@ on common processors featuring privilege levels and memory management units:
     UNIX domain sockets or other IPC mechanisms).
   * network communications within the same or with other systems
 
-* **Capability-based protection**:
-
+Capability-based protection:
   * users not having elevated capabilities (including but not limited to
     CAP_SYS_ADMIN) may not alter the
     kernel's configuration, memory nor state, change other users' view of the
@@ -107,8 +107,7 @@ that the kernel could do better, they should be reported, so that they can be
 reviewed and fixed where reasonably possible, but they will be handled as any
 regular bug:
 
-* **Configuration**:
-
+Configuration:
   * outdated kernels and particularly end-of-life branches are out of the scope
     of the kernel's threat model: administrators are responsible for keeping
     their system up to date. For a bug to qualify as a security bug, it must be
@@ -139,8 +138,7 @@ regular bug:
   * running out-of-tree modules or unofficial kernel forks; these should be
     reported to the relevant vendor.
 
-* **Excess of initial privileges**:
-
+Excess of initial privileges:
   * actions performed by a user already possessing the privileges required to
     perform that action or modify that state (e.g. ``CAP_SYS_ADMIN``,
     ``CAP_NET_ADMIN``, ``CAP_SYS_RAWIO``, ``CAP_SYS_MODULE`` with no further
@@ -154,8 +152,7 @@ regular bug:
   * anything performed by the root user in the initial namespace (e.g. kernel
     oops when writing to a privileged device).
 
-* **Out of production use**:
-
+Out of production use:
   This covers theoretical/probabilistic attacks that rely on laboratory
   conditions with zero system noise, or those requiring an unrealistic number
   of attempts (e.g., billions of trials) that would be detected by standard
@@ -187,8 +184,7 @@ regular bug:
     brute-force method involving millions of connection attempts to guess a
     port number).
 
-* **Hardening failures**:
-
+Hardening failures:
   * ability to bypass some of the kernel's hardening measures with no
     demonstrable exploit path (e.g. ASLR bypass, events timing or probing with
     no demonstrable consequence). These are just weaknesses, not
@@ -197,8 +193,7 @@ regular bug:
   * missing argument checks and failure to report certain errors with no
     immediate consequence.
 
-* **Random information leaks**:
-
+Random information leaks:
   This concerns information leaks of small data parts that happen to be there
   and that cannot be chosen by the attacker, or face access restrictions:
 
@@ -211,8 +206,7 @@ regular bug:
     exploitable vector and are not security bugs, though they must be reported
     and fixed.
 
-* **Crafted file system images**:
-
+Crafted file system images:
   * bugs triggered by mounting a corrupted or maliciously crafted file system
     image are generally not security bugs, as the kernel assumes the underlying
     storage media is under the administrator's control, unless the filesystem
@@ -221,15 +215,13 @@ regular bug:
   * issues that are resolved, mitigated, or detected by running a filesystem
     consistency check (fsck) on the image prior to mounting.
 
-* **Physical access**:
-
+Physical access:
   Issues that require physical access to the machine, hardware modification, or
   the use of specialized hardware (e.g., logic analyzers, DMA-attack tools over
   PCI-E/Thunderbolt) are out of scope unless the system is explicitly
   configured with technologies meant to defend against such attacks
   (e.g. IOMMU).
 
-* **Functional and performance regressions**:
-
+Functional and performance regressions:
   Any issue that can be mitigated by setting proper permissions and limits
   doesn't qualify as a security bug.
