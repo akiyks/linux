@@ -89,6 +89,17 @@ struct rcu_node {
 				/* Tasks blocked in RCU read-side critical */
 				/*  section.  Tasks are placed at the head */
 				/*  of this list and age towards the tail. */
+				/*  A task on this list will have its */
+				/*  ->rcu_node_entry_dqs equal to 0. */
+	struct list_head dqs_blkd_tasks;
+				/* Tasks that were in ->blkd_tasks that */
+				/*  executed outermost rcu_read_unlock(), */
+				/*  but where preemption (or better) was */
+				/*  disabled.  If these are preempted in */
+				/*  a later rcu_read_lock() segment, then */
+				/*  they are moved back to ->blkd_tasks. */
+				/*  A task on this list will have its */
+				/*  ->rcu_node_entry_dqs equal to 1. */
 	struct list_head *gp_tasks;
 				/* Pointer to the first task blocking the */
 				/*  current grace period, or NULL if there */
@@ -112,6 +123,10 @@ struct rcu_node {
 				/*  side effect, not as a lock. */
 	unsigned long boost_time;
 				/* When to start boosting (jiffies). */
+	struct irq_work rcu_deboost_iw;
+				/* Delegate deboosting to a safe environment */
+				/*  if interrupts are disabled at the time of */
+				/*  the call to rcu_read_unlock_special(). */
 	struct mutex kthread_mutex;
 				/* Exclusion for thread spawning and affinity */
 				/*  manipulation. */
@@ -480,9 +495,7 @@ static const char *tp_rcu_varname __used __tracepoint_string = rcu_name;
 static void rcu_bootup_announce(void);
 static void rcu_qs(void);
 static int rcu_preempt_blocked_readers_cgp(struct rcu_node *rnp);
-#ifdef CONFIG_HOTPLUG_CPU
-static bool rcu_preempt_has_tasks(struct rcu_node *rnp);
-#endif /* #ifdef CONFIG_HOTPLUG_CPU */
+static int rcu_preempt_blocked_readers_cgp_ndqs(struct rcu_node *rnp);
 static int rcu_print_task_exp_stall(struct rcu_node *rnp);
 static void rcu_preempt_check_blocked_tasks(struct rcu_node *rnp);
 static void rcu_flavor_sched_clock_irq(int user);
@@ -494,6 +507,7 @@ static bool rcu_is_callbacks_kthread(struct rcu_data *rdp);
 static void rcu_cpu_kthread_setup(unsigned int cpu);
 static void rcu_spawn_one_boost_kthread(struct rcu_node *rnp);
 static bool rcu_preempt_has_tasks(struct rcu_node *rnp);
+static bool rcu_preempt_has_tasks_ndqs(struct rcu_node *rnp);
 static bool rcu_preempt_need_deferred_qs(struct task_struct *t);
 static void zero_cpu_stall_ticks(struct rcu_data *rdp);
 static struct swait_queue_head *rcu_nocb_gp_get(struct rcu_node *rnp);

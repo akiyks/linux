@@ -273,6 +273,7 @@ static void rcu_iw_handler(struct irq_work *iwp)
  */
 static void rcu_print_detail_task_stall_rnp(struct rcu_node *rnp)
 {
+	bool firsttime = true;
 	unsigned long flags;
 	struct task_struct *t;
 
@@ -281,13 +282,23 @@ static void rcu_print_detail_task_stall_rnp(struct rcu_node *rnp)
 		raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
 		return;
 	}
-	t = list_entry(rnp->gp_tasks->prev,
-		       struct task_struct, rcu_node_entry);
-	list_for_each_entry_continue(t, &rnp->blkd_tasks, rcu_node_entry) {
-		/*
-		 * We could be printing a lot while holding a spinlock.
-		 * Avoid triggering hard lockup.
-		 */
+	if (rnp->gp_tasks) {
+		t = list_entry(rnp->gp_tasks->prev,
+			       struct task_struct, rcu_node_entry);
+		list_for_each_entry_continue(t, &rnp->blkd_tasks, rcu_node_entry) {
+			/*
+			 * We could be printing a lot while holding a spinlock.
+			 * Avoid triggering hard lockup.
+			 */
+			touch_nmi_watchdog();
+			sched_show_task(t);
+		}
+	}
+	list_for_each_entry(t, &rnp->blkd_tasks, rcu_node_entry) {
+		if (firsttime) {
+			pr_alert("Tasks with deferred quiescent states:\n");
+			firsttime = false;
+		}
 		touch_nmi_watchdog();
 		sched_show_task(t);
 	}
@@ -299,6 +310,7 @@ struct rcu_stall_chk_rdr {
 	int nesting;
 	union rcu_special rs;
 	bool on_blkd_list;
+	bool on_dqs_blkd_list;
 };
 
 /*
@@ -314,6 +326,7 @@ static int check_slow_task(struct task_struct *t, void *arg)
 	rscrp->nesting = t->rcu_read_lock_nesting;
 	rscrp->rs = t->rcu_read_unlock_special;
 	rscrp->on_blkd_list = !list_empty(&t->rcu_node_entry);
+	rscrp->on_dqs_blkd_list = (t->rcu_node_entry_dqs == 1);
 	return 0;
 }
 
@@ -337,13 +350,21 @@ static int rcu_print_task_stall(struct rcu_node *rnp, unsigned long flags)
 	}
 	pr_err("\tTasks blocked on level-%d rcu_node (CPUs %d-%d):",
 	       rnp->level, rnp->grplo, rnp->grphi);
-	t = list_entry(rnp->gp_tasks->prev,
-		       struct task_struct, rcu_node_entry);
-	list_for_each_entry_continue(t, &rnp->blkd_tasks, rcu_node_entry) {
-		get_task_struct(t);
-		ts[i++] = t;
+	if (rnp->gp_tasks) {
+		t = list_entry(rnp->gp_tasks->prev,
+			       struct task_struct, rcu_node_entry);
+		list_for_each_entry_continue(t, &rnp->blkd_tasks, rcu_node_entry) {
+			get_task_struct(t);
+			ts[i++] = t;
+			if (i >= ARRAY_SIZE(ts))
+				break;
+		}
+	}
+	list_for_each_entry(t, &rnp->dqs_blkd_tasks, rcu_node_entry) {
 		if (i >= ARRAY_SIZE(ts))
 			break;
+		get_task_struct(t);
+		ts[i++] = t;
 	}
 	raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
 	while (i) {
@@ -351,7 +372,8 @@ static int rcu_print_task_stall(struct rcu_node *rnp, unsigned long flags)
 		if (task_call_func(t, check_slow_task, &rscr))
 			pr_cont(" P%d", t->pid);
 		else
-			pr_cont(" P%d/%d:%c%c%c%c",
+			pr_cont(" %c%d/%d:%c%c%c%c",
+				rscr.on_dqs_blkd_list ? 'Q' : 'P',
 				t->pid, rscr.nesting,
 				".b"[rscr.rs.b.blocked],
 				".q"[rscr.rs.b.need_qs],
@@ -573,13 +595,13 @@ static void rcu_check_gp_kthread_starvation(void)
 
 	if (rcu_is_gp_kthread_starving(&j)) {
 		cpu = gpk ? task_cpu(gpk) : -1;
-		pr_err("%s kthread starved for %ld jiffies! g%ld f%#x %s(%d) ->state=%#x ->cpu=%d\n",
+		pr_err("%s kthread starved for %ld jiffies! g%ld f%#x %s(%d) ->state=%c ->cpu=%d\n",
 		       rcu_state.name, j,
 		       (long)rcu_seq_current(&rcu_state.gp_seq),
 		       data_race(READ_ONCE(rcu_state.gp_flags)),
 		       gp_state_getname(rcu_state.gp_state),
 		       data_race(READ_ONCE(rcu_state.gp_state)),
-		       gpk ? data_race(READ_ONCE(gpk->__state)) : ~0, cpu);
+		       gpk ? task_state_to_char(gpk) : '?', cpu);
 		if (gpk) {
 			struct rcu_data *rdp = per_cpu_ptr(&rcu_data, cpu);
 
@@ -616,12 +638,12 @@ static void rcu_check_gp_kthread_expired_fqs_timer(void)
 	    time_after(jiffies, jiffies_fqs + RCU_STALL_MIGHT_MIN) &&
 	    gpk && !READ_ONCE(gpk->on_rq)) {
 		cpu = task_cpu(gpk);
-		pr_err("%s kthread timer wakeup didn't happen for %ld jiffies! g%ld f%#x %s(%d) ->state=%#x\n",
+		pr_err("%s kthread timer wakeup didn't happen for %ld jiffies! g%ld f%#x %s(%d) ->state=%c\n",
 		       rcu_state.name, (jiffies - jiffies_fqs),
 		       (long)rcu_seq_current(&rcu_state.gp_seq),
 		       data_race(READ_ONCE(rcu_state.gp_flags)), // Diagnostic read
 		       gp_state_getname(RCU_GP_WAIT_FQS), RCU_GP_WAIT_FQS,
-		       data_race(READ_ONCE(gpk->__state)));
+		       task_state_to_char(gpk));
 		pr_err("\tPossible timer handling issue on cpu=%d timer-softirq=%u\n",
 		       cpu, kstat_softirqs_cpu(TIMER_SOFTIRQ, cpu));
 	}
@@ -953,10 +975,10 @@ void show_rcu_gp_kthreads(void)
 	jr = j - data_race(READ_ONCE(rcu_state.gp_req_activity));
 	js = j - data_race(READ_ONCE(rcu_state.gp_start));
 	jw = j - data_race(READ_ONCE(rcu_state.gp_wake_time));
-	pr_info("%s: wait state: %s(%d) ->state: %#x ->rt_priority %u delta ->gp_start %lu ->gp_activity %lu ->gp_req_activity %lu ->gp_wake_time %lu ->gp_wake_seq %ld ->gp_seq %ld ->gp_seq_needed %ld ->gp_max %lu ->gp_flags %#x\n",
+	pr_info("%s: wait state: %s(%d) ->state: %c ->rt_priority %u delta ->gp_start %lu ->gp_activity %lu ->gp_req_activity %lu ->gp_wake_time %lu ->gp_wake_seq %ld ->gp_seq %ld ->gp_seq_needed %ld ->gp_max %lu ->gp_flags %#x\n",
 		rcu_state.name, gp_state_getname(rcu_state.gp_state),
 		data_race(READ_ONCE(rcu_state.gp_state)),
-		t ? data_race(READ_ONCE(t->__state)) : 0x1ffff, t ? t->rt_priority : 0xffU,
+		t ? task_state_to_char(t) : '?', t ? t->rt_priority : 0xffU,
 		js, ja, jr, jw, (long)data_race(READ_ONCE(rcu_state.gp_wake_seq)),
 		(long)data_race(READ_ONCE(rcu_state.gp_seq)),
 		(long)data_race(READ_ONCE(rcu_get_root()->gp_seq_needed)),
@@ -967,7 +989,7 @@ void show_rcu_gp_kthreads(void)
 		    !data_race(READ_ONCE(rnp->qsmask)) && !data_race(READ_ONCE(rnp->boost_tasks)) &&
 		    !data_race(READ_ONCE(rnp->exp_tasks)) && !data_race(READ_ONCE(rnp->gp_tasks)))
 			continue;
-		pr_info("\trcu_node %d:%d ->gp_seq %ld ->gp_seq_needed %ld ->qsmask %#lx %c%c%c%c ->n_boosts %ld\n",
+		pr_info("\trcu_node %d:%d ->gp_seq %ld ->gp_seq_needed %ld ->qsmask %#lx %c%c%c%c%c ->n_boosts %ld\n",
 			rnp->grplo, rnp->grphi,
 			(long)data_race(READ_ONCE(rnp->gp_seq)),
 			(long)data_race(READ_ONCE(rnp->gp_seq_needed)),
@@ -976,6 +998,7 @@ void show_rcu_gp_kthreads(void)
 			".B"[!!data_race(READ_ONCE(rnp->boost_tasks))],
 			".E"[!!data_race(READ_ONCE(rnp->exp_tasks))],
 			".G"[!!data_race(READ_ONCE(rnp->gp_tasks))],
+			".D"[!list_empty(&rnp->dqs_blkd_tasks)],
 			data_race(READ_ONCE(rnp->n_boosts)));
 		if (!rcu_is_leaf_node(rnp))
 			continue;

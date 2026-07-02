@@ -146,7 +146,7 @@ static void __maybe_unused sync_exp_reset_tree(void)
 		 * additional blocking tasks will also block the expedited GP
 		 * until such time as the ->expmask bits are cleared.
 		 */
-		if (rcu_is_leaf_node(rnp) && rcu_preempt_has_tasks(rnp))
+		if (rcu_is_leaf_node(rnp) && rcu_preempt_has_tasks_ndqs(rnp))
 			WRITE_ONCE(rnp->exp_tasks, rnp->blkd_tasks.next);
 		raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
 	}
@@ -161,8 +161,8 @@ static void __maybe_unused sync_exp_reset_tree(void)
 static bool sync_rcu_exp_done(struct rcu_node *rnp)
 {
 	raw_lockdep_assert_held_rcu_node(rnp);
-	return READ_ONCE(rnp->exp_tasks) == NULL &&
-	       READ_ONCE(rnp->expmask) == 0;
+	return READ_ONCE(rnp->exp_tasks) == NULL && READ_ONCE(rnp->expmask) == 0 &&
+	       list_empty(&rnp->dqs_blkd_tasks);
 }
 
 /*
@@ -604,7 +604,7 @@ static void synchronize_rcu_expedited_stall(unsigned long jiffies_start, unsigne
 				continue;
 			pr_cont(" l=%u:%d-%d:%#lx/%c",
 				rnp->level, rnp->grplo, rnp->grphi, data_race(rnp->expmask),
-				".T"[!!data_race(rnp->exp_tasks)]);
+				".T"[!!data_race(rnp->exp_tasks) || !list_empty(&rnp->dqs_blkd_tasks)]);
 		}
 		pr_cont("\n");
 	}
@@ -818,14 +818,20 @@ static int rcu_print_task_exp_stall(struct rcu_node *rnp)
 	struct task_struct *t;
 
 	raw_spin_lock_irqsave_rcu_node(rnp, flags);
-	if (!rnp->exp_tasks) {
+	if (!rnp->exp_tasks && list_empty(&rnp->dqs_blkd_tasks)) {
 		raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
 		return 0;
 	}
-	t = list_entry(rnp->exp_tasks->prev,
-		       struct task_struct, rcu_node_entry);
-	list_for_each_entry_continue(t, &rnp->blkd_tasks, rcu_node_entry) {
-		pr_cont(" P%d", t->pid);
+	if (rnp->exp_tasks) {
+		t = list_entry(rnp->exp_tasks->prev,
+			       struct task_struct, rcu_node_entry);
+		list_for_each_entry_continue(t, &rnp->blkd_tasks, rcu_node_entry) {
+			pr_cont(" P%d", t->pid);
+			ndetected++;
+		}
+	}
+	list_for_each_entry(t, &rnp->dqs_blkd_tasks, rcu_node_entry) {
+		pr_cont(" Q%d", t->pid);
 		ndetected++;
 	}
 	raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
@@ -839,23 +845,34 @@ static int rcu_print_task_exp_stall(struct rcu_node *rnp)
  */
 static void rcu_exp_print_detail_task_stall_rnp(struct rcu_node *rnp)
 {
+	bool firsttime = true;
 	unsigned long flags;
 	struct task_struct *t;
 
 	if (!rcu_exp_stall_task_details)
 		return;
 	raw_spin_lock_irqsave_rcu_node(rnp, flags);
-	if (!READ_ONCE(rnp->exp_tasks)) {
+	if (!READ_ONCE(rnp->exp_tasks) && list_empty(&rnp->dqs_blkd_tasks)) {
 		raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
 		return;
 	}
-	t = list_entry(rnp->exp_tasks->prev,
-		       struct task_struct, rcu_node_entry);
-	list_for_each_entry_continue(t, &rnp->blkd_tasks, rcu_node_entry) {
-		/*
-		 * We could be printing a lot while holding a spinlock.
-		 * Avoid triggering hard lockup.
-		 */
+	if (rnp->exp_tasks) {
+		t = list_entry(rnp->exp_tasks->prev,
+			       struct task_struct, rcu_node_entry);
+		list_for_each_entry_continue(t, &rnp->blkd_tasks, rcu_node_entry) {
+			/*
+			 * We could be printing a lot while holding a spinlock.
+			 * Avoid triggering hard lockup.
+			 */
+			touch_nmi_watchdog();
+			sched_show_task(t);
+		}
+	}
+	list_for_each_entry(t, &rnp->dqs_blkd_tasks, rcu_node_entry) {
+		if (firsttime) {
+			pr_alert("Tasks with deferred quiescent states:\n");
+			firsttime = false;
+		}
 		touch_nmi_watchdog();
 		sched_show_task(t);
 	}
