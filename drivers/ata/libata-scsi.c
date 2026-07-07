@@ -2298,6 +2298,7 @@ static unsigned int ata_scsiop_inq_89(struct ata_device *dev,
  *
  * Return: the maximum number of 512-byte pages a single translated WRITE SAME
  * command may send to @dev (never less than one), that is the smaller of:
+ *
  *   - MAX PAGES PER DSM COMMAND (IDENTIFY DEVICE word 105), when the device
  *     reports a non-zero limit; and
  *   - the logical sector size expressed in 512-byte pages (see above).
