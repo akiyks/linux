@@ -215,12 +215,15 @@ Advanced usage examples::
 
 	# ./delaytop -t type
 	Display only specified delay type with avg/max/timestamp
+
     (rows sorted by MAX for that type, largest first)
 
 
 
 delaytop add delay_max fields to track the maximum delay value for each delay
   type (cpu, blkio, irq, swapin, freepages, thrashing, compact, wpcopy) per task::
+
+::
 
 	bash# ./delaytop -t cpu
 	System Pressure Information: (avg10/avg60/avg300/total)
