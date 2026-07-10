@@ -223,8 +223,6 @@ Advanced usage examples::
 delaytop add delay_max fields to track the maximum delay value for each delay
   type (cpu, blkio, irq, swapin, freepages, thrashing, compact, wpcopy) per task::
 
-::
-
 	bash# ./delaytop -t cpu
 	System Pressure Information: (avg10/avg60/avg300/total)
 	CPU some:       0.4%/   0.2%/   0.1%/     220(ms)
