@@ -296,7 +296,7 @@ lookup_mode=%s		 Control the directory lookup behavior for casefolded
 					    different case-folding algorithm.
 					    This mode ignores the on-disk flag.
 			 auto               F2FS determines the mode based on the
-					    on-disk `SB_ENC_NO_COMPAT_FALLBACK_FL`
+					    on-disk ``SB_ENC_NO_COMPAT_FALLBACK_FL``
 					    flag.
 			 ================== ========================================
 resizable_tail_secno=%u  Control the number of sections at the tail of the
