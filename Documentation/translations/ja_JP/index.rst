@@ -13,6 +13,7 @@
 
    disclaimer-ja_JP
    process/howto
+   process/development-process
    process/submitting-patches
    process/submit-checklist
 
