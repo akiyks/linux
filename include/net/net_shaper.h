@@ -57,7 +57,7 @@ struct net_shaper {
 	struct rcu_head rcu;
 };
 
-/**
+/* (not a kernel-doc comment)
  * struct net_shaper_ops - Operations on device H/W shapers
  *
  * The operations applies to either net_device and devlink objects.
@@ -74,7 +74,7 @@ struct net_shaper {
  * comprising the shaper scope and a scope-specific id.
  *
  * Driver ops vs uAPI
- * ~~~~~~~~~~~~~~~~~~
+ * 
  * Members of the driver ops mirror the Netlink uAPI but driver calls do not
  * map 1:1 to user calls. Drivers need to be careful when assuming that calls
  * disallowed at the uAPI level will never be made at the driver level.
@@ -87,7 +87,7 @@ struct net_shaper {
  *    to be removed (re-parenting nodes explicitly is not supported in the uAPI)
  *
  * Implicit creation
- * ~~~~~~~~~~~~~~~~~
+ * 
  * Shapers are created implicitly, meaning that @set and @group operations
  * are called both for existing and new shapers. The driver has to infer
  * whether the operation is an update or a creation by tracking the handles.
@@ -98,6 +98,10 @@ struct net_shaper {
  * The @group operation implicitly creates NET_SHAPER_SCOPE_NETDEV and
  * NET_SHAPER_SCOPE_NODE shapers (the group shaper itself), as well as
  * NET_SHAPER_SCOPE_QUEUE shapers (leaves).
+ */
+
+/**
+ * struct net_shaper_ops - Operations on device H/W shapers
  */
 struct net_shaper_ops {
 	/**
