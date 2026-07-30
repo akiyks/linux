@@ -778,7 +778,7 @@ static void hrtimer_switch_to_hres(void)
 		return;
 	}
 	base->hres_active = true;
-	hrtimer_resolution = HIGH_RES_NSEC;
+	WRITE_ONCE(hrtimer_resolution, HIGH_RES_NSEC);
 
 	tick_setup_sched_timer(true);
 	/* "Retrigger" the interrupt to get things going */
@@ -1087,6 +1087,7 @@ u64 hrtimer_forward(struct hrtimer *timer, ktime_t now, ktime_t interval)
 {
 	ktime_t delta;
 	u64 orun = 1;
+	int res;
 
 	delta = ktime_sub(now, hrtimer_get_expires(timer));
 
@@ -1096,8 +1097,9 @@ u64 hrtimer_forward(struct hrtimer *timer, ktime_t now, ktime_t interval)
 	if (WARN_ON(timer->is_queued))
 		return 0;
 
-	if (interval < hrtimer_resolution)
-		interval = hrtimer_resolution;
+	res = READ_ONCE(hrtimer_resolution);
+	if (interval < res)
+		interval = res;
 
 	if (unlikely(delta >= interval)) {
 		s64 incr = ktime_to_ns(interval);
@@ -1303,6 +1305,10 @@ static inline ktime_t hrtimer_update_lowres(struct hrtimer *timer, ktime_t tim,
 					    const enum hrtimer_mode mode)
 {
 #ifdef CONFIG_TIME_LOW_RES
+
+	/* For hrtimer_resolution to be stable. */
+	lockdep_assert_irqs_disabled();
+
 	/*
 	 * CONFIG_TIME_LOW_RES indicates that the system has no way to return
 	 * granular time values. For relative timers we add hrtimer_resolution
@@ -1994,7 +2000,7 @@ bool hrtimer_active(const struct hrtimer *timer)
 		base = READ_ONCE(timer->base);
 		seq = raw_read_seqcount_begin(&base->seq);
 
-		if (timer->is_queued || base->running == timer)
+		if (timer->is_queued || READ_ONCE(base->running) == timer)
 			return true;
 
 	} while (read_seqcount_retry(&base->seq, seq) || base != READ_ONCE(timer->base));
@@ -2031,7 +2037,7 @@ static void __run_hrtimer(struct hrtimer_cpu_base *cpu_base, struct hrtimer_cloc
 	lockdep_assert_held(&cpu_base->lock);
 
 	debug_hrtimer_deactivate(timer);
-	base->running = timer;
+	WRITE_ONCE(base->running, timer);
 
 	/*
 	 * Separate the ->running assignment from the ->is_queued assignment.
@@ -2090,7 +2096,7 @@ static void __run_hrtimer(struct hrtimer_cpu_base *cpu_base, struct hrtimer_cloc
 	raw_write_seqcount_barrier(&base->seq);
 
 	WARN_ON_ONCE(base->running != timer);
-	base->running = NULL;
+	WRITE_ONCE(base->running, NULL);
 }
 
 static void __hrtimer_run_queues(struct hrtimer_cpu_base *cpu_base, ktime_t now,
