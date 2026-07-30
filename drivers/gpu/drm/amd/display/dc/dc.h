@@ -315,6 +315,7 @@ struct lut3d_caps {
  * @mcm_3d_lut_caps: HW support cap for MCM LUT memory
  * @rmcm_3d_lut_caps: HW support cap for RMCM LUT memory
  * @preblend: whether color manager supports preblend with MPC
+ * @max_gamut_remap_coeff: Need proper description.
  */
 struct mpc_color_caps {
 	uint16_t gamut_remap : 1;
@@ -2280,6 +2281,7 @@ struct dc_probe_urgent_assertion {
  * @u.urgent_request_count:   number of urgent requests in the window
  *                            (DC_PROBE_URGENT_REQUEST_COUNT).
  * @u.prefetch_data_size:     total prefetch data in bytes (DC_PROBE_PREFETCH_DATA_SIZE).
+ * @u: Need proper description.
  */
 struct dc_probe_status {
 	bool                       valid;
