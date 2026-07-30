@@ -17,18 +17,21 @@ Documentation/admin-guide/reporting-issues.rst if you are unclear about what
 information is helpful.  The following information are absolutely necessary in
 **any** security bug report:
 
-  * **affected kernel version range**: with no version indication, your report
+affected kernel version range:
+    with no version indication, your report
     will not be processed.  A significant part of reports are for bugs that
     have already been fixed, so it is extremely important that vulnerabilities
     are verified on recent versions (development tree or latest stable
     version), at least by verifying that the code has not changed since the
     version where it was detected.
 
-  * **description of the problem**: a detailed description of the problem, with
+description of the problem:
+    a detailed description of the problem, with
     traces showing its manifestation, and why you consider that the observed
     behavior as a problem in the kernel, is necessary.
 
-  * **reproducer**: developers will need to be able to reproduce the problem to
+reproducer:
+    developers will need to be able to reproduce the problem to
     consider a fix as effective.  This includes both a way to trigger the issue
     and a way to confirm it happens.  A reproducer with low complexity
     dependencies will be needed (source code, shell script, sequence of
@@ -38,19 +41,22 @@ information is helpful.  The following information are absolutely necessary in
     definition if an issue cannot be reproduced, it is not exploitable, thus it
     is not a security bug.
 
-  * **conditions**: if the bug depends on certain configuration options,
+conditions:
+    if the bug depends on certain configuration options,
     sysctls, permissions, timing, code modifications etc, these should be
     indicated.
 
 In addition, the following information are highly desirable:
 
-  * **suspected location of the bug**: the file names and functions where the
+suspected location of the bug:
+    the file names and functions where the
     bug is suspected to be present are very important, at least to help forward
     the report to the appropriate maintainers.  When not possible (for example,
     "system freezes each time I run this command"), the security team will help
     identify the source of the bug.
 
-  * **a proposed fix**: bug reporters who have analyzed the cause of a bug in
+a proposed fix:
+    bug reporters who have analyzed the cause of a bug in
     the source code almost always have an accurate idea on how to fix it,
     because they spent a long time studying it and its implications.  Proposing
     a tested fix will save maintainers a lot of time, even if the fix ends up
@@ -62,7 +68,8 @@ In addition, the following information are highly desirable:
     only a ``Signed-off-by:`` tag is needed, without ``Reported-by:`` when the
     reporter and author are the same.
 
-  * **mitigations**: very often during a bug analysis, some ways of mitigating
+mitigations:
+    very often during a bug analysis, some ways of mitigating
     the issue appear. It is useful to share them, as they can be helpful to
     keep end users protected during the time it takes them to apply the fix.
 
@@ -178,20 +185,23 @@ quality or accuracy. As such, reporters must be particularly cautious about a
 number of points which tend to make these reports needlessly difficult to
 handle:
 
-  * **Length**: AI-generated reports tend to be excessively long, containing
+Length:
+    AI-generated reports tend to be excessively long, containing
     multiple sections and excessive detail. This makes it difficult to spot
     important information such as affected files, versions, and impact. Please
     ensure that a clear summary of the problem and all critical details are
     presented first. Do not require triage engineers to scan multiple pages of
     text. Configure your tools to produce concise, human-style reports.
 
-  * **Formatting**: Most AI-generated reports are littered with Markdown tags.
+Formatting:
+    Most AI-generated reports are littered with Markdown tags.
     These decorations complicate the search for important information and do
     not survive the quoting processes involved in forwarding or replying.
     Please **always convert your report to plain text** without any formatting
     decorations before sending it.
 
-  * **Impact Evaluation**: Many AI-generated reports lack an understanding
+Impact Evaluation:
+    Many AI-generated reports lack an understanding
     of the kernel's threat model (see Documentation/process/threat-model.rst)
     and go to great lengths inventing theoretical consequences. This adds
     noise and complicates triage. Please stick to verifiable facts (e.g.,
@@ -199,14 +209,16 @@ handle:
     speculative implications. Have your tool read this documentation as
     part of the evaluation process.
 
-  * **Reproducer**: AI-based tools are often capable of generating reproducers.
+Reproducer:
+    AI-based tools are often capable of generating reproducers.
     Please always ensure your tool provides one and **test it thoroughly**. If
     the reproducer does not work, or if the tool cannot produce one, the
     validity of the report should be seriously questioned. Note that since the
     report will be posted to a public list, the reproducer should only be
     shared upon maintainers' request.
 
-  * **Propose a Fix**: Many AI tools are actually better at writing code than
+Propose a Fix:
+    Many AI tools are actually better at writing code than
     evaluating it. Please ask your tool to propose a fix and **test it** before
     reporting the problem. If the fix cannot be tested because it relies on
     rare hardware or almost extinct network protocols, the issue is likely not
