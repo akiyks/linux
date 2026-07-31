@@ -58,7 +58,7 @@ struct net_shaper {
 };
 
 /**
- * struct net_shaper_ops - Operations on device H/W shapers
+ * DOC: Operations on device H/W shapers
  *
  * The operations applies to either net_device and devlink objects.
  * The initial shaping configuration at device initialization is empty:
@@ -98,6 +98,9 @@ struct net_shaper {
  * The @group operation implicitly creates NET_SHAPER_SCOPE_NETDEV and
  * NET_SHAPER_SCOPE_NODE shapers (the group shaper itself), as well as
  * NET_SHAPER_SCOPE_QUEUE shapers (leaves).
+ */
+/**
+ * struct net_shaper_ops - Operations on device H/W shapers
  */
 struct net_shaper_ops {
 	/**
