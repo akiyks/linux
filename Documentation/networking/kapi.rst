@@ -107,6 +107,9 @@ Driver Support
 .. kernel-doc:: include/net/net_shaper.h
    :internal:
 
+.. kernel-doc:: include/net/net_shaper.h
+   :doc: Operations on device H/W shapers
+
 PHY Support
 -----------
 
