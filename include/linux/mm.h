@@ -2318,7 +2318,7 @@ static inline bool vma_flags_is_cow_mapping(const vma_flags_t *flags)
 
 /**
  * vma_is_cow_mapping() - Is this VMA a CoW mapping?
- * @desc: The VMA to check.
+ * @vma: Need proper description.
  *
  * See vma_flags_is_cow_mapping() for details.
  *
