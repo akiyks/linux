@@ -72,7 +72,7 @@ enum hrtimer_mode {
  */
 struct hrtimer_sleeper {
 	struct hrtimer timer;
-	struct task_struct __private *task;
+	struct task_struct *__private task;
 };
 
 static inline void hrtimer_set_expires(struct hrtimer *timer, ktime_t time)
@@ -284,6 +284,15 @@ static inline bool hrtimer_is_queued(struct hrtimer *timer)
 {
 	/* The READ_ONCE pairs with the update functions of timer->is_queued */
 	return READ_ONCE(timer->is_queued);
+}
+
+/*
+ * Helper function to check, whether the timer is running the callback
+ * function
+ */
+static inline int hrtimer_callback_running(struct hrtimer *timer)
+{
+	return READ_ONCE(READ_ONCE(timer->base)->running) == timer;
 }
 
 void hrtimer_update_function(struct hrtimer *timer,
