@@ -545,7 +545,9 @@ do {									\
  * The designated bit is cleared and any tasks waiting in wait_on_bit()
  * or similar will be woken.  This call has RELEASE semantics so that
  * any changes to memory made before this call are guaranteed to be visible
- * after the corresponding wait_on_bit() completes.
+ * after the corresponding wait_on_bit() completes, as well as a full memory
+ * barrier needed for wake_up_bit(), embedded in this API, to function
+ * properly.
  */
 static inline void clear_and_wake_up_bit(int bit, unsigned long *word)
 {
