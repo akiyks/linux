@@ -70,7 +70,7 @@ The definition of "valid" pointers is subject to change at any time, and has
 absolutely no ABI stability guarantees.
 
 As mentioned above, a nested pointer obtained from walking a trusted pointer is
-no longer trusted, with one exception. If a struct type has a field that is
+no longer trusted, with one exception. If a ``struct`` type has a field that is
 guaranteed to be valid (trusted or rcu, as in KF_RCU description below) as long
 as its parent pointer is valid, the following macros can be used to express
 that to the verifier:
@@ -578,18 +578,18 @@ against the arena. Larger accesses must verify the range explicitly.
 2.9 kfunc Return Values
 -----------------------
 
-A kfunc may return a scalar, a pointer, or a small struct or union by
+A kfunc may return a scalar, a pointer, or a small ``struct`` or ``union`` by
 value. A scalar or pointer of up to 8 bytes is returned in R0, as usual.
 
-A struct or union returned by value must be composed only of scalars and arena
-pointers, where a scalar is an integer or an enum and an arena pointer is one
+A ``struct`` or ``union`` returned by value must be composed only of scalars and arena
+pointers, where a scalar is an integer or an ``enum`` and an arena pointer is one
 carrying the ``btf_type_tag("arena")`` attribute. Those may be nested in
-structs and unions and in arrays of any number of dimensions, in any
+``struct``\ s and ``union``\ s and in arrays of any number of dimensions, in any
 combination, as long as what the nesting bottoms out in is a scalar or an arena
 pointer. Its bytes are handed back to the program as the raw contents of R0
 (and R2), so a member of any other pointer type would be laundered into a
 scalar and escape the verifier's pointer provenance and reference tracking. A
-struct or union with such a member is therefore rejected at load time, and so
+``struct`` or ``union`` with such a member is therefore rejected at load time, and so
 is one with a floating-point member, which the ABI may not return in R0:R2 at
 all.
 
@@ -600,10 +600,10 @@ program no reach it did not already have. The result is confined to the
 program's arena in either case.
 
 A kfunc may also return a value larger than 8 bytes and up to 16 bytes -- a
-struct or union of scalars and arena pointers, or an ``__int128``. Such a
+``struct`` or ``union`` of scalars and arena pointers, or an ``__int128``. Such a
 value is returned in the register pair R0:R2, matching the convention LLVM
 uses for the BPF target: the first 8 bytes in R0 and the second 8 bytes in R2.
-A struct or union of 8 bytes or less is returned in R0 alone.
+A ``struct`` or ``union`` of 8 bytes or less is returned in R0 alone.
 
 ::
 
@@ -624,11 +624,11 @@ rejected at load time on a JIT that does not advertise this capability (see
 by the interpreter. A return value larger than 16 bytes is not supported.
 
 The same R0:R2 convention applies to a BPF subprogram, global or static, that
-returns an ``__int128`` or a struct or union larger than 8 bytes. It is only
+returns an ``__int128`` or a ``struct`` or ``union`` larger than 8 bytes. It is only
 used when the program is JITed, since the interpreter propagates only R0 out of
 a subprogram: without a JIT the return value stays in R0 alone, and a caller
 reading R2 is rejected for reading an uninitialized register. A global
-subprogram is verified in isolation, so its by-value struct or union return is
+subprogram is verified in isolation, so its by-value ``struct`` or ``union`` return is
 restricted to scalars and arena pointers just like a kfunc's; a static
 subprogram is verified inline and has no such restriction. The main program is
 not covered: its return value is the program's exit code, read out of R0
