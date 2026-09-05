@@ -42,7 +42,7 @@ static __always_inline void ticket_spin_lock(arch_spinlock_t *lock)
 	 * atomic_cond_read_acquire() is RCpc, but rather than defining a
 	 * custom cond_read_rcsc() here we just emit a full fence.  We only
 	 * need the prior reads before subsequent writes ordering from
-	 * smb_mb(), but as atomic_cond_read_acquire() just emits reads and we
+	 * smp_mb(), but as atomic_cond_read_acquire() just emits reads and we
 	 * have no outstanding writes due to the atomic_fetch_add() the extra
 	 * orderings are free.
 	 */

@@ -828,7 +828,7 @@ void __cpu_map_flush(struct list_head *flush_list)
 		bq_flush_to_queue(bq);
 		local_unlock_nested_bh(&bq->obj->bulkq->bq_lock);
 
-		/* If already running, costs spin_lock_irqsave + smb_mb */
+		/* If already running, costs spin_lock_irqsave + smp_mb */
 		wake_up_process(bq->obj->kthread);
 	}
 }
