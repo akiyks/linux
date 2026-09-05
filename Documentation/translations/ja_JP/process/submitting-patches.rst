@@ -583,36 +583,36 @@ Acked-by:、Cc:、Co-developed-by: を使用する場合
 
 ``From:`` の作者自身が提出するパッチの例::
 
-    <changelog>
+	<changelog>
 
-    Co-developed-by: First Co-Author <first@coauthor.example.org>
-    Signed-off-by: First Co-Author <first@coauthor.example.org>
-    Co-developed-by: Second Co-Author <second@coauthor.example.org>
-    Signed-off-by: Second Co-Author <second@coauthor.example.org>
-    Signed-off-by: From Author <from@author.example.org>
+	Co-developed-by: First Co-Author <first@coauthor.example.org>
+	Signed-off-by: First Co-Author <first@coauthor.example.org>
+	Co-developed-by: Second Co-Author <second@coauthor.example.org>
+	Signed-off-by: Second Co-Author <second@coauthor.example.org>
+	Signed-off-by: From Author <from@author.example.org>
 
 ``Co-developed-by:`` に記載された作者が提出するパッチの例::
 
-    From: From Author <from@author.example.org>
+	From: From Author <from@author.example.org>
 
-    <changelog>
+	<changelog>
 
-    Co-developed-by: Random Co-Author <random@coauthor.example.org>
-    Signed-off-by: Random Co-Author <random@coauthor.example.org>
-    Signed-off-by: From Author <from@author.example.org>
-    Co-developed-by: Submitting Co-Author <sub@coauthor.example.org>
-    Signed-off-by: Submitting Co-Author <sub@coauthor.example.org>
+	Co-developed-by: Random Co-Author <random@coauthor.example.org>
+	Signed-off-by: Random Co-Author <random@coauthor.example.org>
+	Signed-off-by: From Author <from@author.example.org>
+	Co-developed-by: Submitting Co-Author <sub@coauthor.example.org>
+	Signed-off-by: Submitting Co-Author <sub@coauthor.example.org>
 
 
 Reported-by:、Tested-by:、Reviewed-by:、Suggested-by:、Fixes: の使用
 ---------------------------------------------------------------------
 
-``Reported-by:`` タグは、バグを発見して報告した人の功績を示すものであり、
-今後も再び協力してもらうきっかけになることが期待されます。このタグは
+``Reported-by:`` タグは、バグを発見して報告した人の功績を示し、
+今後も再び協力してもらうきっかけとなることを期待するものです。このタグは
 バグを対象としています。機能追加の要望に対する功績を示すためには
 使用しないでください。報告が Web 上で参照できない場合を除き、
 ``Reported-by:`` タグの後には、その報告を指す ``Closes:`` タグを
-付ける必要があります。パッチが報告された問題の一部だけを修正する場合は、
+付けてください。報告された問題の一部だけを修正するパッチの場合は、
 ``Closes:`` の代わりに ``Link:`` タグを使用できます。なお、
 ``Reported-by:`` は、名前を記載される本人の明示的な許可なしに
 使用できる可能性がある三つのタグのうちの一つです。詳細については、
@@ -620,46 +620,81 @@ Reported-by:、Tested-by:、Reviewed-by:、Suggested-by:、Fixes: の使用
 
 ``Tested-by:`` タグは、記載された人が（何らかの環境で）パッチを
 正常にテストしたことを示します。このタグは、何らかのテストが
-実施されたことをメンテナーに知らせ、将来のパッチでテスターを
-探す手段を提供するとともに、テスターの功績を記録します。
+実施されたことをメンテナーに知らせ、将来のパッチのテスターを
+見つける手段を提供するとともに、テスターの功績を記録します。
 
 一方、``Reviewed-by:`` は、パッチがレビューされ、以下の
-レビュー担当者の声明に従って受け入れ可能と判断されたことを示します::
+レビューアの声明に従って受け入れ可能と判断されたことを示します
 
-        レビュー担当者による確認声明
+.. note:: 【訳注】
+
+    DCO と同様に原文を示します。
+
+::
+
+	Reviewer's statement of oversight
+
+	By offering my Reviewed-by: tag, I state that:
+
+	 (a) I have carried out a technical review of this patch to
+	     evaluate its appropriateness and readiness for inclusion into
+	     the mainline kernel.
+
+	 (b) Any problems, concerns, or questions relating to the patch
+	     have been communicated back to the submitter.  I am satisfied
+	     with the submitter's response to my comments.
+
+	 (c) While there may be things that could be improved with this
+	     submission, I believe that it is, at this time, (1) a
+	     worthwhile modification to the kernel, and (2) free of known
+	     issues which would argue against its inclusion.
+
+	 (d) While I have reviewed the patch and believe it to be sound, I
+	     do not (unless explicitly stated elsewhere) make any
+	     warranties or guarantees that it will achieve its stated
+	     purpose or function properly in any given situation.
+
+
+.. note:: 【訳補】
+
+   以下は非公式な訳例です。
+
+::
+
+	レビューアによる確認声明
 
         ``Reviewed-by:`` タグを付けることにより、私は以下を表明します:
 
          (a) このパッチがメインラインカーネルへの取り込みに適切であり、
              その準備が整っているかを評価するため、技術的なレビューを
-             行いました。
+             行った。
 
          (b) パッチに関する問題、懸念、または質問はすべて提出者に
-             伝えられています。私は、自分のコメントに対する提出者の
-             回答に満足しています。
+             伝えられている。私は、自分のコメントに対する提出者の
+             回答に満足している。
 
-         (c) この提出物には改善できる点が残っている可能性がありますが、
+         (c) この提出物には改善できる点が残っている可能性があるが、
              現時点では、(1) カーネルに対する価値のある変更であり、
              (2) 取り込みに反対する理由となる既知の問題がないと
-             考えています。
+             考える。
 
-         (d) 私はこのパッチをレビューし、妥当であると考えていますが、
+         (d) 私はこのパッチをレビューし、妥当であると考えるが、
              別途明示されていない限り、そのパッチが記載された目的を
-             達成すること、またはいかなる状況でも正しく動作することを
-             保証するものではありません。
+             達成すること、またいかなる状況でも正しく動作することを
+             保証するものではない。
 
 ``Reviewed-by:`` タグは、そのパッチが重大な技術的問題を残していない、
 カーネルに対する適切な変更であるという意見を表明するものです。
 必要なレビューを行った既知の身元を持つ人であれば、関心のある
-レビュー担当者は誰でもパッチに ``Reviewed-by:`` タグを付けられます。
-このタグは、レビュー担当者の功績を示すとともに、どの程度のレビューが
+レビューアは誰でもパッチに ``Reviewed-by:`` タグを付けられます。
+このタグは、レビューアの功績を示すとともに、どの程度のレビューが
 行われたかをメンテナーに知らせる役割を果たします。対象分野を理解し、
-十分なレビューを行うことで知られているレビュー担当者が付けた
+十分なレビューを行うことで知られているレビューアが付けた
 ``Reviewed-by:`` タグは、通常、パッチがカーネルに取り込まれる
 可能性を高めます。
 
-``Tested-by:`` と ``Reviewed-by:`` の両方のタグは、メーリングリスト上で
-テスターまたはレビュー担当者から受け取った後、次のバージョンを
+``Tested-by:`` と ``Reviewed-by:`` のタグの双方は、メーリングリスト上で
+テスターまたはレビューアから受け取った後、次のバージョンを
 送信するときに、作者が該当するパッチへ追加する必要があります。
 ただし、次のバージョンでパッチが大幅に変更された場合は、これらのタグが
 適用できなくなる可能性があるため、削除する必要があります。
@@ -668,7 +703,7 @@ Reported-by:、Tested-by:、Reviewed-by:、Suggested-by:、Fixes: の使用
 （``---`` 区切りの後）。
 
 ``Suggested-by:`` タグは、パッチのアイデアが記載された人によって
-提案されたことを示し、そのアイデアに対する功績を記録します。
+示唆されたことを示し、そのアイデアに対する功績を記録します。
 アイデアを提案した人の功績をきちんと記録すれば、今後も再び協力して
 もらうきっかけになることが期待されます。なお、これは、名前を
 記載される本人の明示的な許可なしに使用できる可能性がある三つの
@@ -680,7 +715,7 @@ Reported-by:、Tested-by:、Reviewed-by:、Suggested-by:、Fixes: の使用
 ようにし、バグ修正のレビューに役立ちます。また、このタグは stable
 kernel チームが、どの stable kernel バージョンに修正を適用すべきかを
 判断する際にも役立ちます。パッチが修正するバグを示す方法としては、
-これが推奨されています。詳細については :ref:`describe_changes` を
+これが推奨されています。詳細については `変更内容を記述する`_ を
 参照してください。
 
 注意: ``Fixes:`` タグを付けても、stable kernel rules の手順や、
@@ -691,5 +726,3 @@ Documentation/process/stable-kernel-rules.rst を参照してください。
 最後に、タグを付けることは歓迎され、通常は非常にありがたいものですが、
 署名者（すなわち、提出者およびメンテナー）は、提示されたタグを
 適用するかどうかを自身の判断で決めることができます。
-
-.. _tagging_people:
