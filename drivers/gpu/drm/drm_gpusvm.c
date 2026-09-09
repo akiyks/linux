@@ -67,9 +67,7 @@
  *	sit in contiguous memory so a single drm_gpusvm_range_set_unmapped()
  *	can mark them all. A driver can keep one instance inline for the single
  *	device case and switch to a heap array only when more devices join,
- *	e.g.:
- *
- *	.. code-block:: c
+ *	e.g.::
  *
  *		struct driver_range {
  *			struct drm_gpusvm_range base;
@@ -99,9 +97,7 @@
  *	The 1:1 examples below pass @num_pages == 1 and &drange->pages. In the
  *	N:1 case the driver instead passes the whole array and its count, so a
  *	single call faults the CPU range once and DMA maps it for every owning
- *	drm_device, e.g.:
- *
- *	.. code-block:: c
+ *	drm_device, e.g.::
  *
  *		// GPU fault handler: one fault, one DMA mapping per device
  *		err = drm_gpusvm_get_pages(gpusvm, driver_pages(drange),
