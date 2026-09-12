@@ -56,11 +56,41 @@
 \makeatother
 %% Prevent default \sphinxtableofcontentshook from overwriting above tweaks.
 \renewcommand{\sphinxtableofcontentshook}{} % Empty the hook
+%% In reST, it is impossible to mark up sentence ending puncts properly.
+%% Disable double spacing there.
+\frenchspacing
 
 % Prevent column squeezing of tabulary.  \tymin is set by Sphinx as:
 %   \setlength{\tymin}{3\fontcharwd\font`0 }
 % , which is too short.
 \setlength{\tymin}{20em}
+
+% For setting fontsize of literal blocks
+\AtBeginEnvironment{sphinxalltt}{\kdocliteralfontsize}
+\newcommand{\setliteralfontsize}[1]{%
+  \def\kdocliteralfontsize{#1}%
+  \fvset{fontsize={#1}}%
+}
+
+% Set default font size for literal and code blocks (in order to reduce
+% ugly-looking line breaks
+\setliteralfontsize{\footnotesize}
+
+% For setting baselinespacing for literal blocks, default is \singlespacing
+\AtBeginEnvironment{sphinxalltt}{\kdocliteralspacing}
+\def\kdocliteralspacing{\singlespacing}
+
+% For setting singlespacing for lireral blocks (used in CJK pages)
+\newcommand{\setliteralspacingsingle}{%
+  \def\kdocliteralspacing{\singlespacing}%
+  \fvset{baselinestretch=1}%
+}
+
+% For setting onehalfspacing for lireral blocks
+\newcommand{\setliteralspacingonehalf}{%
+  \def\kdocliteralspacing{\onehalfspacing}%
+  \fvset{baselinestretch=1.5}%
+}
 
 % Adjust \headheight for fancyhdr
 \addtolength{\headheight}{1.6pt}
@@ -196,8 +226,8 @@
     }
     \newcommand{\kerneldocEndJP}{\endgroup}
 
-    % Single spacing in literal blocks
-    \fvset{baselinestretch=1}
+    % Single spacing in literal blocks by default
+    \setliteralspacingsingle
     % To customize \sphinxtableofcontents
     \usepackage{etoolbox}
     % Inactivate CJK after tableofcontents
