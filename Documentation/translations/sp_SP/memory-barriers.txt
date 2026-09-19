@@ -1042,7 +1042,7 @@ barrera de lectura o la barrera de dependencia de dirección, y viceversa:
 	===================                 ===================
 	WRITE_ONCE(a, 1);    }----   --->{  v = READ_ONCE(c);
 	WRITE_ONCE(b, 2);    }    \ /    {  w = READ_ONCE(d);
-	<barrera de escritura>            \        <barrera de lectura>
+	<barrera de escritura>     \        <barrera de lectura>
 	WRITE_ONCE(c, 3);    }    / \    {  x = READ_ONCE(a);
 	WRITE_ONCE(d, 4);    }----   --->{  y = READ_ONCE(b);
 
@@ -1385,8 +1385,8 @@ solo se usará:
 	                                        +-------+       | CPU 2 |
 	                                        :       :DIVIDE |       |
 	                                        +-------+       |       |
-  La CPU ocupada con la división ---> --->| A->0  |~~~~   |       |
-  especula sobre el LOAD de A             +-------+   ~   |       |
+	La CPU ocupada con la división ---> --->| A->0  |~~~~   |       |
+	especula sobre el LOAD de A             +-------+   ~   |       |
 	                                        :       :   ~   |       |
 	                                        :       :DIVIDE |       |
 	                                        :       :   ~   |       |
@@ -1407,8 +1407,8 @@ entonces la especulación será cancelada y el valor recargado:
 	                                        +-------+       | CPU 2 |
 	                                        :       :DIVIDE |       |
 	                                        +-------+       |       |
-  La CPU ocupada con la división ---> --->| A->0  |~~~~   |       |
-  especula sobre el LOAD de A             +-------+   ~   |       |
+	La CPU ocupada con la división ---> --->| A->0  |~~~~   |       |
+	especula sobre el LOAD de A             +-------+   ~   |       |
 	                                        :       :   ~   |       |
 	                                        :       :DIVIDE |       |
 	                                        :       :   ~   |       |
@@ -1621,13 +1621,13 @@ de optimizaciones que, si bien son perfectamente seguras en código de un
 solo subproceso, pueden resultar fatales en código concurrente. Aquí hay
 algunos ejemplos de tal tipo de optimizaciones:
 
-(*) El compilador está en su derecho de reordenar cargas y stores de la
-    misma variable, y en algunos casos, la CPU está dentro de su
-    derecho de reordenar cargas a la misma variable. Esto significa que
-    el siguiente código:
+ (*) El compilador está en su derecho de reordenar cargas y stores de la
+     misma variable, y en algunos casos, la CPU está dentro de su
+     derecho de reordenar cargas a la misma variable. Esto significa que
+     el siguiente código:
 
- a[0] = x;
- a[1] = x;
+	a[0] = x;
+	a[1] = x;
 
      Podría resultar en un valor más antiguo de x almacenado en a[1] que en
      a[0]. Evite que tanto el compilador como la CPU hagan esto de la
@@ -1639,31 +1639,31 @@ algunos ejemplos de tal tipo de optimizaciones:
      En resumen, READ_ONCE() y WRITE_ONCE() proporcionan coherencia de
      caché para accesos desde múltiples CPUs a una sola variable.
 
-     (*) El compilador tiene derecho a juntar cargas sucesivas de la misma
-         variable. Tal fusión puede hacer que el compilador "optimice" el
-         siguiente código:
+ (*) El compilador tiene derecho a juntar cargas sucesivas de la misma
+     variable. Tal fusión puede hacer que el compilador "optimice" el
+     siguiente código:
 
-    	while (tmp = a)
-    		hacer_algo_con(tmp);
+	while (tmp = a)
+		hacer_algo_con(tmp);
 
-        en el siguiente código, que, aunque en cierto sentido es legítimo
-        para un código de un solo subproceso, es casi seguro que no es lo
-        que el desarrollador pretendía:
+     en el siguiente código, que, aunque en cierto sentido es legítimo
+     para un código de un solo subproceso, es casi seguro que no es lo
+     que el desarrollador pretendía:
 
-   	if (tmp = a)
-   		for (;;)
-   			hacer_algo_con(tmp);
+	if (tmp = a)
+		for (;;)
+			hacer_algo_con(tmp);
 
-        Use READ_ONCE() para evitar que el compilador le haga esto:
+     Use READ_ONCE() para evitar que el compilador le haga esto:
 
-   	while (tmp = READ_ONCE(a))
-   		hacer_algo_con(tmp);
+	while (tmp = READ_ONCE(a))
+		hacer_algo_con(tmp);
 
  (*) El compilador tiene derecho a recargar una variable, por ejemplo,
-    en los casos en que la alta presión de los registros impida que el
-    compilador mantenga todos los datos de interés en registros. El
-    compilador podría por lo tanto, optimizar la variable 'tmp' de nuestro
-    ejemplo anterior:
+     en los casos en que la alta presión de los registros impida que el
+     compilador mantenga todos los datos de interés en registros. El
+     compilador podría por lo tanto, optimizar la variable 'tmp' de nuestro
+     ejemplo anterior:
 
 	while (tmp = a)
 		hacer_algo_con(tmp);
@@ -1675,12 +1675,12 @@ algunos ejemplos de tal tipo de optimizaciones:
 	while (a)
 		hacer_algo_con(a);
 
-    Por ejemplo, la versión optimizada de este código podría resultar en
-    pasar un cero a hacer_algo_con() en el caso de que la variable a sea
-    modificada por alguna otra CPU, entre la instrucción "while" y la
-    llamada a hacer_algo_con().
+     Por ejemplo, la versión optimizada de este código podría resultar en
+     pasar un cero a hacer_algo_con() en el caso de que la variable a sea
+     modificada por alguna otra CPU, entre la instrucción "while" y la
+     llamada a hacer_algo_con().
 
-    De nuevo, use READ_ONCE() para evitar que el compilador haga esto:
+     De nuevo, use READ_ONCE() para evitar que el compilador haga esto:
 
 	while (tmp = READ_ONCE(a))
 		hacer_algo_con(tmp);
@@ -1750,7 +1750,7 @@ algunos ejemplos de tal tipo de optimizaciones:
 	... Código que no almacena la variable a  ...
 	WRITE_ONCE(a, 0);
 
-  (*) El compilador tiene derecho a reordenar los accesos a memoria a menos
+ (*) El compilador tiene derecho a reordenar los accesos a memoria a menos
      que le diga que no. Por ejemplo, considere la siguiente interacción
      entre el código de nivel de proceso y un controlador de interrupción:
 
@@ -1825,12 +1825,12 @@ algunos ejemplos de tal tipo de optimizaciones:
 	else
 		b = 42;
 
-    El compilador podría ahorrar un branch al optimizar esto de la
-    siguiente manera:
+     El compilador podría ahorrar un branch al optimizar esto de la
+     siguiente manera:
 
-    	b = 42;
-    	if (a)
-    		b = a;
+	b = 42;
+	if (a)
+		b = a;
 
      En el código de un solo subproceso, esto no solo es seguro, sino que
      también ahorra un branch. Desafortunadamente, en código concurrente,
@@ -1844,10 +1844,10 @@ algunos ejemplos de tal tipo de optimizaciones:
 	else
 		WRITE_ONCE(b, 42);
 
-    El compilador también puede inventar cargas. Estos casos suelen ser
-    menos perjudiciales, pero pueden dar como resultado "bouncing" de la
-    línea de caché y, por lo tanto, bajo rendimiento y escalabilidad.
-    Utilice READ_ONCE() para evitar cargas inventadas.
+     El compilador también puede inventar cargas. Estos casos suelen ser
+     menos perjudiciales, pero pueden dar como resultado "bouncing" de la
+     línea de caché y, por lo tanto, bajo rendimiento y escalabilidad.
+     Utilice READ_ONCE() para evitar cargas inventadas.
 
  (*) Para ubicaciones de memoria alineadas cuyo tamaño les permita
      acceder con una sola instrucción de referencia de memoria, evite el
@@ -2172,26 +2172,26 @@ interbloqueo ("deadlock", punto muerto).
 	¿Por qué funciona esto?
 
 	Un punto clave es que solo estamos hablando de la CPU re-haciendo el
-  orden, no el compilador. Si el compilador (o, ya puestos, el
-  desarrollador) cambió las operaciones, un deadlock -podría- ocurrir.
+	orden, no el compilador. Si el compilador (o, ya puestos, el
+	desarrollador) cambió las operaciones, un deadlock -podría- ocurrir.
 
 	Pero supongamos que la CPU reordenó las operaciones. En este caso, el
 	desbloqueo precede al bloqueo en el código ensamblador. La CPU
-  simplemente eligió intentar ejecutar primero la última operación de
-  bloqueo. Si hay un interbloqueo, esta operación de bloqueo simplemente
-  esperará (o tratará de dormir, pero hablaremos de eso más adelante). La
-  CPU eventualmente ejecutará la operación de desbloqueo (que precedió a la
+	simplemente eligió intentar ejecutar primero la última operación de
+	bloqueo. Si hay un interbloqueo, esta operación de bloqueo simplemente
+	esperará (o tratará de dormir, pero hablaremos de eso más adelante). La
+	CPU eventualmente ejecutará la operación de desbloqueo (que precedió a la
 	operación de bloqueo en el código ensamblador), lo que desenmascará el
-  potencial punto muerto, permitiendo que la operación de bloqueo tenga
-  éxito.
+	potencial punto muerto, permitiendo que la operación de bloqueo tenga
+	éxito.
 
 	Pero, ¿y si el cerrojo es un cerrojo que duerme ("sleeplock")? En tal
-  caso, el código intentará entrar al scheduler, donde eventualmente
-  encontrará una barrera de memoria, que forzará la operación de desbloqueo
-  anterior para completar, nuevamente desentrañando el punto muerto. Podría
+	caso, el código intentará entrar al scheduler, donde eventualmente
+	encontrará una barrera de memoria, que forzará la operación de desbloqueo
+	anterior para completar, nuevamente desentrañando el punto muerto. Podría
 	haber una carrera de desbloqueo del sueño ("sleep-unlock race"), pero la
-  primitiva de bloqueo necesita resolver tales carreras correctamente en
-  cualquier caso.
+	primitiva de bloqueo necesita resolver tales carreras correctamente en
+	cualquier caso.
 
 Es posible que los cerrojos y los semáforos no proporcionen ninguna
 garantía de orden en sistemas compilados en UP, por lo que no se puede
@@ -2217,7 +2217,7 @@ La siguiente secuencia de eventos es aceptable:
 
 	ACQUIRE, {*F,*A}, *E, {*C,*D}, *B, RELEASE
 
-  [+] Tenga en cuenta que {*F,*A} indica un acceso combinado.
+	[+] Tenga en cuenta que {*F,*A} indica un acceso combinado.
 
 Pero ninguno de los siguientes lo son:
 
@@ -2306,7 +2306,7 @@ no debe confiar en ello. La barrera se produce antes del acceso al estado
 de la tarea. En particular, se encuentra entre el STORE para indicar el
 evento y el STORE para configurar TASK_RUNNING (hilo ejecutando):
 
-	CPU 1 (Durmiente)			CPU 2 (Despertadora)
+	CPU 1 (Durmiente)		CPU 2 (Despertadora)
 	===============================	===============================
 	set_current_state();		STORE evento_indicado
 	  smp_store_mb();		wake_up();
@@ -2654,7 +2654,7 @@ grados de garantías de orden:
 	Las funciones de acceso MMIO readX() y writeX() usan un puntero al
 	periférico al que se accede como un parámetro __iomem *. para punteros
 	asignados los atributos de E/S predeterminados (por ejemplo, los
-        devueltos por ioremap()), las garantías de orden son las siguientes:
+	devueltos por ioremap()), las garantías de orden son las siguientes:
 
 	1. Se ordenan todos los accesos readX() y writeX() a un mismo periférico
 	   entre estos. Esto asegura que los registros de acceso MMIO por el
@@ -2663,95 +2663,95 @@ grados de garantías de orden:
 
 	2. Se ordena un writeX() emitido por un subproceso de CPU que contiene un
 	   spinlock antes de un writeX() al mismo periférico desde otro
-           subproceso de CPU, si emitido después de una adquisición posterior del
+	   subproceso de CPU, si emitido después de una adquisición posterior del
 	   mismo spinlock. Esto garantiza que ese registro MMIO escribe en un
-           dispositivo en particular, mientras que se obtiene un spinlock en un
-           orden consistente con las adquisiciones del cerrojo.
+	   dispositivo en particular, mientras que se obtiene un spinlock en un
+	   orden consistente con las adquisiciones del cerrojo.
 
 	3. Un writeX() por un subproceso de la CPU al periférico primero esperará
 	   a la finalización de todas las escrituras anteriores en la memoria
-           emitidas por, o bien propagadas por, el mismo subproceso. Esto asegura
+	   emitidas por, o bien propagadas por, el mismo subproceso. Esto asegura
 	   que las escrituras de la CPU a un búfer DMA de salida asignadas por
-           dma_alloc_coherent() serán visibles para un motor ("engine") DMA
-           cuando la CPU escriba en sus registros de control MMIO, para activar
-           la transferencia.
+	   dma_alloc_coherent() serán visibles para un motor ("engine") DMA
+	   cuando la CPU escriba en sus registros de control MMIO, para activar
+	   la transferencia.
 
 	4. Un readX() de un subproceso del CPU, desde el periférico, se
 	   completará antes de que cualquier lectura subsiguiente de memoria por
 	   el mismo subproceso pueda comenzar. Esto asegura que las lecturas de
-           la CPU desde un búfer DMA entrantes asignadas por
-           dma_alloc_coherent(), no verán datos obsoletos después de leer el
-           registro de estado MMIO del motor DMA, para establecer que la
-           transferencia DMA se haya completado.
+	   la CPU desde un búfer DMA entrantes asignadas por
+	   dma_alloc_coherent(), no verán datos obsoletos después de leer el
+	   registro de estado MMIO del motor DMA, para establecer que la
+	   transferencia DMA se haya completado.
 
 	5. Un readX() por un subproceso del CPU, desde el periférico, se
 	   completará antes de que cualquier bucle delay() subsiguiente pueda
-           comenzar a ejecutarse en el mismo subproceso. Esto asegura que dos
-           escrituras del CPU a registros MMIO en un periférico llegarán al menos
+	   comenzar a ejecutarse en el mismo subproceso. Esto asegura que dos
+	   escrituras del CPU a registros MMIO en un periférico llegarán al menos
 	   con 1us de diferencia, si la primera escritura se lee inmediatamente
-           de vuelta con readX() y se llama a udelay(1) antes del segundo
-           writeX():
+	   de vuelta con readX() y se llama a udelay(1) antes del segundo
+	   writeX():
 
 		writel(42, DEVICE_REGISTER_0); // Llega al dispositivo ...
 		readl(DEVICE_REGISTER_0);
 		udelay(1);
 		writel(42, DEVICE_REGISTER_1); // al menos 1us antes de esto....
 
-Las propiedades de orden de los punteros __iomem obtenidos con valores de
-atributos que no sean los valores por defecto (por ejemplo, los devueltos
-por ioremap_wc()) son específicos de la arquitectura subyacente y, por lo
-tanto, las garantías enumeradas anteriormente no pueden por lo general ser
-aseguradas para accesos a este tipo de "mappings" (asignaciones).
+	Las propiedades de orden de los punteros __iomem obtenidos con valores de
+	atributos que no sean los valores por defecto (por ejemplo, los devueltos
+	por ioremap_wc()) son específicos de la arquitectura subyacente y, por lo
+	tanto, las garantías enumeradas anteriormente no pueden por lo general ser
+	aseguradas para accesos a este tipo de "mappings" (asignaciones).
 
  (*) readX_relaxed(), writeX_relaxed():
 
 	Son similares a readX() y writeX(), pero proporcionan una garantía de
-        orden de memoria más débil. Específicamente, no garantizan orden con
+	orden de memoria más débil. Específicamente, no garantizan orden con
 	respecto al bloqueo, los accesos normales a la memoria o los bucles
-        delay() (es decir, los puntos 2-5 arriba) pero todavía se garantiza que
-        se ordenarán con respecto a otros accesos desde el mismo hilo de la CPU,
-        al mismo periférico, cuando se opera en punteros __iomem asignados con el
-        valor predeterminado para los atributos de E/S.
+	delay() (es decir, los puntos 2-5 arriba) pero todavía se garantiza que
+	se ordenarán con respecto a otros accesos desde el mismo hilo de la CPU,
+	al mismo periférico, cuando se opera en punteros __iomem asignados con el
+	valor predeterminado para los atributos de E/S.
 
  (*) readsX(), writesX():
 
 	Los puntos de entrada readsX() y writesX() MMIO están diseñados para
-        acceder FIFOs mapeados en memoria y basados en registros que residen en
-        periféricos, que no son capaces de realizar DMA. Por tanto, sólo
-        proporcionan garantías de orden readX_relaxed() y writeX_relaxed(), como
-        se documentó anteriormente.
+	acceder FIFOs mapeados en memoria y basados en registros que residen en
+	periféricos, que no son capaces de realizar DMA. Por tanto, sólo
+	proporcionan garantías de orden readX_relaxed() y writeX_relaxed(), como
+	se documentó anteriormente.
 
  (*) inX(), outX():
 
 	Los puntos de entrada inX() y outX() están destinados a acceder a mapas
-        de puertos "legacy" (antiguos) de periféricos de E/S, que pueden requerir
+	de puertos "legacy" (antiguos) de periféricos de E/S, que pueden requerir
 	instrucciones especiales en algunas arquitecturas (especialmente, en
-        x86). El número de puerto del periférico que se está accedido se pasa
-        como un argumento.
+	x86). El número de puerto del periférico que se está accedido se pasa
+	como un argumento.
 
 	Dado que muchas arquitecturas de CPU acceden finalmente a estos
-        periféricos a través de un mapeo interno de memoria virtual, las
-        garantías de orden portátiles proporcionadas por inX() y outX() son las
-        mismas que las proporcionadas por readX() y writeX(), respectivamente, al
-        acceder a una asignación con los valores de atributos de E/S
-        predeterminados (los que haya por defecto).
+	periféricos a través de un mapeo interno de memoria virtual, las
+	garantías de orden portátiles proporcionadas por inX() y outX() son las
+	mismas que las proporcionadas por readX() y writeX(), respectivamente, al
+	acceder a una asignación con los valores de atributos de E/S
+	predeterminados (los que haya por defecto).
 
-        Los drivers de dispositivos pueden esperar que outX() emita una
-        transacción de escritura no publicada, que espera una respuesta de
-        finalización del periférico de E/S antes de regresar. Esto no está
-        garantizado por todas las arquitecturas y por lo tanto no forma parte de
-        la semántica de orden portátil.
+	Los drivers de dispositivos pueden esperar que outX() emita una
+	transacción de escritura no publicada, que espera una respuesta de
+	finalización del periférico de E/S antes de regresar. Esto no está
+	garantizado por todas las arquitecturas y por lo tanto no forma parte de
+	la semántica de orden portátil.
 
  (*) insX(), outsX():
 
-        Como arriba, los puntos de entrada insX() y outsX() proporcionan el mismo
-        orden garantizado por readsX() y writesX() respectivamente, al acceder a
-        un mapping con los atributos de E/S predeterminados.
+	Como arriba, los puntos de entrada insX() y outsX() proporcionan el mismo
+	orden garantizado por readsX() y writesX() respectivamente, al acceder a
+	un mapping con los atributos de E/S predeterminados.
 
  (*) ioreadX(), iowriteX():
 
-        Estos funcionarán adecuadamente para el tipo de acceso que realmente están
-        haciendo, ya sea inX()/outX() o readX()/writeX().
+	Estos funcionarán adecuadamente para el tipo de acceso que realmente están
+	haciendo, ya sea inX()/outX() o readX()/writeX().
 
 Con la excepción de los puntos de entrada (insX(), outsX(), readsX() y
 writesX()), todo lo anterior supone que el periférico subyacente es
@@ -3006,14 +3006,14 @@ puede reducirse a:
 ya que, sin una barrera de escritura o WRITE_ONCE(), puede que se asuma
 que el efecto del almacenamiento de V a *A se pierde. Similarmente:
 
-  	*A = Y;
-  	Z = *A;
+	*A = Y;
+	Z = *A;
 
 puede, sin una barrera de memoria o un READ_ONCE() y WRITE_ONCE(), esto
 sea reducido a:
 
-  	*A = Y;
-  	Z = Y;
+	*A = Y;
+	Z = Y;
 
 y la operación LOAD nunca aparezca fuera de la CPU.
 

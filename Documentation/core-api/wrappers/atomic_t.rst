@@ -6,14 +6,6 @@
 Atomic types
 ============
 
-.. raw:: latex
-
-    \footnotesize
-
 .. include:: ../../atomic_t.txt
    :literal:
-
-.. raw:: latex
-
-    \normalsize
 
