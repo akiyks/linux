@@ -5,3 +5,4 @@ Device Power Management Data Types
 ==================================
 
 .. kernel-doc:: include/linux/pm.h
+   :no-identifiers: dev_pm_info
