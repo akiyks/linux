@@ -218,6 +218,7 @@ drivers/base/power/runtime.c and include/linux/pm_runtime.h:
 
 .. kernel-doc:: drivers/base/power/runtime.c
    :export:
+   :no-identifiers: pm_runtime_get_if_active
 
 .. kernel-doc:: include/linux/pm_runtime.h
 
