@@ -1315,7 +1315,7 @@ instead.
 
 **mandatory**
 
-vfs_mkdir() now returns a dentry - the one returned by ->mkdir().  If
+vfs_mkdir() now returns a dentry - the one returned by ``->mkdir()``.  If
 that dentry is different from the dentry passed in, including if it is
 an IS_ERR() dentry pointer, the original dentry is dput().
 
@@ -1335,7 +1335,7 @@ in-tree filesystems have done).
 
 **mandatory**
 
-The ->setlease() file_operation must now be explicitly set in order to provide
+The ``->setlease()`` file_operation must now be explicitly set in order to provide
 support for leases. When set to NULL, the kernel will now return -EINVAL to
 attempts to set a lease. Filesystems that wish to use the kernel-internal lease
 implementation should set it to generic_setlease().
@@ -1370,7 +1370,7 @@ similar.
 
 ---
 
-** mandatory**
+**mandatory**
 
 lock_rename(), lock_rename_child(), unlock_rename() are no
 longer available.  Use start_renaming() or similar.
@@ -1382,7 +1382,7 @@ longer available.  Use start_renaming() or similar.
 If you really need to iterate through dentries for given inode, use
 for_each_alias(dentry, inode) instead of hlist_for_each_entry; better
 yet, see if any of the exported primitives could be used instead of
-the entire loop.  You still need to hold ->i_lock of the inode over
+the entire loop.  You still need to hold ``->i_lock`` of the inode over
 either form of manual loop.
 
 ---
@@ -1398,7 +1398,7 @@ d_alloc_parallel() no longer requires a waitqueue_head.
 d_dispose_if_unused() is gone; use __move_to_shrink_list() if you really
 need that functionality, but watch out for memory safety issues - just
 as with d_dispose_if_unused() these are not trivial; with this variant
-of API it's more explicit, since grabbing ->d_lock is caller-side, but
+of API it's more explicit, since grabbing ``->d_lock`` is caller-side, but
 d_dispose_if_unused() had all the same issues.  It's a low-level primitive;
 use only if you have no alternative.
 
@@ -1415,10 +1415,10 @@ to be involved in non-exclusive create, it should provide atomic_open.
 **mandatory**
 
 All struct mnt_idmap pointers handed to filesystems are const now.
-->create(), ->mkdir(), ->mknod(), ->symlink(), ->rename(), ->setattr(),
-->getattr(), ->permission(), ->tmpfile(), ->get_acl(), ->set_acl() and
-->fileattr_set() as well as the xattr ->set() handler and the vfs_*()
-helpers take a const struct mnt_idmap *. mnt_idmap() and file_mnt_idmap()
+``->create()``, ``->mkdir()``, ``->mknod()``, ``->symlink()``, ``->rename()``, ``->setattr()``,
+``->getattr()``, ``->permission()``, ``->tmpfile()``, ``->get_acl()``, ``->set_acl()`` and
+``->fileattr_set()`` as well as the xattr ``->set()`` handler and the ``vfs_*()``
+helpers take a const ``struct mnt_idmap *``. mnt_idmap() and file_mnt_idmap()
 return one. The idmapping is immutable so nothing should have modified it
 anyway. References are taken and dropped via mnt_idmap_get() and
 mnt_idmap_put() as before, both accept a const pointer.
