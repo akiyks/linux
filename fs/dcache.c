@@ -2028,10 +2028,11 @@ EXPORT_SYMBOL(d_alloc);
  *
  * Some rename operations need to be combined with another operation
  * inside the filesystem.
- * 1/ A cluster filesystem when renaming to an in-use file might need to
- *   first "silly-rename" that target out of the way before the main rename
- * 2/ A filesystem that supports white-out might want to create a whiteout
- *   in place of the file being moved.
+ *
+ * 1) A cluster filesystem when renaming to an in-use file might need to
+ *    first "silly-rename" that target out of the way before the main rename
+ * 2) A filesystem that supports white-out might want to create a whiteout
+ *    in place of the file being moved.
  *
  * For this they need two dentries which temporarily have the same name,
  * before one is renamed.  d_duplicate() provides for this.  Given a
