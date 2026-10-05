@@ -209,8 +209,8 @@ TEMP_MAX
 
 TIME_TO_EMPTY_NOW, TIME_TO_EMPTY_AVG
   seconds left for battery to be considered empty
-  (i.e., while battery powers a load). *_NOW is a
-  momentary reading; *_AVG is averaged over a fixed period.
+  (i.e., while battery powers a load). ``*_NOW`` is a
+  momentary reading; ``*_AVG`` is averaged over a fixed period.
 TIME_TO_FULL_NOW, TIME_TO_FULL_AVG
   seconds left for battery to be considered full
   (i.e., while battery is charging). Same now/avg distinction.
