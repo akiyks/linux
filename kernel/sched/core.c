@@ -11370,3 +11370,9 @@ void sched_push_current_non_preferred_cpu(struct rq *rq)
 			    push_task, this_cpu_ptr(&npc_push_task_work));
 }
 #endif
+// Not for mainline, but hopefully someone has a trick that gets this
+// job done.
+struct task_struct *rcu_cpu_curr(int cpu)
+{
+	return cpu_curr(cpu);
+}
