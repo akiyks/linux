@@ -4,7 +4,6 @@
 
 	\renewcommand\thesection*
 	\renewcommand\thesubsection*
-	\kerneldocCJKon
 	\kerneldocBeginTC{
 
 .. _linux_doc_zh_tw:
