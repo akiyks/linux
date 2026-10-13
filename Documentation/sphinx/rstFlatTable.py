@@ -32,6 +32,7 @@
     * stub-columns:  [int] count of stub columns
     * widths:        [[int] [int] ... ] widths of columns
     * fill-cells:    instead of autospann missing cells, insert missing cells
+    * class:         for "longtable"
 
     roles:
 
@@ -127,6 +128,7 @@ class FlatTable(Table):
         tableBuilder.parseFlatTableNode(node)
         tableNode = tableBuilder.buildTableNode()
         # SDK.CONSOLE()  # print --> tableNode.asdom().toprettyxml()
+        tableNode['classes'] += self.options.get('class', [])
         if title:
             tableNode.insert(0, title)
         return [tableNode] + messages
