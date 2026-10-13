@@ -37,6 +37,8 @@ The list below describes mount options supported by NTFS3 driver in addition to
 generic ones. You can use every mount option with **no** option. If it is in
 this table marked with no it means default is without **no**.
 
+.. tabularcolumns:: >{\ttfamily}\Y{.2}\Y{.8}
+
 .. flat-table::
    :widths: 1 5
    :fill-cells:
