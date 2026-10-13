@@ -40,6 +40,7 @@ this table marked with no it means default is without **no**.
 .. tabularcolumns:: >{\ttfamily}\Y{.2}\Y{.8}
 
 .. flat-table::
+   :class: longtable
    :widths: 1 5
    :fill-cells:
 
