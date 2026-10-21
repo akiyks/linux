@@ -273,7 +273,7 @@ EXPORT_SYMBOL_GPL(vc_font_size);
  * vc_cursor_valid_size - Computes a valid cursor size from the given value
  * @cursor_size: The size constant of cursor pattern
  *
- * The argument given in @cursor_size is one of the CUR_ constants, as stored
+ * The argument given in @cursor_size is one of the %CUR_ constants, as stored
  * in struct @vc_data.vc_cursor_type. For unknown values, the helper draws the
  * default cursor or an underline dash.
  *
@@ -317,7 +317,7 @@ EXPORT_SYMBOL_GPL(vc_cursor_valid_size);
  *
  * The parameter @cell_height is the height of the character cell as
  * displayed by the console. The argument given in @cursor_size is one
- * of the CUR_ constants. See vc_cursor_valid_size() for how to get a
+ * of the %CUR_ constants. See vc_cursor_valid_size() for how to get a
  * valid cursor-size constant.
  *
  * Returns:
@@ -353,7 +353,7 @@ EXPORT_SYMBOL_GPL(vc_cursor_start);
  *
  * The parameter @cell_height is the height of the character cell as
  * displayed by the console. The argument given in @cursor_size is one
- * of the CUR_ constants. See vc_cursor_valid_size() for how to get a
+ * of the %CUR_ constants. See vc_cursor_valid_size() for how to get a
  * valid cursor-size constant.
  *
  * Returns:
