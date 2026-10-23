@@ -51,7 +51,7 @@ Skipnames = [ 'for', 'if', 'register', 'sizeof', 'struct', 'unsigned' ]
 # when following struct/union/enum/typedef keywords.
 # Example: "a simple struct that" in workqueue.rst should not be marked as code.
 #
-Skipidentifiers = [ 'that', 'which', 'where', 'whose' ]
+Skipidentifiers = [ 'that', 'which', 'where', 'whose', 'and', 'or', 'return' ]
 
 #
 # Many places in the docs refer to common system calls.  It is
