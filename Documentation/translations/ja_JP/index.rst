@@ -15,6 +15,7 @@
    process/howto
    process/submitting-patches
    process/submit-checklist
+   process/stable-api-nonsense.rst
 
 .. raw:: latex
 
