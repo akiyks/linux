@@ -13,6 +13,8 @@
    process/development-process
    process/submitting-patches
    process/submit-checklist
+   process/stable-api-nonsense
+   process/stable-kernel-rules
 
 .. raw:: latex
 
