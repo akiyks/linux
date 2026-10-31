@@ -1,0 +1,28 @@
+% Translations have Asian (CJK) characters which are only displayed if
+% xeCJK is used
+\usepackage{ifthen}
+\newboolean{needCJK}
+\setboolean{needCJK}{false}
+\ifnum\pdfstrcmp{\jobname}{translations}=0
+    \setboolean{needCJK}{true}
+\fi
+\ifnum\pdfstrcmp{\jobname}{zh_CN}=0
+    \setboolean{needCJK}{true}
+\fi
+\ifnum\pdfstrcmp{\jobname}{zh_TW}=0
+    \setboolean{needCJK}{true}
+\fi
+\ifnum\pdfstrcmp{\jobname}{ja_JP}=0
+    \setboolean{needCJK}{true}
+\fi
+\ifnum\pdfstrcmp{\jobname}{ko_KR}=0
+    \setboolean{needCJK}{true}
+\fi
+
+\ifthenelse{\boolean{needCJK}}{
+    \IfFontExistsTF{Noto Sans CJK SC}{
+        \IfFileExists{xeCJK.sty}{
+	    \usepackage{xeCJK}
+        }{}
+    }{}
+}{}
