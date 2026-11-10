@@ -97,7 +97,7 @@ AUTHENTIC
 
 HEALTH
   represents health of the battery. Values correspond to
-  POWER_SUPPLY_HEALTH_*, defined in include/linux/power_supply.h.
+  `POWER_SUPPLY_HEALTH_*`, defined in include/linux/power_supply.h.
 
 VOLTAGE_OCV
   open circuit voltage of the battery.
@@ -188,7 +188,7 @@ CAPACITY_ALERT_MIN
 CAPACITY_ALERT_MAX
   maximum capacity alert value in percents.
 CAPACITY_LEVEL
-  capacity level. This corresponds to POWER_SUPPLY_CAPACITY_LEVEL_*.
+  capacity level. This corresponds to `POWER_SUPPLY_CAPACITY_LEVEL_*`.
 
 TEMP
   temperature of the power supply.

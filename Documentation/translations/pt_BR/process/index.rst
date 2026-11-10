@@ -34,6 +34,7 @@ devem estar familiarizados.
    :maxdepth: 1
 
    Requisitos mínimos <changes>
+   Linguagem de programação <programming-language>
    Estilo de codificação do kernel Linux <coding-style>
    Informações sobre clientes de email para Linux <email-clients>
    Como aplicar patches <applying-patches>
