@@ -21,7 +21,9 @@ just regular bugs that have been improperly qualified as security bugs due to
 a lack of awareness of the Linux kernel's threat model, as described in
 Documentation/process/threat-model.rst, and ought to have been sent through
 the normal channels described in Documentation/admin-guide/reporting-issues.rst
-instead.
+instead. Note that when such a bug may still have a security impact for some
+users, its reproducer and any exploit must never be posted publicly; only the
+fix is (see Documentation/process/threat-model.rst).
 
 The security list exists for urgent bugs that grant an attacker a capability
 they are not supposed to have on a correctly configured production system, and
@@ -142,8 +144,8 @@ handle:
     Please always ensure your tool provides one and **test it thoroughly**. If
     the reproducer does not work, or if the tool cannot produce one, the
     validity of the report should be seriously questioned. Note that since the
-    report will be posted to a public list, the reproducer should only be
-    shared upon maintainers' request.
+    report will be posted to a public list, the reproducer must only be
+    shared privately with the maintainers.
 
   * **Propose a Fix**: Many AI tools are actually better at writing code than
     evaluating it. Please ask your tool to propose a fix and **test it** before
@@ -162,7 +164,7 @@ likely that usage has declined and exposed users are virtually non-existent
 (e.g., drivers for very old hardware, obsolete filesystems). In such cases,
 there is no need to consume a maintainer's time with an unimportant report. If
 the issue is clearly trivial and publicly discoverable, you should report it
-directly to the public mailing lists.
+directly to the public mailing lists, without the reproducer.
 
 At the very least, when using an AI assistant to find and report bugs, make the
 assistant read this file and threat-model.rst before proceeding, and have it
@@ -194,7 +196,9 @@ affected subsystem's maintainers, and to Cc: the Linux kernel security team
 when needed (see below).  Do not send it to a public list at this stage,
 unless you have good reasons to consider the issue as being public or trivial
 to discover (e.g. result of a widely available automated vulnerability
-scanning tool that can be repeated by anyone, or use of AI-based tools).
+scanning tool that can be repeated by anyone, or use of AI-based tools).  Even
+in this case, never post a reproducer or an exploit to a public list; only
+maintainers need it, and publishing it could put some users in trouble.
 
 Finding the maintainers
 ~~~~~~~~~~~~~~~~~~~~~~~
