@@ -382,6 +382,14 @@ run additional tests.  Reports where the reporter does not respond promptly
 or cannot effectively discuss their findings may be abandoned if the
 communication does not quickly improve.
 
+In practice, a report for which questions or requests from the security team
+or the maintainers remain unanswered for 7 days will most likely be dropped.
+This matches the maximum embargo duration described below, which is how long
+the security team considers it reasonable to keep an issue private.  Given the
+number of reports handled in parallel, the same bug may also end up being fixed
+later after being reported by someone else, in which case credit can no longer
+be guaranteed.
+
 Messages sometimes get lost, especially those containing attachments or HTML.
 Since the report is private, you have no other way to know whether it was
 delivered than to ask. However, some subsystems have a long report queue, some
