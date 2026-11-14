@@ -5,7 +5,8 @@ Security bugs
 
 Linux kernel developers take security very seriously.  As such, we'd
 like to know when a security bug is found so that it can be fixed and
-disclosed as quickly as possible.
+disclosed as quickly as possible. If you are a maintainer and received
+a report, there is a section dedicated to you below.
 
 What qualifies as a security bug
 --------------------------------
@@ -402,6 +403,24 @@ resending, to increase the chances of successful delivery. In any case, please
 do not ask for proper receipt before this delay. This will not make your report
 be processed faster, will add extra load on maintainers and all you risk is
 your future messages being ignored.
+
+For maintainers receiving a report
+----------------------------------
+
+If you maintain some code in the kernel and received a security report, don't
+panic, you're not alone! The wording of AI-generated reports these days tends
+to sound scary, but just stick to technical facts and proceed like you would
+with any other bug report. Feel free to share the report with other maintainers
+who you think can help you, telling them upfront that the report is private.
+Many other reports are being handled by other maintainers at any instant, do
+not start to worry that the security of the whole kernel suddenly depends on
+your ability to provide a quick fix. Do not let reporters dictate conditions
+that are not compatible with what this document describes. If you have any
+question or doubt, be it about the validity of the report, its impact, the
+process to follow, difficult interactions with a reporter, or even if you've
+mistakenly leaked part of the report to a public list (yes, this happens), just
+ask the security team for help, for example by replying to the report with the
+security team in Cc:, or by forwarding it to them if you're seeking advice.
 
 Disclosure and embargoed information
 ------------------------------------
