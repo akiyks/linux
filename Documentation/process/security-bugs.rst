@@ -303,6 +303,15 @@ exception is when an issue concerns closely related parts maintained by the
 exact same subset of maintainers, and these parts are expected to be fixed all
 at once by the same commit, then it may be acceptable to report them at once.
 
+If this is your first report, send only one, and wait for confirmation that it
+is in the expected form before sending the other ones as individual messages.
+The vast majority of first reports need to be adjusted, and otherwise the same
+mistakes are repeated in all of them, putting needless pressure on the
+maintainers and on the security team.  Violating this rule is a clear
+indication that the reporter did not read this document, and such reporters
+should be prepared not to receive any response at all, as maintainers and the
+security team have better things to do than to repeat what is written here.
+
 Please send **plain text** emails without attachments where possible.
 It is much harder to have a context-quoted discussion about a complex
 issue if all the details are hidden away in attachments. Archives (zip, tar,
