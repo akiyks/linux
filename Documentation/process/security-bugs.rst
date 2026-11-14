@@ -7,6 +7,42 @@ Linux kernel developers take security very seriously.  As such, we'd
 like to know when a security bug is found so that it can be fixed and
 disclosed as quickly as possible.
 
+What qualifies as a security bug
+--------------------------------
+
+It is important that most bugs are handled publicly so as to involve the widest
+possible audience and find the best solution.  By nature, bugs that are handled
+in closed discussions between a small set of participants are less likely to
+produce the best possible fix (e.g., risk of missing valid use cases, limited
+testing abilities).
+
+It turns out that the majority of the bugs reported via the security team are
+just regular bugs that have been improperly qualified as security bugs due to
+a lack of awareness of the Linux kernel's threat model, as described in
+Documentation/process/threat-model.rst, and ought to have been sent through
+the normal channels described in Documentation/admin-guide/reporting-issues.rst
+instead.
+
+The security list exists for urgent bugs that grant an attacker a capability
+they are not supposed to have on a correctly configured production system, and
+can be easily exploited, representing an imminent threat to many users.  Before
+reporting, consider whether the issue actually crosses a trust boundary on such
+a system.
+
+**If you resorted to AI assistance to identify a bug, you must treat it as
+public**. While you may have valid reasons to believe it is not, the security
+team's experience shows that bugs discovered this way systematically surface
+simultaneously across multiple researchers, often on the same day. In this
+case, do not publicly share a reproducer, as this could cause unintended harm;
+just mention that one is available and maintainers might ask for it privately
+if they need it.
+
+If you are unsure whether an issue qualifies, err on the side of reporting
+privately: the security team would rather triage a borderline report than miss
+a real vulnerability.  Reporting ordinary bugs to the security list, however,
+does not make them move faster and consumes triage capacity that other reports
+need.
+
 Preparing your report
 ---------------------
 
@@ -69,107 +105,6 @@ In addition, the following information are highly desirable:
   * **mitigations**: very often during a bug analysis, some ways of mitigating
     the issue appear. It is useful to share them, as they can be helpful to
     keep end users protected during the time it takes them to apply the fix.
-
-What qualifies as a security bug
---------------------------------
-
-It is important that most bugs are handled publicly so as to involve the widest
-possible audience and find the best solution.  By nature, bugs that are handled
-in closed discussions between a small set of participants are less likely to
-produce the best possible fix (e.g., risk of missing valid use cases, limited
-testing abilities).
-
-It turns out that the majority of the bugs reported via the security team are
-just regular bugs that have been improperly qualified as security bugs due to
-a lack of awareness of the Linux kernel's threat model, as described in
-Documentation/process/threat-model.rst, and ought to have been sent through
-the normal channels described in Documentation/admin-guide/reporting-issues.rst
-instead.
-
-The security list exists for urgent bugs that grant an attacker a capability
-they are not supposed to have on a correctly configured production system, and
-can be easily exploited, representing an imminent threat to many users.  Before
-reporting, consider whether the issue actually crosses a trust boundary on such
-a system.
-
-**If you resorted to AI assistance to identify a bug, you must treat it as
-public**. While you may have valid reasons to believe it is not, the security
-team's experience shows that bugs discovered this way systematically surface
-simultaneously across multiple researchers, often on the same day. In this
-case, do not publicly share a reproducer, as this could cause unintended harm;
-just mention that one is available and maintainers might ask for it privately
-if they need it.
-
-If you are unsure whether an issue qualifies, err on the side of reporting
-privately: the security team would rather triage a borderline report than miss
-a real vulnerability.  Reporting ordinary bugs to the security list, however,
-does not make them move faster and consumes triage capacity that other reports
-need.
-
-Identifying contacts
---------------------
-
-The most effective way to report a security bug is to send it directly to the
-affected subsystem's maintainers and Cc: the Linux kernel security team.  Do
-not send it to a public list at this stage, unless you have good reasons to
-consider the issue as being public or trivial to discover (e.g. result of a
-widely available automated vulnerability scanning tool that can be repeated by
-anyone, or use of AI-based tools).
-
-If you're sending a report for issues affecting multiple parts in the kernel,
-even if they're fairly similar issues, please send individual messages (think
-that maintainers will not all work on the issues at the same time). The only
-exception is when an issue concerns closely related parts maintained by the
-exact same subset of maintainers, and these parts are expected to be fixed all
-at once by the same commit, then it may be acceptable to report them at once.
-
-One difficulty for most first-time reporters is to figure the right list of
-recipients to send a report to.  In the Linux kernel, all official maintainers
-are trusted, so the consequences of accidentally including the wrong maintainer
-are essentially a bit more noise for that person, i.e. nothing dramatic.  As
-such, a suitable method to figure the list of maintainers (which kernel
-security officers use) is to rely on the get_maintainer.pl script, tuned to
-only report maintainers.  This script, when passed a file name, will look for
-its path in the MAINTAINERS file to figure a hierarchical list of relevant
-maintainers.  Calling it a first time with the finest level of filtering will
-most of the time return a short list of this specific file's maintainers::
-
-  $ ./scripts/get_maintainer.pl --no-l --no-r --pattern-depth 1 \
-    drivers/example.c
-  Developer One <dev1@example.com> (maintainer:example driver)
-  Developer Two <dev2@example.org> (maintainer:example driver)
-
-These two maintainers should then receive the message.  If the command does not
-return anything, it means the affected file is part of a wider subsystem, so we
-should be less specific::
-
-  $ ./scripts/get_maintainer.pl --no-l --no-r drivers/example.c
-  Developer One <dev1@example.com> (maintainer:example subsystem)
-  Developer Two <dev2@example.org> (maintainer:example subsystem)
-  Developer Three <dev3@example.com> (maintainer:example subsystem [GENERAL])
-  Developer Four <dev4@example.org> (maintainer:example subsystem [GENERAL])
-
-Here, picking the first, most specific ones, is sufficient.  When the list is
-long, it is possible to produce a comma-delimited e-mail address list on a
-single line suitable for use in the To: field of a mailer like this::
-
-  $ ./scripts/get_maintainer.pl --no-tree --no-l --no-r --no-n --m \
-    --no-git-fallback --no-substatus --no-rolestats --no-multiline \
-    --pattern-depth 1 drivers/example.c
-  dev1@example.com, dev2@example.org
-
-or this for the wider list::
-
-  $ ./scripts/get_maintainer.pl --no-tree --no-l --no-r --no-n --m \
-    --no-git-fallback --no-substatus --no-rolestats --no-multiline \
-    drivers/example.c
-  dev1@example.com, dev2@example.org, dev3@example.com, dev4@example.org
-
-If at this point you're still facing difficulties spotting the right
-maintainers, **and only in this case**, it's possible to send your report to
-the Linux kernel security team only.  Your message will be triaged, and you
-will receive instructions about whom to contact, if needed.  Your message may
-equally be forwarded as-is to the relevant maintainers.
 
 Responsible use of AI to find bugs
 ----------------------------------
@@ -239,7 +174,7 @@ identify the maintainers with get_maintainer.pl.
 On top of that procedure, the AI assistant **MUST**:
 
 1. Prepare a plain-text report explaining the problem. It must contain the
-   four items listed at the top of this file as absolutely necessary: the
+   four items listed above as absolutely necessary: the
    affected version or commit ID noted while following the procedure above,
    the description of the problem, the reproducer or its status, and the
    triggering conditions.
@@ -251,22 +186,69 @@ On top of that procedure, the AI assistant **MUST**:
 
 A more detailed process is covered at https://github.com/masoncl/kres.git.
 
-Sending the report
-------------------
+Identifying contacts
+--------------------
 
-Reports are to be sent over e-mail exclusively.  Please use a working e-mail
-address, preferably the same that you want to appear in ``Reported-by`` tags
-if any.  If unsure, send your report to yourself first.
+The most effective way to report a security bug is to send it directly to the
+affected subsystem's maintainers and Cc: the Linux kernel security team.  Do
+not send it to a public list at this stage, unless you have good reasons to
+consider the issue as being public or trivial to discover (e.g. result of a
+widely available automated vulnerability scanning tool that can be repeated by
+anyone, or use of AI-based tools).
 
-The security team and maintainers almost always require additional
-information beyond what was initially provided in a report and rely on
-active and efficient collaboration with the reporter to perform further
-testing (e.g., verifying versions, configuration options, mitigations, or
-patches). Before contacting the security team, the reporter must ensure
-they are available to explain their findings, engage in discussions, and
-run additional tests.  Reports where the reporter does not respond promptly
-or cannot effectively discuss their findings may be abandoned if the
-communication does not quickly improve.
+Finding the maintainers
+~~~~~~~~~~~~~~~~~~~~~~~
+
+One difficulty for most first-time reporters is to figure the right list of
+recipients to send a report to.  In the Linux kernel, all official maintainers
+are trusted, so the consequences of accidentally including the wrong maintainer
+are essentially a bit more noise for that person, i.e. nothing dramatic.  As
+such, a suitable method to figure the list of maintainers (which kernel
+security officers use) is to rely on the get_maintainer.pl script, tuned to
+only report maintainers.  This script, when passed a file name, will look for
+its path in the MAINTAINERS file to figure a hierarchical list of relevant
+maintainers.  Calling it a first time with the finest level of filtering will
+most of the time return a short list of this specific file's maintainers::
+
+  $ ./scripts/get_maintainer.pl --no-l --no-r --pattern-depth 1 \
+    drivers/example.c
+  Developer One <dev1@example.com> (maintainer:example driver)
+  Developer Two <dev2@example.org> (maintainer:example driver)
+
+These two maintainers should then receive the message.  If the command does not
+return anything, it means the affected file is part of a wider subsystem, so we
+should be less specific::
+
+  $ ./scripts/get_maintainer.pl --no-l --no-r drivers/example.c
+  Developer One <dev1@example.com> (maintainer:example subsystem)
+  Developer Two <dev2@example.org> (maintainer:example subsystem)
+  Developer Three <dev3@example.com> (maintainer:example subsystem [GENERAL])
+  Developer Four <dev4@example.org> (maintainer:example subsystem [GENERAL])
+
+Here, picking the first, most specific ones, is sufficient.  When the list is
+long, it is possible to produce a comma-delimited e-mail address list on a
+single line suitable for use in the To: field of a mailer like this::
+
+  $ ./scripts/get_maintainer.pl --no-tree --no-l --no-r --no-n --m \
+    --no-git-fallback --no-substatus --no-rolestats --no-multiline \
+    --pattern-depth 1 drivers/example.c
+  dev1@example.com, dev2@example.org
+
+or this for the wider list::
+
+  $ ./scripts/get_maintainer.pl --no-tree --no-l --no-r --no-n --m \
+    --no-git-fallback --no-substatus --no-rolestats --no-multiline \
+    drivers/example.c
+  dev1@example.com, dev2@example.org, dev3@example.com, dev4@example.org
+
+If at this point you're still facing difficulties spotting the right
+maintainers, **and only in this case**, it's possible to send your report to
+the Linux kernel security team only.  Your message will be triaged, and you
+will receive instructions about whom to contact, if needed.  Your message may
+equally be forwarded as-is to the relevant maintainers.
+
+Copying the security team
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The report must be sent to maintainers.  If there are two or fewer
 recipients in your message, you must also always Cc: the Linux kernel
@@ -283,6 +265,20 @@ who will help verify the bug report and assist developers working on a fix.
 It is possible that the security team will bring in extra help from area
 maintainers to understand and fix the security vulnerability.
 
+Sending the report
+------------------
+
+Reports are to be sent over e-mail exclusively.  Please use a working e-mail
+address, preferably the same that you want to appear in ``Reported-by`` tags
+if any.  If unsure, send your report to yourself first.
+
+If you're sending a report for issues affecting multiple parts in the kernel,
+even if they're fairly similar issues, please send individual messages (think
+that maintainers will not all work on the issues at the same time). The only
+exception is when an issue concerns closely related parts maintained by the
+exact same subset of maintainers, and these parts are expected to be fixed all
+at once by the same commit, then it may be acceptable to report them at once.
+
 Please send **plain text** emails without attachments where possible.
 It is much harder to have a context-quoted discussion about a complex
 issue if all the details are hidden away in attachments.  Think of it like a
@@ -295,6 +291,19 @@ sometimes online, which by definition is not acceptable for a confidential
 security report. Note that some mailers tend to mangle formatting of plain
 text by default, please consult Documentation/process/email-clients.rst for
 more info.
+
+After sending the report
+------------------------
+
+The security team and maintainers almost always require additional
+information beyond what was initially provided in a report and rely on
+active and efficient collaboration with the reporter to perform further
+testing (e.g., verifying versions, configuration options, mitigations, or
+patches). Before contacting the security team, the reporter must ensure
+they are available to explain their findings, engage in discussions, and
+run additional tests.  Reports where the reporter does not respond promptly
+or cannot effectively discuss their findings may be abandoned if the
+communication does not quickly improve.
 
 Disclosure and embargoed information
 ------------------------------------
