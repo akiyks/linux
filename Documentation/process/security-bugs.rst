@@ -275,9 +275,7 @@ security team in any of the following cases:
     this impact, and you will need to share any information you have;
 
   * you are seeking specific help, such as when resending a message which got
-    no response within a week (and please do not ask for feedback before such
-    a delay, some subsystems have a long report queue, and some maintainers can
-    only read them in their spare time).
+    no response within a week (see "After sending the report").
 
 Otherwise, when a report of clear impact is sent to a larger team of clearly
 identified maintainers, it is not necessary to Cc: the security list.  Never
@@ -383,6 +381,19 @@ they are available to explain their findings, engage in discussions, and
 run additional tests.  Reports where the reporter does not respond promptly
 or cannot effectively discuss their findings may be abandoned if the
 communication does not quickly improve.
+
+Messages sometimes get lost, especially those containing attachments or HTML.
+Since the report is private, you have no other way to know whether it was
+delivered than to ask. However, some subsystems have a long report queue, some
+maintainers are overloaded or only work in their spare time, so please wait for
+a week without any response before resending your report with the security team
+in Cc: (see above). In this case, be clear about the fact that it is a resend,
+and if possible, provide a reference to the original message. Better double
+check that the message is sent in plain text, and drop any attachment when
+resending, to increase the chances of successful delivery. In any case, please
+do not ask for proper receipt before this delay. This will not make your report
+be processed faster, will add extra load on maintainers and all you risk is
+your future messages being ignored.
 
 Disclosure and embargoed information
 ------------------------------------
