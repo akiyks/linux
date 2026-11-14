@@ -305,7 +305,11 @@ at once by the same commit, then it may be acceptable to report them at once.
 
 Please send **plain text** emails without attachments where possible.
 It is much harder to have a context-quoted discussion about a complex
-issue if all the details are hidden away in attachments.  Think of it like a
+issue if all the details are hidden away in attachments. Archives (zip, tar,
+etc.), binary files and documents (PDF, etc.) are never acceptable: when a
+reproducer is too large to be placed in the message, attach its source files
+as plain text, and provide scripts that generate the required files (e.g. file
+system images) instead of the files themselves. Think of it like a
 :doc:`regular patch submission <../process/submitting-patches>`
 (even if you don't have a patch yet): describe the problem and impact, and
 list reproduction steps, all in plain text, then provide a proposed fix as
