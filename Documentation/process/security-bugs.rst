@@ -42,10 +42,16 @@ a system.
 **If you resorted to AI assistance to identify a bug, you must treat it as
 public**. While you may have valid reasons to believe it is not, the security
 team's experience shows that bugs discovered this way systematically surface
-simultaneously across multiple researchers, often on the same day. In this
-case, do not publicly share a reproducer, as this could cause unintended harm;
-just mention that one is available and maintainers might ask for it privately
-if they need it.
+simultaneously across multiple researchers, often on the same day. Others are
+then likely to be already working on exploiting the same bug, so keeping it
+private would protect nobody, while handling it publicly lets everyone fix it
+quickly without wasting time in a needless embargo. This applies even when the
+bug falls within the threat model: only the fix and its description are made
+public, and reporters following this procedure will never be blamed for it. In
+any case, do not publicly share a reproducer, as this could cause unintended
+harm; just mention that one is available and maintainers might ask for it
+privately if they need it, or better, send it upfront in a separate message to
+maintainers only.
 
 If you are unsure whether an issue qualifies, err on the side of reporting
 privately: the security team would rather triage a borderline report than miss
@@ -169,10 +175,10 @@ ignored.
 Use common sense when evaluating the report. If the affected file has not been
 touched for more than one year and is maintained by a single individual, it is
 likely that usage has declined and exposed users are virtually non-existent
-(e.g., drivers for very old hardware, obsolete filesystems). In such cases,
-there is no need to consume a maintainer's time with an unimportant report. If
-the issue is clearly trivial and publicly discoverable, you should report it
-directly to the public mailing lists, without the reproducer.
+(e.g., drivers for very old hardware, obsolete filesystems). In such cases, as
+well as when the issue is clearly trivial and publicly discoverable, there is
+no need to consume a maintainer's time with a private security report: just
+send the fix publicly like any regular bug fix, without the reproducer.
 
 At the very least, when using an AI assistant to find and report bugs, make the
 assistant read this file and threat-model.rst before proceeding, and have it
