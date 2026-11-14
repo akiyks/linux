@@ -15,7 +15,14 @@ It is important that most bugs are handled publicly so as to involve the widest
 possible audience and find the best solution.  By nature, bugs that are handled
 in closed discussions between a small set of participants are less likely to
 produce the best possible fix (e.g., risk of missing valid use cases, limited
-testing abilities).
+testing abilities). In addition, dealing with private discussions on patches
+adds much more burden to maintainers who cannot follow their usual process nor
+benefit from their usual tools. For example, many subsystems have CI jobs
+running on publicly posted patches and will not merge a fix before it has been
+validated, and automated review tools such as Sashiko review patches posted to
+the lists. Since the fix will have to be posted publicly anyway, sending it
+privately first only delays it by the time needed to ask for it to be reposted
+publicly, adds extra work, and loses the benefit of early reviews.
 
 It turns out that the majority of the bugs reported via the security team are
 just regular bugs that have been improperly qualified as security bugs due to
