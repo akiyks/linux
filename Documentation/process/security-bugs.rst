@@ -190,11 +190,11 @@ Identifying contacts
 --------------------
 
 The most effective way to report a security bug is to send it directly to the
-affected subsystem's maintainers and Cc: the Linux kernel security team.  Do
-not send it to a public list at this stage, unless you have good reasons to
-consider the issue as being public or trivial to discover (e.g. result of a
-widely available automated vulnerability scanning tool that can be repeated by
-anyone, or use of AI-based tools).
+affected subsystem's maintainers, and to Cc: the Linux kernel security team
+when needed (see below).  Do not send it to a public list at this stage,
+unless you have good reasons to consider the issue as being public or trivial
+to discover (e.g. result of a widely available automated vulnerability
+scanning tool that can be repeated by anyone, or use of AI-based tools).
 
 Finding the maintainers
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -250,15 +250,35 @@ equally be forwarded as-is to the relevant maintainers.
 Copying the security team
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The report must be sent to maintainers.  If there are two or fewer
-recipients in your message, you must also always Cc: the Linux kernel
-security team who will ensure the message is delivered to the proper
-people, and will be able to assist small maintainer teams with processes
-they may not be familiar with.  For larger teams, Cc: the Linux kernel
-security team for your first few reports or when seeking specific help,
-such as when resending a message which got no response within a week.
-Once you have become comfortable with the process for a few reports, it is
-no longer necessary to Cc: the security list when sending to large teams.
+The report must be sent to maintainers.  You must also Cc: the Linux kernel
+security team in any of the following cases:
+
+  * it is your first report: many first reports are incomplete, too long, too
+    strong, difficult to handle, and put a lot of pressure on maintainers. The
+    security team will help with the process and with the qualification of the
+    issue. Note that this rule also applies if you were asked to fix or adjust
+    a previous submission;
+
+  * there are two or fewer maintainers among the recipients: the security
+    team will ensure the message is delivered to the proper people, and
+    will be able to assist small maintainer teams with processes they may
+    not be familiar with;
+
+  * the maintainers could not be clearly identified (see above);
+
+  * the impact of the issue is uncertain and needs to be qualified. In this
+    case, your must clearly state upfront that you are seeking help to qualify
+    this impact, and you will need to share any information you have;
+
+  * you are seeking specific help, such as when resending a message which got
+    no response within a week (and please do not ask for feedback before such
+    a delay, some subsystems have a long report queue, and some maintainers can
+    only read them in their spare time).
+
+Otherwise, when a report of clear impact is sent to a larger team of clearly
+identified maintainers, it is not necessary to Cc: the security list.  Never
+Cc: the security list on a message sent to a public list.
+
 The Linux kernel security team can be contacted by email at
 <security@kernel.org>.  This is a private list of security officers
 who will help verify the bug report and assist developers working on a fix.
