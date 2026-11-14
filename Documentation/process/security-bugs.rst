@@ -307,14 +307,56 @@ Please send **plain text** emails without attachments where possible.
 It is much harder to have a context-quoted discussion about a complex
 issue if all the details are hidden away in attachments.  Think of it like a
 :doc:`regular patch submission <../process/submitting-patches>`
-(even if you don't have a patch yet): describe the problem and impact, list
-reproduction steps, and follow it with a proposed fix, all in plain text.
+(even if you don't have a patch yet): describe the problem and impact, and
+list reproduction steps, all in plain text, then provide a proposed fix as
+described below.
 Markdown, HTML and RST formatted reports are particularly frowned upon since
 they're quite hard to read for humans and encourage to use dedicated viewers,
 sometimes online, which by definition is not acceptable for a confidential
 security report. Note that some mailers tend to mangle formatting of plain
 text by default, please consult Documentation/process/email-clients.rst for
 more info.
+
+Sending a fix
+~~~~~~~~~~~~~
+
+Most fixes sent along with reports cannot be applied as-is because they were
+damaged by the mailer or lacking a commit message, forcing maintainers to ask
+for a resend. A fix must be applicable using ``git am``, which is most easily
+achieved by letting git produce and send the messages (see
+Documentation/process/submitting-patches.rst).
+
+When the fix is meant to only be sent privately, the preferred method is to
+send the report as a cover letter of a series, followed by the fix::
+
+  $ git format-patch --cover-letter -1
+  (edit 0000-cover-letter.patch and replace the subject and text with the
+   report's subject and text)
+  $ git send-email --suppress-cc=all --to=<maintainers> 000*.patch
+
+The recipients are those determined above (add ``--cc=`` for the security team
+when needed). The ``--suppress-cc=all`` option is important: without it,
+``git send-email`` also sends the messages to addresses found in the patch's
+tags (e.g. ``Cc: stable@vger.kernel.org``), which would leak the report to a
+public list.
+
+If the report was already sent, the fix may be sent as a reply to it, to the
+same recipients, for example using ``git send-email --suppress-cc=all
+--in-reply-to=<report's Message-ID>``. As a last resort, when none of these
+methods is possible, the file produced by ``git format-patch`` may be attached
+as-is to the report, but be aware that some maintainers will not look at
+attachments. However, never attach more than one patch per message without
+being explicitly invited to so, as this would significantly complicate reviews.
+
+When the fix is meant to be public (e.g. for bugs found using AI-based tools,
+see above), send it using ``git send-email`` to the maintainers and lists
+reported by get_maintainer.pl (i.e. without the ``--no-l`` option), with a
+commit message that does not detail how to exploit the bug. Then send the
+report and the reproducer privately to the maintainers (and to the security
+team when needed), mentioning the patch's Message-ID or its link on
+https://lore.kernel.org/ so that they can be matched. The report may also be
+sent as a reply to the public message, after carefully removing all public
+addresses from the To: and Cc: fields.
 
 After sending the report
 ------------------------
