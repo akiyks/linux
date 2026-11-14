@@ -234,7 +234,12 @@ The following classes of problems are not considered vulnerabilities:
     image: mounting a block device is a privileged operation (see above), and
     the administrator is responsible for the media they mount. This includes
     issues that are resolved, mitigated, or detected by running a filesystem
-    consistency check (fsck) on the image prior to mounting.
+    consistency check (fsck) on the image prior to mounting. Automatic
+    mounting of unchecked file systems (e.g. removable media mounted by a
+    desktop environment) does not change this: an automounter is expected to
+    check a file system before mounting it, otherwise it is at fault, and if
+    the check does not detect the issue, the file system checker is at fault.
+    In such cases, fixes should be directed to these tools.
 
   * bugs whose reproduction requires hardware modification or emulation,
     including fake USB devices that pretend to be another one, or devices
