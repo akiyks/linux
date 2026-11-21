@@ -43,7 +43,6 @@
 #include <linux/torture.h>
 #include <linux/vmalloc.h>
 #include <linux/sched/debug.h>
-#include <linux/sched/sysctl.h>
 #include <linux/oom.h>
 #include <linux/tick.h>
 #include <linux/rcupdate_trace.h>
@@ -61,6 +60,8 @@ MODULE_AUTHOR("Paul E. McKenney <paulmck@linux.ibm.com> and Josh Triplett <josh@
 #define RCUTORTURE_RDR_MASK_1	(0xff << RCUTORTURE_RDR_SHIFT_1)
 #define RCUTORTURE_RDR_SHIFT_2	16	// Put SRCU index in upper bits.
 #define RCUTORTURE_RDR_MASK_2	(0xff << RCUTORTURE_RDR_SHIFT_2)
+#define SRCU_TORTURE_IRQSAVE	0x80	// In an SRCU reader index (MASK_1 or _2):
+					//  the atomic reader disabled interrupts.
 #define RCUTORTURE_RDR_BH	0x01	// Extend readers by disabling bh.
 #define RCUTORTURE_RDR_IRQ	0x02	//  ... disabling interrupts.
 #define RCUTORTURE_RDR_PREEMPT	0x04	//  ... disabling preemption.
@@ -117,6 +118,7 @@ torture_param(int, n_barrier_cbs, 0, "# of callbacks/kthreads for barrier testin
 torture_param(int, n_up_down, 32, "# of concurrent up/down hrtimer-based RCU readers");
 torture_param(int, nfakewriters, 4, "Number of RCU fake writer threads");
 torture_param(bool, nmi_calls, true, "Exercise ->call() from NMI on nmi_capable flavors");
+torture_param(bool, nmi_readers, true, "Run readers from NMI with NMI-safe reader flavors");
 torture_param(int, nreaders, -1, "Number of RCU reader threads");
 torture_param(bool, nwriters, 1, "Number of RCU writer threads (0 or 1)");
 torture_param(int, object_debug, 0, "Enable debug-object double call_rcu() testing");
@@ -133,6 +135,8 @@ torture_param(int, preempt_interval, MSEC_PER_SEC, "Interval between preemptions
 torture_param(int, read_exit_delay, 13, "Delay between read-then-exit episodes (s)");
 torture_param(int, read_exit_burst, 16, "# of read-then-exit bursts per episode, zero to disable");
 torture_param(int, reader_flavor, SRCU_READ_FLAVOR_NORMAL, "Reader flavors to use, one per bit.");
+torture_param(bool, atomic_irqsave, false,
+	      "Atomic SRCU readers alternate per CPU with irqsave readers");
 torture_param(int, shuffle_interval, 3, "Number of seconds between shuffles");
 torture_param(int, shutdown_secs, 0, "Shutdown time (s), <= zero to disable.");
 torture_param(int, stall_cpu, 0, "Stall duration (s), zero to disable.");
@@ -149,6 +153,7 @@ torture_param(int, test_boost, 1, "Test RCU prio boost: 0=no, 1=maybe, 2=yes.");
 torture_param(int, test_boost_duration, 4, "Duration of each boost test, seconds.");
 torture_param(int, test_boost_holdoff, 0, "Holdoff time from rcutorture start, seconds.");
 torture_param(int, test_boost_interval, 7, "Interval between boost tests, seconds.");
+torture_param(int, test_boost_reader_ms, 2000, "Boost-test reader CPU time, ms.");
 torture_param(int, test_nmis, 0, "End-test NMI tests, 0 to disable.");
 torture_param(bool, test_no_idle_hz, true, "Test support for tickless idle CPUs");
 torture_param(int, test_srcu_lockdep, 0, "Test specified SRCU deadlock scenario.");
@@ -220,6 +225,11 @@ static atomic_long_t n_rcu_torture_timers;
 static atomic_long_t n_rcu_torture_irqs;
 static atomic_long_t n_rcu_torture_nmi_call;
 static atomic_long_t n_rcu_torture_nmi_cb;
+static atomic_long_t n_rcu_torture_nmi_read;
+// Pipe and batch counts of the readers in NMI, as rcu_torture_count and
+// rcu_torture_batch for the others.  An NMI may interrupt this_cpu_inc().
+static atomic_long_t rcu_torture_nmi_pipe[RCU_TORTURE_PIPE_LEN + 1];
+static atomic_long_t rcu_torture_nmi_batch[RCU_TORTURE_PIPE_LEN + 1];
 static long n_barrier_attempts;
 static long n_barrier_successes; /* did rcu_barrier test succeed? */
 static unsigned long n_read_exits;
@@ -333,6 +343,7 @@ static bool shutdown_time_arrived(void)
 }
 
 static unsigned long boost_starttime;	/* jiffies of next boost test start. */
+static unsigned long boost_claimed;	/* ->boost_starttime of claimed test. */
 static DEFINE_MUTEX(boost_mutex);	/* protect setting boost_starttime */
 					/*  and boost task create/destroy. */
 static atomic_t barrier_cbs_count;	/* Barrier callbacks registered. */
@@ -424,7 +435,6 @@ struct rcu_torture_ops {
 	void (*fqs)(void);
 	void (*stats)(void);
 	void (*gp_kthread_dbg)(void);
-	bool (*check_boost_failed)(unsigned long gp_state, int *cpup);
 	int (*stall_dur)(void);
 	void (*get_gp_data)(int *flags, unsigned long *gp_seq);
 	void (*gp_slow_register)(atomic_t *rgssp);
@@ -438,6 +448,7 @@ struct rcu_torture_ops {
 	long cbflood_max;
 	int irq_capable;
 	int nmi_capable;
+	bool (*nmi_reader_capable)(void); // Are ->readlock() and ->readunlock() NMI-safe?
 	int can_boost;
 	int extendables;
 	int slow_gps;
@@ -636,7 +647,6 @@ static struct rcu_torture_ops rcu_ops = {
 	.cb_barrier		= rcu_barrier,
 	.fqs			= rcu_force_quiescent_state,
 	.gp_kthread_dbg		= show_rcu_gp_kthreads,
-	.check_boost_failed	= rcu_check_boost_fail,
 	.stall_dur		= rcu_jiffies_till_stall_check,
 	.get_gp_data		= rcutorture_get_gp_data,
 	.gp_slow_register	= rcu_gp_slow_register,
@@ -725,6 +735,87 @@ static void srcu_torture_init_forbidden_apis(void)
 	cur_ops->start_gp_poll = NULL;
 }
 
+/*
+ * With atomic_irqsave, every other atomic SRCU reader of a CPU disables
+ * interrupts instead of preemption.  rcutorture_one_extend() may end the
+ * readers of a CPU in any order, so the first one saves the interrupt state
+ * and the last one restores it.  No extension may enable interrupts or bottom
+ * halves within such a reader.  So the irqsave readers run only for a torture
+ * type without extendables: every srcu type but busted_srcud.  No reader may
+ * end under ->pi_lock.
+ */
+static bool srcu_torture_irqsave_on;
+
+struct srcu_torture_irqsave {
+	unsigned int count;	// Picks the form of the next reader.
+	int depth;		// Readers of this CPU that disabled interrupts.
+	unsigned long flags;	// Interrupt state before the first one.
+};
+
+static DEFINE_PER_CPU(struct srcu_torture_irqsave, srcu_torture_irqsave);
+
+static void srcu_torture_init_irqsave(void)
+{
+	if (!atomic_irqsave || !(reader_flavor & SRCU_READ_FLAVOR_ATOMIC) ||
+	    cur_ops->extendables)
+		return;
+	srcu_torture_irqsave_on = true;
+	cur_ops->no_pi_lock = 1;
+	VERBOSE_TOROUT_STRING("srcu_torture_init atomic SRCU, irqsave readers");
+}
+
+static int srcu_torture_read_lock_atomic(void)
+{
+	struct srcu_torture_irqsave *stip;
+	unsigned long flags;
+	int idx;
+
+	if (!srcu_torture_irqsave_on || in_nmi() ||
+	    !(this_cpu_inc_return(srcu_torture_irqsave.count) & 0x1))
+		return srcu_read_lock_atomic(srcu_ctlp);
+	idx = srcu_read_lock_atomic_irqsave(srcu_ctlp, flags);
+	stip = this_cpu_ptr(&srcu_torture_irqsave);
+	if (!stip->depth++)
+		stip->flags = flags;
+	return idx | SRCU_TORTURE_IRQSAVE;
+}
+
+static void srcu_torture_read_unlock_atomic(int idx)
+{
+	struct srcu_torture_irqsave *stip;
+	unsigned long flags;
+
+	if (!(idx & SRCU_TORTURE_IRQSAVE)) {
+		srcu_read_unlock_atomic(srcu_ctlp, idx);
+		return;
+	}
+	idx &= ~SRCU_TORTURE_IRQSAVE;
+	WARN_ON_ONCE(!irqs_disabled());  // Its section must be interrupts-off.
+	stip = this_cpu_ptr(&srcu_torture_irqsave);
+	local_save_flags(flags);  // Disabled: keep it so for the other readers.
+	if (!WARN_ON_ONCE(stip->depth <= 0) && !--stip->depth)
+		flags = stip->flags;
+	srcu_read_unlock_atomic_irqrestore(srcu_ctlp, idx, flags);
+}
+
+/*
+ * Wait for an atomic SRCU grace period within an RCU reader.  The wait must
+ * not end an RCU grace period: this reader still holds it up.  The cookie is
+ * taken within the reader, so no RCU grace period can complete it there.
+ */
+static void srcu_torture_check_atomic_in_rcu_reader(void)
+{
+	unsigned long cookie;
+
+	rcu_read_lock();
+	cookie = get_state_synchronize_rcu();
+	synchronize_srcu_atomic(srcu_ctlp);
+	WARN_ONCE(poll_state_synchronize_rcu(cookie),
+		  "%s: synchronize_srcu_atomic() ended an RCU grace period within an RCU reader\n",
+		  __func__);
+	rcu_read_unlock();
+}
+
 static void srcu_torture_init(void)
 {
 	rcu_sync_torture_init();
@@ -744,6 +835,8 @@ static void srcu_torture_init(void)
 		srcu_ctlp = &srcu_ctla;
 		VERBOSE_TOROUT_STRING("srcu_torture_init atomic SRCU");
 		srcu_torture_init_forbidden_apis();
+		srcu_torture_init_irqsave();
+		srcu_torture_check_atomic_in_rcu_reader();
 	}
 }
 
@@ -783,11 +876,19 @@ static int srcu_torture_read_lock(void)
 		ret += idx << 3;
 	}
 	if (reader_flavor & SRCU_READ_FLAVOR_ATOMIC) {
-		idx = srcu_read_lock_atomic(srcu_ctlp);
-		WARN_ON_ONCE(idx & ~0x1);
-		ret += idx << 4;
+		idx = srcu_torture_read_lock_atomic();
+		WARN_ON_ONCE(idx & ~(0x1 | SRCU_TORTURE_IRQSAVE));
+		ret += ((idx & 0x1) << 4) | (idx & SRCU_TORTURE_IRQSAVE);
 	}
 	return ret;
+}
+
+// Only these reader flavors may be used from NMI.
+static bool srcu_torture_nmi_reader_capable(void)
+{
+	return reader_flavor &&
+	       !(reader_flavor & ~(SRCU_READ_FLAVOR_NMI | SRCU_READ_FLAVOR_FAST |
+				   SRCU_READ_FLAVOR_ATOMIC));
 }
 
 static void
@@ -817,9 +918,10 @@ srcu_read_delay(struct torture_random_state *rrsp, struct rt_read_seg *rtrsp)
 
 static void srcu_torture_read_unlock(int idx)
 {
-	WARN_ON_ONCE((reader_flavor && (idx & ~reader_flavor)) || (!reader_flavor && (idx & ~0x1)));
+	WARN_ON_ONCE((reader_flavor && (idx & ~(reader_flavor | SRCU_TORTURE_IRQSAVE))) ||
+		     (!reader_flavor && (idx & ~0x1)));
 	if (reader_flavor & SRCU_READ_FLAVOR_ATOMIC)
-		srcu_read_unlock_atomic(srcu_ctlp, (idx & 0x10) >> 4);
+		srcu_torture_read_unlock_atomic(((idx & 0x10) >> 4) | (idx & SRCU_TORTURE_IRQSAVE));
 	if (reader_flavor & SRCU_READ_FLAVOR_FAST_UPDOWN)
 		srcu_read_unlock_fast_updown(srcu_ctlp,
 					     __srcu_ctr_to_ptr(srcu_ctlp, (idx & 0x8) >> 3));
@@ -981,6 +1083,7 @@ static struct rcu_torture_ops srcu_ops = {
 	.have_up_down	= IS_ENABLED(CONFIG_TINY_SRCU)
 				? 0 : SRCU_READ_FLAVOR_NORMAL | SRCU_READ_FLAVOR_FAST_UPDOWN,
 	.nmi_capable	= 1,
+	.nmi_reader_capable = srcu_torture_nmi_reader_capable,
 	.name		= "srcu"
 };
 
@@ -1003,10 +1106,13 @@ static void srcud_torture_init(void)
 		WARN_ON(init_srcu_struct_atomic(&srcu_ctld));
 		VERBOSE_TOROUT_STRING("srcud_torture_init atomic SRCU");
 		srcu_torture_init_forbidden_apis();
+		srcu_torture_init_irqsave();
 	} else {
 		WARN_ON(init_srcu_struct(&srcu_ctld));
 	}
 	srcu_ctlp = &srcu_ctld;
+	if (reader_flavor & SRCU_READ_FLAVOR_ATOMIC)
+		srcu_torture_check_atomic_in_rcu_reader();
 }
 
 static void srcu_torture_cleanup(void)
@@ -1049,6 +1155,7 @@ static struct rcu_torture_ops srcud_ops = {
 	.have_up_down	= IS_ENABLED(CONFIG_TINY_SRCU)
 				? 0 : SRCU_READ_FLAVOR_NORMAL | SRCU_READ_FLAVOR_FAST_UPDOWN,
 	.nmi_capable	= 1,
+	.nmi_reader_capable = srcu_torture_nmi_reader_capable,
 	.name		= "srcud"
 };
 
@@ -1334,93 +1441,124 @@ static unsigned long rcutorture_seq_diff(unsigned long new, unsigned long old)
 }
 
 /*
- * RCU torture priority-boost testing.  Runs one real-time thread per
- * CPU for moderate bursts, repeatedly starting grace periods and waiting
- * for them to complete.  If a given grace period takes too long, we assume
- * that priority inversion has occurred.
+ * RCU torture priority-boost testing.  Each test interval, one CPU
+ * runs a normal-priority reader that spins inside an RCU read-side
+ * critical section until it has consumed test_boost_reader_ms of CPU
+ * time, while a SCHED_FIFO hog on the same CPU tries to starve it.  RT
+ * throttling is left enabled, so an unboosted reader gets only a few
+ * percent of the CPU, far too little to finish within test_boost_duration.
+ * If the reader finishes anyway, boosting lifted it above the hog.
+ *
+ * Only one CPU is tested per interval because RCU boosts the readers
+ * of a given rcu_node one at a time, so a second slow reader sharing the
+ * rcu_node would wait for the first one's whole CPU burn.
  */
 
-static int old_rt_runtime = -1;
+struct rcu_torture_boost_reader {
+	struct completion done;
+	bool in_cs;	// Reader is inside its RCU read-side critical section.
+	bool finished;	// Reader consumed all of its CPU time.
+	bool abort;	// Hog asks the reader to give up.
+	u64 ran_ns;	// CPU time consumed so far.
+};
 
-static void rcu_torture_disable_rt_throttle(void)
+// Reader CPU time so far, retrying to avoid torn 64-bit loads on 32-bit.
+static u64 rcu_torture_boost_runtime(void)
 {
-	/*
-	 * Disable RT throttling so that rcutorture's boost threads don't get
-	 * throttled. Only possible if rcutorture is built-in otherwise the
-	 * user should manually do this by setting the sched_rt_period_us and
-	 * sched_rt_runtime sysctls.
-	 */
-	if (!IS_BUILTIN(CONFIG_RCU_TORTURE_TEST) || old_rt_runtime != -1)
-		return;
+	u64 a, b;
 
-	old_rt_runtime = sysctl_sched_rt_runtime;
-	sysctl_sched_rt_runtime = -1;
+	do {
+		a = READ_ONCE(current->se.sum_exec_runtime);
+		b = READ_ONCE(current->se.sum_exec_runtime);
+	} while (a != b);
+	return a;
 }
 
-static void rcu_torture_enable_rt_throttle(void)
+static int rcu_torture_boost_reader(void *arg)
 {
-	if (!IS_BUILTIN(CONFIG_RCU_TORTURE_TEST) || old_rt_runtime == -1)
-		return;
+	struct rcu_torture_boost_reader *br = arg;
+	u64 goal = (u64)test_boost_reader_ms * NSEC_PER_MSEC;
+	u64 ran;
+	u64 start;
+	int idx;
 
-	sysctl_sched_rt_runtime = old_rt_runtime;
-	old_rt_runtime = -1;
+	idx = cur_ops->readlock();
+	start = rcu_torture_boost_runtime();
+	WRITE_ONCE(br->in_cs, true);
+	do {
+		cpu_relax();
+		ran = rcu_torture_boost_runtime() - start;
+		WRITE_ONCE(br->ran_ns, ran);
+	} while (ran < goal && !READ_ONCE(br->abort) && !torture_must_stop());
+	// Publish before unlocking: deboosting lets the hog preempt us at once.
+	WRITE_ONCE(br->finished, ran >= goal);
+	cur_ops->readunlock(idx);
+	kthread_complete_and_exit(&br->done, 0);
 }
 
-static bool rcu_torture_boost_failed(unsigned long gp_state, unsigned long *start)
+// Run one boost test on this CPU.
+static void rcu_torture_boost_once(void)
 {
-	int cpu;
 	static int dbg_done;
-	unsigned long end = jiffies;
-	bool gp_done;
-	unsigned long j;
-	static unsigned long last_persist;
-	unsigned long lp;
-	unsigned long mininterval = test_boost_duration * HZ - HZ / 2;
+	struct rcu_torture_boost_reader br = { };
+	unsigned long endtime;
+	unsigned long gp_state = 0;
+	unsigned long start;
+	struct task_struct *t;
+	bool stuttered = false;
 
-	if (end - *start > mininterval) {
-		// Recheck after checking time to avoid false positives.
-		smp_mb(); // Time check before grace-period check.
-		if (cur_ops->poll_gp_state(gp_state))
-			return false; // passed, though perhaps just barely
-		if (cur_ops->check_boost_failed && !cur_ops->check_boost_failed(gp_state, &cpu)) {
-			// At most one persisted message per boost test.
-			j = jiffies;
-			lp = READ_ONCE(last_persist);
-			if (time_after(j, lp + mininterval) &&
-			    cmpxchg(&last_persist, lp, j) == lp) {
-				if (cpu < 0)
-					pr_info("Boost inversion persisted: QS from all CPUs\n");
-				else
-					pr_info("Boost inversion persisted: No QS from CPU %d\n", cpu);
-			}
-			return false; // passed on a technicality
-		}
-		VERBOSE_TOROUT_STRING("rcu_torture_boost boosting failed");
-		n_rcu_torture_boost_failure++;
-		if (!xchg(&dbg_done, 1) && cur_ops->gp_kthread_dbg) {
-			pr_info("Boost inversion thread ->rt_priority %u gp_state %lu jiffies %lu\n",
-				current->rt_priority, gp_state, end - *start);
-			cur_ops->gp_kthread_dbg();
-			// Recheck after print to flag grace period ending during splat.
-			gp_done = cur_ops->poll_gp_state(gp_state);
-			pr_info("Boost inversion: GP %lu %s.\n", gp_state,
-				gp_done ? "ended already" : "still pending");
-
-		}
-
-		return true; // failed
-	} else if (cur_ops->check_boost_failed && !cur_ops->check_boost_failed(gp_state, NULL)) {
-		*start = jiffies;
+	init_completion(&br.done);
+	t = kthread_run_on_cpu(rcu_torture_boost_reader, &br, raw_smp_processor_id(),
+			       "rcu_torture_boost_rdr_%u");
+	if (IS_ERR(t)) {
+		n_rcu_torture_boost_ktrerror++;
+		return;
 	}
 
-	return false; // passed
+	// Wait for the reader to enter its critical section, then start
+	// a grace period that it will block.
+	start = jiffies;
+	while (!READ_ONCE(br.in_cs) && !torture_must_stop() &&
+	       time_before(jiffies, start + HZ))
+		schedule_timeout_uninterruptible(1);
+	if (!READ_ONCE(br.in_cs))
+		goto out;
+	gp_state = cur_ops->start_gp_poll();
+
+	// Hog the CPU until the reader finishes or the interval ends.
+	start = jiffies;
+	endtime = start + test_boost_duration * HZ;
+	while (!READ_ONCE(br.finished) && time_before(jiffies, endtime) &&
+	       !torture_must_stop()) {
+		if (stutter_wait("rcu_torture_boost")) {
+			sched_set_fifo_low(current);
+			stuttered = true;
+			break;
+		}
+		cpu_relax();
+	}
+
+	smp_mb(); // Time check before reader check.
+	if (!READ_ONCE(br.finished) && !stuttered && !torture_must_stop()) {
+		VERBOSE_TOROUT_STRING("rcu_torture_boost boosting failed");
+		n_rcu_torture_boost_failure++;
+		pr_info("Boost inversion: reader got only %llu of %d ms CPU in %lu jiffies, GP %s.\n",
+			div64_ul(READ_ONCE(br.ran_ns), NSEC_PER_MSEC), test_boost_reader_ms,
+			jiffies - start,
+			cur_ops->poll_gp_state(gp_state) ? "ended" : "still pending");
+		if (!xchg(&dbg_done, 1) && cur_ops->gp_kthread_dbg) {
+			pr_info("Boost inversion thread ->rt_priority %u gp_state %lu jiffies %lu\n",
+				current->rt_priority, gp_state, jiffies - start);
+			cur_ops->gp_kthread_dbg();
+		}
+	}
+out:
+	WRITE_ONCE(br.abort, true);
+	wait_for_completion(&br.done);
 }
 
 static int rcu_torture_boost(void *arg)
 {
-	unsigned long endtime;
-	unsigned long gp_state;
-	unsigned long gp_state_time;
 	unsigned long oldstarttime;
 	unsigned long booststarttime = get_torture_init_jiffies() + test_boost_holdoff * HZ;
 
@@ -1441,9 +1579,6 @@ static int rcu_torture_boost(void *arg)
 
 	/* Each pass through the following loop does one boost-test cycle. */
 	do {
-		bool failed = false; // Test failed already in this test interval
-		bool gp_initiated = false;
-
 		if (kthread_should_stop())
 			goto checkwait;
 
@@ -1457,33 +1592,9 @@ static int rcu_torture_boost(void *arg)
 				goto checkwait;
 		}
 
-		// Do one boost-test interval.
-		endtime = oldstarttime + test_boost_duration * HZ;
-		while (time_before(jiffies, endtime)) {
-			// Has current GP gone too long?
-			if (gp_initiated && !failed && !cur_ops->poll_gp_state(gp_state))
-				failed = rcu_torture_boost_failed(gp_state, &gp_state_time);
-			// If we don't have a grace period in flight, start one.
-			if (!gp_initiated || cur_ops->poll_gp_state(gp_state)) {
-				gp_state = cur_ops->start_gp_poll();
-				gp_initiated = true;
-				gp_state_time = jiffies;
-			}
-			if (stutter_wait("rcu_torture_boost")) {
-				sched_set_fifo_low(current);
-				// If the grace period already ended,
-				// we don't know when that happened, so
-				// start over.
-				if (cur_ops->poll_gp_state(gp_state))
-					gp_initiated = false;
-			}
-			if (torture_must_stop())
-				goto checkwait;
-		}
-
-		// In case the grace period extended beyond the end of the loop.
-		if (gp_initiated && !failed && !cur_ops->poll_gp_state(gp_state))
-			rcu_torture_boost_failed(gp_state, &gp_state_time);
+		// Do one boost-test interval, if no other CPU claimed it.
+		if (xchg(&boost_claimed, oldstarttime) != oldstarttime)
+			rcu_torture_boost_once();
 
 		/*
 		 * Set the start time of the next test interval.
@@ -2711,6 +2822,10 @@ static DEFINE_TORTURE_RANDOM_PERCPU(rcu_torture_timer_rand);
  * per-CPU hardware perf counter overflows into an NMI, and its handler submits
  * a preallocated callback via ->call().  One callback per CPU is in flight at a
  * time (guarded by an atomic) to avoid allocating in NMI.
+ *
+ * The same handler also runs a reader, for flavors whose ->nmi_reader_capable()
+ * says that their readers are NMI-safe.  The reader may interrupt another
+ * reader on its CPU, in the middle of its counter update.
  */
 #ifdef CONFIG_PERF_EVENTS
 static struct perf_event_attr rcu_torture_nmi_attr = {
@@ -2735,6 +2850,8 @@ struct rcu_torture_nmi_cb {
 
 static struct perf_event **rcu_torture_nmi_events;
 static int rcu_torture_nmi_hp_state;
+static bool rcu_torture_nmi_do_calls;
+static bool rcu_torture_nmi_do_reads;
 static DEFINE_PER_CPU(struct rcu_torture_nmi_cb, rcu_torture_nmi_cb);
 
 static void rcu_torture_nmi_invoked(struct rcu_head *rhp)
@@ -2745,6 +2862,34 @@ static void rcu_torture_nmi_invoked(struct rcu_head *rhp)
 	atomic_set(&rtncp->inuse, 0);
 }
 
+/*
+ * A reader in NMI.  lockdep is off in NMI and does not record the reader,
+ * so the pointer is loaded without a lockdep check.  The element
+ * must not go through two grace periods before the reader ends.
+ * rcu_torture_stats_print() checks this in the pipe counts.
+ */
+static void rcu_torture_nmi_read(void)
+{
+	unsigned long started, completed;
+	struct rcu_torture *p;
+	int idx, pipe_count;
+
+	idx = cur_ops->readlock();
+	started = cur_ops->get_gp_seq();
+	p = rcu_dereference_raw(rcu_torture_current);
+	if (p) {
+		if (!READ_ONCE(p->rtort_mbtest))
+			atomic_inc(&n_rcu_torture_mberror);
+		pipe_count = min(READ_ONCE(p->rtort_pipe_count), RCU_TORTURE_PIPE_LEN);
+		completed = rcutorture_seq_diff(cur_ops->get_gp_seq(), started);
+		completed = min_t(unsigned long, completed, RCU_TORTURE_PIPE_LEN);
+		atomic_long_inc(&rcu_torture_nmi_pipe[pipe_count]);
+		atomic_long_inc(&rcu_torture_nmi_batch[completed]);
+	}
+	cur_ops->readunlock(idx);
+	atomic_long_inc(&n_rcu_torture_nmi_read);
+}
+
 static void rcu_torture_nmi_overflow(struct perf_event *event,
 				     struct perf_sample_data *data,
 				     struct pt_regs *regs)
@@ -2753,10 +2898,12 @@ static void rcu_torture_nmi_overflow(struct perf_event *event,
 
 	if (!in_nmi())
 		return;
-	if (cur_ops->call && !atomic_xchg(&rtncp->inuse, 1)) {
+	if (rcu_torture_nmi_do_calls && !atomic_xchg(&rtncp->inuse, 1)) {
 		atomic_long_inc(&n_rcu_torture_nmi_call);
 		cur_ops->call(&rtncp->rh, rcu_torture_nmi_invoked);
 	}
+	if (rcu_torture_nmi_do_reads)
+		rcu_torture_nmi_read();
 }
 
 static int rcu_torture_nmi_online(unsigned int cpu)
@@ -2789,7 +2936,10 @@ static void rcu_torture_nmi_init(void)
 {
 	int ret;
 
-	if (!nmi_calls || !cur_ops->nmi_capable || !cur_ops->call)
+	rcu_torture_nmi_do_calls = nmi_calls && cur_ops->nmi_capable && cur_ops->call;
+	rcu_torture_nmi_do_reads = nmi_readers && cur_ops->nmi_reader_capable &&
+				   cur_ops->nmi_reader_capable();
+	if (!rcu_torture_nmi_do_calls && !rcu_torture_nmi_do_reads)
 		return;
 	rcu_torture_nmi_events = kzalloc_objs(*rcu_torture_nmi_events,
 					      nr_cpu_ids);
@@ -2815,8 +2965,11 @@ static void rcu_torture_nmi_cleanup(void)
 	}
 	kfree(rcu_torture_nmi_events);
 	rcu_torture_nmi_events = NULL;
-	if (!atomic_long_read(&n_rcu_torture_nmi_call))
+	if (rcu_torture_nmi_do_calls && !atomic_long_read(&n_rcu_torture_nmi_call))
 		pr_alert("%s: nmi_calls set but no ->call() ever issued from NMI, so NMI ->call() went untested (no PMU, or NMIs unavailable here).\n",
+			 __func__);
+	if (rcu_torture_nmi_do_reads && !atomic_long_read(&n_rcu_torture_nmi_read))
+		pr_alert("%s: nmi_readers set but no reader ever ran in NMI, so NMI readers went untested (no PMU, or NMIs unavailable here).\n",
 			 __func__);
 }
 #else /* #ifdef CONFIG_PERF_EVENTS */
@@ -3152,6 +3305,7 @@ rcu_torture_stats_print(void)
 	int cpu;
 	int i;
 	long pipesummary[RCU_TORTURE_PIPE_LEN + 1] = { 0 };
+	int j;
 	long batchsummary[RCU_TORTURE_PIPE_LEN + 1] = { 0 };
 	long n_gpwraps = 0;
 	unsigned long ndowns = 0;
@@ -3183,6 +3337,10 @@ rcu_torture_stats_print(void)
 		if (pipesummary[i] != 0)
 			break;
 	} // The value of variable "i" is used later, so don't clobber it!
+	for (j = RCU_TORTURE_PIPE_LEN; j >= 0; j--) {
+		if (atomic_long_read(&rcu_torture_nmi_pipe[j]))
+			break;
+	} // Same for "j", for the readers in NMI.
 
 	pr_alert("%s%s ", torture_type, TORTURE_FLAG);
 	rtcp = rcu_access_pointer(rcu_torture_current);
@@ -3212,9 +3370,10 @@ rcu_torture_stats_print(void)
 		data_race(n_barrier_attempts),
 		data_race(n_rcu_torture_barrier_error));
 	pr_cont("read-exits: %ld ", data_race(n_read_exits)); // Statistic.
-	pr_cont("nmi-calls: %ld nmi-cbs: %ld ",
+	pr_cont("nmi-calls: %ld nmi-cbs: %ld nmi-reads: %ld ",
 		atomic_long_read(&n_rcu_torture_nmi_call),
-		atomic_long_read(&n_rcu_torture_nmi_cb));
+		atomic_long_read(&n_rcu_torture_nmi_cb),
+		atomic_long_read(&n_rcu_torture_nmi_read));
 	pr_cont("nocb-toggles: %ld:%ld ",
 		atomic_long_read(&n_nocb_offload), atomic_long_read(&n_nocb_deoffload));
 	pr_cont("gpwraps: %ld\n", n_gpwraps);
@@ -3223,7 +3382,7 @@ rcu_torture_stats_print(void)
 	if (atomic_read(&n_rcu_torture_mberror) ||
 	    atomic_read(&n_rcu_torture_mbchk_fail) ||
 	    n_rcu_torture_barrier_error || n_rcu_torture_boost_ktrerror ||
-	    n_rcu_torture_boost_failure || i > 1) {
+	    n_rcu_torture_boost_failure || i > 1 || j > 1) {
 		pr_cont("%s", "!!! ");
 		atomic_inc(&n_rcu_torture_error);
 		WARN_ON_ONCE(atomic_read(&n_rcu_torture_mberror));
@@ -3232,6 +3391,7 @@ rcu_torture_stats_print(void)
 		WARN_ON_ONCE(n_rcu_torture_boost_ktrerror); // no boost kthread
 		WARN_ON_ONCE(n_rcu_torture_boost_failure); // boost failed (TIMER_SOFTIRQ RT prio?)
 		WARN_ON_ONCE(i > 1); // Too-short grace period
+		WARN_ON_ONCE(j > 1); // Too-short grace period, reader in NMI
 	}
 	pr_cont("Reader Pipe: ");
 	for (i = 0; i < RCU_TORTURE_PIPE_LEN + 1; i++)
@@ -3243,6 +3403,20 @@ rcu_torture_stats_print(void)
 	for (i = 0; i < RCU_TORTURE_PIPE_LEN + 1; i++)
 		pr_cont(" %ld", batchsummary[i]);
 	pr_cont("\n");
+
+	if (atomic_long_read(&n_rcu_torture_nmi_read)) {
+		pr_alert("%s%s ", torture_type, TORTURE_FLAG);
+		pr_cont("NMI Reader Pipe: ");
+		for (i = 0; i < RCU_TORTURE_PIPE_LEN + 1; i++)
+			pr_cont(" %ld", atomic_long_read(&rcu_torture_nmi_pipe[i]));
+		pr_cont("\n");
+
+		pr_alert("%s%s ", torture_type, TORTURE_FLAG);
+		pr_cont("NMI Reader Batch: ");
+		for (i = 0; i < RCU_TORTURE_PIPE_LEN + 1; i++)
+			pr_cont(" %ld", atomic_long_read(&rcu_torture_nmi_batch[i]));
+		pr_cont("\n");
+	}
 
 	pr_alert("%s%s ", torture_type, TORTURE_FLAG);
 	pr_cont("Free-Block Circulation: ");
@@ -3390,7 +3564,6 @@ static int rcutorture_booster_cleanup(unsigned int cpu)
 	mutex_lock(&boost_mutex);
 	t = boost_tasks[cpu];
 	boost_tasks[cpu] = NULL;
-	rcu_torture_enable_rt_throttle();
 	mutex_unlock(&boost_mutex);
 
 	/* This must be outside of the mutex, otherwise deadlock! */
@@ -3428,7 +3601,6 @@ static int rcutorture_booster_init(unsigned int cpu)
 
 	/* Don't allow time recalculation while creating a new task. */
 	mutex_lock(&boost_mutex);
-	rcu_torture_disable_rt_throttle();
 	VERBOSE_TOROUT_STRING("Creating rcu_torture_boost task");
 	boost_tasks[cpu] = kthread_run_on_cpu(rcu_torture_boost, NULL,
 					      cpu, "rcu_torture_boost_%u");
@@ -5048,6 +5220,10 @@ rcu_torture_init(void)
 			per_cpu(rcu_torture_batch, cpu)[i] = 0;
 		}
 	}
+	for (i = 0; i < RCU_TORTURE_PIPE_LEN + 1; i++) {
+		atomic_long_set(&rcu_torture_nmi_pipe[i], 0);
+		atomic_long_set(&rcu_torture_nmi_batch[i], 0);
+	}
 	err_segs_recorded = 0;
 	rt_read_nsegs = 0;
 
@@ -5151,6 +5327,10 @@ rcu_torture_init(void)
 		test_boost_interval = 1;
 	if (test_boost_duration < 2)
 		test_boost_duration = 2;
+	if (test_boost_reader_ms < 1)
+		test_boost_reader_ms = 1;
+	if (test_boost_reader_ms > test_boost_duration * MSEC_PER_SEC)
+		test_boost_reader_ms = test_boost_duration * MSEC_PER_SEC;
 	if (rcu_torture_can_boost()) {
 
 		boost_starttime = jiffies + test_boost_interval * HZ;

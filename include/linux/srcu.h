@@ -93,7 +93,7 @@ int init_srcu_struct_atomic(struct srcu_struct *ssp);
 //					0x04		// SRCU-lite is no longer with us.
 #define SRCU_READ_FLAVOR_FAST		0x04		// srcu_read_lock_fast(), also NMI-safe.
 #define SRCU_READ_FLAVOR_FAST_UPDOWN	0x08		// srcu_read_lock_fast_updown().
-#define SRCU_READ_FLAVOR_ATOMIC		0x10		// srcu_read_lock_atomic().
+#define SRCU_READ_FLAVOR_ATOMIC		0x10		// srcu_read_lock_atomic(), also NMI-safe.
 #define SRCU_READ_FLAVOR_ALL		(SRCU_READ_FLAVOR_NORMAL | SRCU_READ_FLAVOR_NMI | \
 					 SRCU_READ_FLAVOR_FAST | SRCU_READ_FLAVOR_FAST_UPDOWN | \
 					 SRCU_READ_FLAVOR_ATOMIC)
@@ -357,6 +357,39 @@ static inline int srcu_read_lock(struct srcu_struct *ssp)
 	return retval;
 }
 
+/*
+ * Register an atomic-section reader.  The caller has disabled preemption,
+ * or interrupts.
+ */
+static inline int __srcu_read_lock_atomic(struct srcu_struct *ssp)
+	__acquires_shared(ssp)
+{
+	int retval;
+
+	/*
+	 * Arm might_sleep() to catch even a *potentially* sleeping call
+	 * in the section, not just an actual schedule: the atomic-domain
+	 * promise must hold on every path, contended or not. In hardirq,
+	 * softirq, or NMI the annotation would land on the interrupted
+	 * task, and can also result in data races against that task's
+	 * own non_block_start()/non_block_end() invocations; it is also
+	 * redundant there, so skip it.
+	 */
+	if (in_task())
+		non_block_start();
+	srcu_check_read_flavor(ssp, SRCU_READ_FLAVOR_ATOMIC);
+	retval = __srcu_read_lock_nmisafe(ssp);
+	/*
+	 * An NMI may interrupt lockdep itself.  Annotate it as a trylock
+	 * there, as srcu_read_lock_nmisafe() does.
+	 */
+	if (in_nmi())
+		rcu_try_lock_acquire(&ssp->dep_map);
+	else
+		srcu_lock_acquire(&ssp->dep_map);
+	return retval;
+}
+
 /**
  * srcu_read_lock_atomic - register a new reader promising an atomic section
  * @ssp: srcu_struct in which to register the new reader.
@@ -372,29 +405,34 @@ static inline int srcu_read_lock(struct srcu_struct *ssp)
  * The lock and matching srcu_read_unlock_atomic() must be invoked on
  * the same CPU, from the same context; passing the return value to
  * another task is not permitted for this flavor.
+ *
+ * This function is NMI-safe, in a manner similar to
+ * srcu_read_lock_nmisafe().
  */
 static inline int srcu_read_lock_atomic(struct srcu_struct *ssp)
 	__acquires_shared(ssp)
 {
-	int retval;
-
 	preempt_disable();
-	/*
-	 * Arm might_sleep() to catch even a *potentially* sleeping call
-	 * in the section, not just an actual schedule: the atomic-domain
-	 * promise must hold on every path, contended or not. In hardirq,
-	 * softirq, or NMI the annotation would land on the interrupted
-	 * task, and can also result in data races against that task's
-	 * own non_block_start()/non_block_end() invocations; it is also
-	 * redundant there, so skip it.
-	 */
-	if (in_task())
-		non_block_start();
-	srcu_check_read_flavor(ssp, SRCU_READ_FLAVOR_ATOMIC);
-	retval = __srcu_read_lock(ssp);
-	srcu_lock_acquire(&ssp->dep_map);
-	return retval;
+	return __srcu_read_lock_atomic(ssp);
 }
+
+/**
+ * srcu_read_lock_atomic_irqsave - register an atomic reader, interrupts off
+ * @ssp: srcu_struct in which to register the new reader.
+ * @flags: interrupt state to restore at srcu_read_unlock_atomic_irqrestore().
+ *
+ * As srcu_read_lock_atomic(), but with interrupts disabled for the
+ * duration instead of preemption.  Use it when synchronize_srcu_atomic()
+ * may be invoked with interrupts disabled for this srcu_struct: its
+ * readers must then disable interrupts too.
+ *
+ * Returns the index to pass to srcu_read_unlock_atomic_irqrestore().
+ */
+#define srcu_read_lock_atomic_irqsave(ssp, flags)			\
+({									\
+	local_irq_save(flags);						\
+	__srcu_read_lock_atomic((ssp));					\
+})
 
 /**
  * srcu_read_lock_fast - register a new reader for an SRCU-protected structure.
@@ -588,6 +626,21 @@ static inline void srcu_read_unlock(struct srcu_struct *ssp, int idx)
 	__srcu_read_unlock(ssp, idx);
 }
 
+/*
+ * Unregister an atomic-section reader.  The caller then enables preemption,
+ * or interrupts, again.
+ */
+static inline void __srcu_read_unlock_atomic(struct srcu_struct *ssp, int idx)
+	__releases_shared(ssp)
+{
+	WARN_ON_ONCE(idx & ~0x1);
+	srcu_check_read_flavor(ssp, SRCU_READ_FLAVOR_ATOMIC);
+	srcu_lock_release(&ssp->dep_map);
+	__srcu_read_unlock_nmisafe(ssp, idx);
+	if (in_task())
+		non_block_end();
+}
+
 /**
  * srcu_read_unlock_atomic - unregister an atomic-section reader
  * @ssp: srcu_struct from which to unregister the old reader.
@@ -596,14 +649,21 @@ static inline void srcu_read_unlock(struct srcu_struct *ssp, int idx)
 static inline void srcu_read_unlock_atomic(struct srcu_struct *ssp, int idx)
 	__releases_shared(ssp)
 {
-	WARN_ON_ONCE(idx & ~0x1);
-	srcu_check_read_flavor(ssp, SRCU_READ_FLAVOR_ATOMIC);
-	srcu_lock_release(&ssp->dep_map);
-	__srcu_read_unlock(ssp, idx);
-	if (in_task())
-		non_block_end();
+	__srcu_read_unlock_atomic(ssp, idx);
 	preempt_enable();
 }
+
+/**
+ * srcu_read_unlock_atomic_irqrestore - unregister an irqsave atomic reader
+ * @ssp: srcu_struct from which to unregister the old reader.
+ * @idx: return value from corresponding srcu_read_lock_atomic_irqsave().
+ * @flags: interrupt state saved by srcu_read_lock_atomic_irqsave().
+ */
+#define srcu_read_unlock_atomic_irqrestore(ssp, idx, flags)		\
+do {									\
+	__srcu_read_unlock_atomic((ssp), (idx));			\
+	local_irq_restore(flags);					\
+} while (0)
 
 /**
  * srcu_read_unlock_fast - unregister a old reader from an SRCU-protected structure.

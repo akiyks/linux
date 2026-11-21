@@ -497,6 +497,12 @@ static int scftorture_invoker(void *arg)
 
 	VERBOSE_SCFTORTOUT("scftorture_invoker %d: Waiting for all SCF torturers from cpu %d", scfp->cpu, raw_smp_processor_id());
 
+	// Make sure that the CPU is affinitized appropriately during testing.
+	curcpu = raw_smp_processor_id();
+	WARN_ONCE(curcpu != cpu,
+		  "%s: Wanted CPU %d, running on %d, nr_cpu_ids = %d, cpumask = %*pbl\n",
+		  __func__, scfp->cpu, curcpu, nr_cpu_ids, cpumask_pr_args(current->cpus_ptr));
+
 	if (atomic_dec_return(&n_started))
 		while (atomic_read_acquire(&n_started)) {
 			if (torture_must_stop()) {
