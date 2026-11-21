@@ -3,10 +3,6 @@
 Traducción al español
 =====================
 
-.. raw:: latex
-
-	\kerneldocCJKoff
-
 :maintainer: Carlos Bilbao <carlos.bilbao@kernel.org>
 
 .. _sp_disclaimer:
