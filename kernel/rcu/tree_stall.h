@@ -323,7 +323,6 @@ static int check_slow_task(struct task_struct *t, void *arg)
 	int cpu;
 	struct rcu_node *rnp;
 	struct rcu_stall_chk_rdr *rscrp = arg;
-	struct task_struct *th;
 
 	if (task_curr(t))
 		return -EBUSY; // It is running, so decline to inspect it.
