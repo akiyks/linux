@@ -268,6 +268,7 @@ void rcu_softirq_qs(void)
 			 "Illegal rcu_softirq_qs() in RCU read-side critical section");
 	rcu_qs();
 	rcu_preempt_deferred_qs(current);
+	rcu_momentary_eqs();
 	rcu_tasks_qs(current, false);
 }
 
@@ -2671,6 +2672,7 @@ static void rcu_do_batch(struct rcu_data *rdp)
 			lockdep_assert_irqs_enabled();
 			cond_resched_tasks_rcu_qs();
 			lockdep_assert_irqs_enabled();
+			rcu_momentary_eqs();
 			local_bh_disable();
 			// But rcuc kthreads can delay quiescent-state
 			// reporting, so check time limits for them.
