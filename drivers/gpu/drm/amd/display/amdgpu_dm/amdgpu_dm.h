@@ -490,14 +490,14 @@ struct amdgpu_display_manager {
 	struct mutex dc_lock;
 
 	/**
-	 * @sw_counter_lock
+	 * @sw_counter_lock:
 	 *
 	 * Guards sw_vblank counter.
 	 */
 	spinlock_t sw_counter_lock;
 
 	/**
-	 * @use_sw_vblank_counter
+	 * @use_sw_vblank_counter:
 	 *
 	 * use sw vblank counter instead of hw vblank counter. Can only be set
 	 * under dc_lock and sw_counter_lock.
