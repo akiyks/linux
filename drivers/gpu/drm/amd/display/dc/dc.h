@@ -2233,6 +2233,7 @@ struct dc_probe_latencies {
 /**
  * union dc_probe_outstanding_req - HUBP requests outstanding after an OTG window.
  *
+ * @bits:	Need proper description.
  * @bits.any:              a request is outstanding in HUBP.
  * @bits.data:             a data request is outstanding.
  * @bits.chunk_meta_trans: a chunk, meta or translation request is outstanding.
