@@ -43,6 +43,7 @@ fi
 configs_rcutorture=
 configs_locktorture=
 configs_scftorture=
+configs_hazptr=
 kcsan_kmake_args=
 
 # Default compression, duration, and apportionment.
@@ -70,6 +71,7 @@ do_rcutasksflavors="${ifnotaarch64}" # FIXME: Back to "yes" when SMP=n auto-avoi
 do_srcu_lockdep=yes
 do_atomic_srcu=yes
 do_rcu_rust=no
+do_hazptr=yes
 
 # doyesno - Helper function for yes/no arguments
 function doyesno () {
@@ -90,6 +92,7 @@ usage () {
 	echo "       --do-all"
 	echo "       --do-allmodconfig / --do-no-allmodconfig / --no-allmodconfig"
 	echo "       --do-clocksourcewd / --do-no-clocksourcewd / --no-clocksourcewd"
+	echo "       --do-hazptr / --do-no-hazptr / --no-hazptr"
 	echo "       --do-kasan / --do-no-kasan / --no-kasan"
 	echo "       --do-kcsan / --do-no-kcsan / --no-kcsan"
 	echo "       --do-kvfree / --do-no-kvfree / --no-kvfree"
@@ -117,6 +120,11 @@ do
 	--compress-concurrency)
 		checkarg --compress-concurrency "(concurrency level)" $# "$2" '^[0-9][0-9]*$' '^error'
 		compress_concurrency=$2
+		shift
+		;;
+	--config-hazptr|--configs-hazptr)
+		checkarg --configs-hazptr "(list of config files)" "$#" "$2" '^[^/]\+$' '^--'
+		configs_hazptr="$configs_hazptr $2"
 		shift
 		;;
 	--config-rcutorture|--configs-rcutorture)
@@ -149,6 +157,7 @@ do
 		do_kasan=yes
 		do_kcsan=yes
 		do_clocksourcewd="${ifnotaarch64}"
+		do_hazptr=yes
 		do_srcu_lockdep=yes
 		do_atomic_srcu=yes
 		;;
@@ -157,6 +166,9 @@ do
 		;;
 	--do-clocksourcewd|--do-no-clocksourcewd|--no-clocksourcewd)
 		do_clocksourcewd=`doyesno "$1" --do-clocksourcewd`
+		;;
+	--do-hazptr|--do-no-hazptr|--no-hazptr)
+		do_hazptr=`doyesno "$1" --do-hazptr`
 		;;
 	--do-kasan|--do-no-kasan|--no-kasan)
 		do_kasan=`doyesno "$1" --do-kasan`
@@ -185,6 +197,7 @@ do
 		do_kasan=no
 		do_kcsan=no
 		do_clocksourcewd=no
+		do_hazptr=no
 		do_srcu_lockdep=no
 		do_atomic_srcu=no
 		;;
@@ -492,8 +505,15 @@ fi
 # --torture rcu
 if test "$do_rcutorture" = "yes"
 then
-	torture_bootargs="rcupdate.rcu_cpu_stall_suppress_at_boot=1 torture.disable_onoff_at_boot rcupdate.rcu_task_stall_timeout=30000"
-	torture_set "rcutorture" tools/testing/selftests/rcutorture/bin/kvm.sh --allcpus --duration "$duration_rcutorture" --configs "$configs_rcutorture" --trust-make
+	qemu_args=
+	if test "$ifnotaarch64" = yes
+	then
+		qemu_args="-cpu host,pmu=on"
+	fi
+	torture_bootargs="rcupdate.rcu_cpu_stall_suppress_at_boot=1 torture.disable_onoff_at_boot rcupdate.rcu_task_stall_timeout=30000 rcutorture.nmi_calls=1 rcutorture.nmi_readers=1"
+	torture_set "rcutorture" tools/testing/selftests/rcutorture/bin/kvm.sh --allcpus \
+		--duration "$duration_rcutorture" --configs "$configs_rcutorture" \
+		${qemu_args:+--qemu-args "$qemu_args"} --trust-make
 fi
 
 # Test atomic SRCU across Tree SRCU (SRCU-N and SRCU-P) and Tiny SRCU
@@ -502,15 +522,24 @@ fi
 # does not support.
 if test "$do_atomic_srcu" = "yes"
 then
-	torture_bootargs="rcutorture.reader_flavor=0x10"
+	torture_bootargs="rcutorture.reader_flavor=0x10 rcutorture.atomic_irqsave=1 rcutorture.nmi_readers=1"
 	configs_atomic_srcu="SRCU-N SRCU-P"
 	if test "$ifnotaarch64" = yes
 	then
 		configs_atomic_srcu="$configs_atomic_srcu SRCU-T"
+		qemu_args="-cpu host,pmu=on"
+	else
+		qemu_args=
 	fi
 	torture_set "atomic-srcu" tools/testing/selftests/rcutorture/bin/kvm.sh \
 		--allcpus --duration "$duration_rcutorture" \
-		--configs "$configs_atomic_srcu" --trust-make
+		--configs "$configs_atomic_srcu" ${qemu_args:+--qemu-args "$qemu_args"} --trust-make
+
+	# Half the readers then use srcu_read_lock_atomic_irqsave().
+	torture_bootargs="rcutorture.reader_flavor=0x10 rcutorture.atomic_irqsave=1 rcutorture.nmi_readers=1"
+	torture_set "atomic-srcu-irqsave" tools/testing/selftests/rcutorture/bin/kvm.sh \
+		--allcpus --duration "$duration_rcutorture" \
+		--configs "SRCU-P" ${qemu_args:+--qemu-args "$qemu_args"} --trust-make
 fi
 
 if test "$do_locktorture" = "yes"
@@ -524,7 +553,7 @@ then
 	# Scale memory based on the number of CPUs.
 	scfmem=$((3+SCALE_ALLOTED_CPUS/16))
 	torture_bootargs="scftorture.nthreads=$SCALE_ALLOTED_CPUS torture.disable_onoff_at_boot csdlock_debug=1"
-	torture_set "scftorture" tools/testing/selftests/rcutorture/bin/kvm.sh --torture scf --allcpus --duration "$duration_scftorture" --configs "$configs_scftorture" --kconfig "CONFIG_NR_CPUS=$SCALE_ALLOTED_CPUS" --memory ${scfmem}G --trust-make
+	torture_set "scftorture" tools/testing/selftests/rcutorture/bin/kvm.sh --torture scf --allcpus --duration "$duration_scftorture" --configs "$configs_scftorture" --kconfig "CONFIG_NR_CPUS=$SCALE_ALLOTED_CPUS CONFIG_CSD_LOCK_WAIT_DEBUG=y" --memory ${scfmem}G --trust-make
 fi
 
 if test "$do_rt" = "yes"
@@ -718,6 +747,17 @@ then
 		torture_bootargs="rcupdate.rcu_cpu_stall_suppress_at_boot=1 torture.disable_onoff_at_boot rcupdate.rcu_task_stall_timeout=30000 tsc=watchdog"
 		torture_set "clocksourcewd-3" tools/testing/selftests/rcutorture/bin/kvm.sh --allcpus --duration 45s --configs TREE03 --trust-make
 	fi
+fi
+
+# Calculate hazptr defaults and apportion time
+if test -z "$configs_hazptr"
+then
+	configs_hazptr=CFLIST
+fi
+if test "$do_hazptr" = "yes"
+then
+	torture_bootargs=""
+	torture_set "hazptr" tools/testing/selftests/rcutorture/bin/kvm.sh --torture hazptr --allcpus --duration "$duration_rcutorture" --configs "$configs_hazptr" --trust-make
 fi
 
 echo " --- " $scriptname $args
