@@ -386,7 +386,7 @@ if html_theme in ["sphinx_rtd_theme", "sphinx_rtd_dark_mode"]:
     try:
         import sphinx_rtd_theme
 
-        html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+        extensions.append("sphinx_rtd_theme")
 
         # Add any paths that contain custom static files (such as style sheets) here,
         # relative to this directory. They are copied after the builtin static files,
@@ -400,7 +400,8 @@ if html_theme in ["sphinx_rtd_theme", "sphinx_rtd_dark_mode"]:
             try:
                 import sphinx_rtd_dark_mode            # pylint: disable=W0611
 
-                extensions.append("sphinx_rtd_dark_mode")
+                extensions.append('sphinx_rtd_dark_mode')
+                html_css_files.append('theme_rtd_dark_mode_colors.css')
             except ImportError:
                 html_theme = "sphinx_rtd_theme"
 
